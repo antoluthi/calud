@@ -1,0 +1,28 @@
+[
+    {
+        "nom": "Poutre Portable Pro",
+        "prix": "89.99 €",
+        "description": "Poutre de suspension portable professionnelle, idéale pour l'entraînement intensif. Construction robuste et compacte.",
+        "image": "",
+        "caracteristiques": [
+            "Poids max supporté: 150kg",
+            "Matériau: Bois de hêtre",
+            "Dimensions: 60cm x 15cm x 8cm",
+            "Système de suspension inclus",
+            "Portable et facile à installer"
+        ]
+    },
+    {
+        "nom": "Poutre Compact",
+        "prix": "59.99 €",
+        "description": "Version compacte parfaite pour les déplacements. Légère mais résistante, elle s'installe partout.",
+        "image": "",
+        "caracteristiques": [
+            "Poids max supporté: 120kg",
+            "Matériau: Bois composite",
+            "Dimensions: 45cm x 12cm x 6cm",
+            "Ultra-portable",
+            "Installation rapide"
+        ]
+    }
+]
