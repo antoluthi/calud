@@ -104,7 +104,7 @@ foreach ($produits as &$produit) {
                                     </td>
                                     <td><?= date('d/m/Y', strtotime($produit['created_at'])) ?></td>
                                     <td>
-                                        <button class="btn-icon" onclick='editProduct(<?= json_encode($produit) ?>)' title="Modifier">✏️</button>
+                                        <button class="btn-icon" onclick='editProduct(<?= htmlspecialchars(json_encode($produit), ENT_QUOTES) ?>)' title="Modifier">✏️</button>
                                         <button class="btn-icon" onclick="toggleProductStatus(<?= $produit['id'] ?>, <?= $produit['actif'] ? 'false' : 'true' ?>)" title="<?= $produit['actif'] ? 'Désactiver' : 'Activer' ?>">
                                             <?= $produit['actif'] ? '🔴' : '🟢' ?>
                                         </button>
