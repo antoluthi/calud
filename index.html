@@ -770,7 +770,7 @@
             </ul>
             <div class="nav-right">
                 <div id="user-section">
-                    <button id="login-btn" class="login-btn">
+                    <button id="login-btn" class="login-btn" style="display:none">
                         <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
                             <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.18L12.05 13.56c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.438 15.983 5.482 18 9.003 18z" fill="#34A853"/>
@@ -928,11 +928,47 @@
         let cart = [];
         let currentUser = null;
 
+        // Vérifier l'état de connexion au chargement
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('api/auth/status.php');
+                const data = await response.json();
+
+                const loginBtn = document.getElementById('login-btn');
+                const userProfile = document.getElementById('user-profile');
+                const userAvatar = document.getElementById('user-avatar');
+                const userName = document.getElementById('user-name');
+
+                if (data.authenticated && data.user) {
+                    // Utilisateur connecté
+                    currentUser = {
+                        name: data.user.name,
+                        email: data.user.email,
+                        avatar: data.user.picture
+                    };
+                    loginBtn.style.display = 'none';
+                    userProfile.style.display = 'flex';
+                    userAvatar.src = data.user.picture;
+                    userName.textContent = data.user.name;
+                } else {
+                    // Non connecté
+                    loginBtn.style.display = 'flex';
+                    userProfile.style.display = 'none';
+                    currentUser = null;
+                }
+
+                updateContactForm();
+            } catch (error) {
+                console.error('Erreur vérification auth:', error);
+                document.getElementById('login-btn').style.display = 'flex';
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             renderProducts();
             setupEventListeners();
-            updateContactForm();
+            checkAuthStatus();
         });
 
         // Render products
@@ -1086,29 +1122,23 @@
             closeCart.addEventListener('click', closeCartFunc);
             cartOverlay.addEventListener('click', closeCartFunc);
 
-            // Login (simulation)
+            // Login avec Google OAuth (VRAI)
             loginBtn.addEventListener('click', () => {
-                // Simulate Google login
-                currentUser = {
-                    name: 'Utilisateur Test',
-                    email: 'user@example.com',
-                    avatar: 'https://via.placeholder.com/36'
-                };
-                
-                loginBtn.style.display = 'none';
-                userProfile.style.display = 'flex';
-                document.getElementById('user-name').textContent = currentUser.name;
-                document.getElementById('user-avatar').src = currentUser.avatar;
-                
-                updateContactForm();
+                window.location.href = 'api/auth/login.php';
             });
 
-            // Logout
-            logoutBtn.addEventListener('click', () => {
-                currentUser = null;
-                loginBtn.style.display = 'flex';
-                userProfile.style.display = 'none';
-                updateContactForm();
+            // Logout (VRAI)
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    await fetch('api/auth/logout.php');
+                    currentUser = null;
+                    loginBtn.style.display = 'flex';
+                    userProfile.style.display = 'none';
+                    updateContactForm();
+                    location.reload();
+                } catch (error) {
+                    console.error('Erreur logout:', error);
+                }
             });
 
             // Checkout
