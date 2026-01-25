@@ -1,0 +1,188 @@
+<?php
+/**
+ * API Admin - Gestion des Produits
+ * CRUD complet pour les produits
+ */
+
+require_once '../config.php';
+
+// Vérifier que l'utilisateur est admin
+requireAdmin();
+
+$db = getDB();
+$method = $_SERVER['REQUEST_METHOD'];
+
+// GET - Récupérer les produits
+if ($method === 'GET') {
+    if (isset($_GET['id'])) {
+        // Récupérer un produit spécifique
+        $stmt = $db->prepare("SELECT * FROM produits WHERE id = ?");
+        $stmt->execute([$_GET['id']]);
+        $produit = $stmt->fetch();
+
+        if ($produit) {
+            // Décoder le JSON des caractéristiques
+            if ($produit['caracteristiques']) {
+                $produit['caracteristiques'] = json_decode($produit['caracteristiques']);
+            }
+            sendJSON($produit);
+        } else {
+            sendJSON(['error' => 'Produit non trouvé'], 404);
+        }
+    } else {
+        // Récupérer tous les produits
+        $stmt = $db->query("SELECT * FROM produits ORDER BY created_at DESC");
+        $produits = $stmt->fetchAll();
+
+        // Décoder le JSON pour chaque produit
+        foreach ($produits as &$produit) {
+            if ($produit['caracteristiques']) {
+                $produit['caracteristiques'] = json_decode($produit['caracteristiques']);
+            }
+        }
+
+        sendJSON($produits);
+    }
+}
+
+// POST - Créer un nouveau produit
+if ($method === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    // Validation
+    if (empty($data['nom']) || !isset($data['prix'])) {
+        sendJSON(['error' => 'Le nom et le prix sont requis'], 400);
+    }
+
+    // Préparer les caractéristiques (convertir en JSON)
+    $caracteristiques = isset($data['caracteristiques']) && is_array($data['caracteristiques'])
+        ? json_encode($data['caracteristiques'], JSON_UNESCAPED_UNICODE)
+        : '[]';
+
+    try {
+        $stmt = $db->prepare("
+            INSERT INTO produits (nom, prix, description, image, caracteristiques, actif)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+
+        $stmt->execute([
+            $data['nom'],
+            $data['prix'],
+            $data['description'] ?? '',
+            $data['image'] ?? '',
+            $caracteristiques,
+            isset($data['actif']) ? ($data['actif'] ? 1 : 0) : 1
+        ]);
+
+        $id = $db->lastInsertId();
+
+        sendJSON([
+            'success' => true,
+            'message' => 'Produit créé avec succès',
+            'id' => $id
+        ], 201);
+    } catch (PDOException $e) {
+        error_log("Erreur création produit: " . $e->getMessage());
+        sendJSON(['error' => 'Erreur lors de la création du produit'], 500);
+    }
+}
+
+// PUT - Mettre à jour un produit
+if ($method === 'PUT') {
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    // Validation
+    if (empty($data['id'])) {
+        sendJSON(['error' => 'ID du produit requis'], 400);
+    }
+
+    // Vérifier que le produit existe
+    $stmt = $db->prepare("SELECT id FROM produits WHERE id = ?");
+    $stmt->execute([$data['id']]);
+    if (!$stmt->fetch()) {
+        sendJSON(['error' => 'Produit non trouvé'], 404);
+    }
+
+    try {
+        // Construire la requête dynamiquement
+        $updates = [];
+        $params = [];
+
+        if (isset($data['nom'])) {
+            $updates[] = "nom = ?";
+            $params[] = $data['nom'];
+        }
+
+        if (isset($data['prix'])) {
+            $updates[] = "prix = ?";
+            $params[] = $data['prix'];
+        }
+
+        if (isset($data['description'])) {
+            $updates[] = "description = ?";
+            $params[] = $data['description'];
+        }
+
+        if (isset($data['image'])) {
+            $updates[] = "image = ?";
+            $params[] = $data['image'];
+        }
+
+        if (isset($data['caracteristiques'])) {
+            $updates[] = "caracteristiques = ?";
+            $carac = is_array($data['caracteristiques'])
+                ? json_encode($data['caracteristiques'], JSON_UNESCAPED_UNICODE)
+                : $data['caracteristiques'];
+            $params[] = $carac;
+        }
+
+        if (isset($data['actif'])) {
+            $updates[] = "actif = ?";
+            $params[] = $data['actif'] ? 1 : 0;
+        }
+
+        if (empty($updates)) {
+            sendJSON(['error' => 'Aucune donnée à mettre à jour'], 400);
+        }
+
+        $params[] = $data['id'];
+        $sql = "UPDATE produits SET " . implode(', ', $updates) . " WHERE id = ?";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        sendJSON([
+            'success' => true,
+            'message' => 'Produit mis à jour avec succès'
+        ]);
+    } catch (PDOException $e) {
+        error_log("Erreur mise à jour produit: " . $e->getMessage());
+        sendJSON(['error' => 'Erreur lors de la mise à jour du produit'], 500);
+    }
+}
+
+// DELETE - Supprimer un produit
+if ($method === 'DELETE') {
+    $id = $_GET['id'] ?? null;
+
+    if (!$id) {
+        sendJSON(['error' => 'ID du produit requis'], 400);
+    }
+
+    try {
+        $stmt = $db->prepare("DELETE FROM produits WHERE id = ?");
+        $stmt->execute([$id]);
+
+        if ($stmt->rowCount() > 0) {
+            sendJSON([
+                'success' => true,
+                'message' => 'Produit supprimé avec succès'
+            ]);
+        } else {
+            sendJSON(['error' => 'Produit non trouvé'], 404);
+        }
+    } catch (PDOException $e) {
+        error_log("Erreur suppression produit: " . $e->getMessage());
+        sendJSON(['error' => 'Erreur lors de la suppression du produit'], 500);
+    }
+}

@@ -76,7 +76,7 @@ function sendJSON($data, $statusCode = 200) {
 function getCurrentUser() {
     if (isset($_SESSION['user_id'])) {
         $db = getDB();
-        $stmt = $db->prepare("SELECT id, email, name, picture FROM users WHERE id = ?");
+        $stmt = $db->prepare("SELECT id, email, name, picture, is_admin FROM users WHERE id = ?");
         $stmt->execute([$_SESSION['user_id']]);
         return $stmt->fetch();
     }
@@ -87,5 +87,19 @@ function getCurrentUser() {
 function requireAuth() {
     if (!isset($_SESSION['user_id'])) {
         sendJSON(['error' => 'Non authentifié'], 401);
+    }
+}
+
+// Fonction pour vérifier si l'utilisateur est admin
+function isAdmin() {
+    $user = getCurrentUser();
+    return $user && isset($user['is_admin']) && $user['is_admin'] == 1;
+}
+
+// Fonction pour exiger les droits admin
+function requireAdmin() {
+    requireAuth();
+    if (!isAdmin()) {
+        sendJSON(['error' => 'Accès refusé: droits administrateur requis'], 403);
     }
 }
