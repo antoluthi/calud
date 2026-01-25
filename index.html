@@ -916,48 +916,8 @@
     </footer>
 
     <script>
-        // Products data
-        const products = [
-            {
-                id: 1,
-                name: "Poutre Basique",
-                price: 45,
-                description: "Poutre d'entraînement portable parfaite pour débuter",
-                features: [
-                    "Fabrication artisanale en bois",
-                    "Installation rapide (< 2 min)",
-                    "Poids max supporté: 120kg",
-                    "Compact et transportable"
-                ],
-                sizes: ["S (15mm)", "M (20mm)", "L (25mm)"]
-            },
-            {
-                id: 2,
-                name: "Poutre Pro",
-                price: 75,
-                description: "Poutre professionnelle avec prises variées",
-                features: [
-                    "Multiple types de prises",
-                    "Texture antidérapante",
-                    "Résistance renforcée",
-                    "Idéal entraînement intensif"
-                ],
-                sizes: ["S (15mm)", "M (20mm)", "L (25mm)", "XL (30mm)"]
-            },
-            {
-                id: 3,
-                name: "Kit Complet",
-                price: 120,
-                description: "Pack complet pour entraînement optimal",
-                features: [
-                    "2 poutres différentes",
-                    "Sangles de suspension incluses",
-                    "Guide d'entraînement",
-                    "Sac de transport premium"
-                ],
-                sizes: ["Pack S/M", "Pack M/L", "Pack L/XL"]
-            }
-        ];
+        // Products data (sera rempli par main.js depuis l'API)
+        let products = [];
 
         // State
         let cart = [];
@@ -1001,35 +961,10 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            renderProducts();
+            // renderProducts sera appelé par main.js après le chargement de l'API
             setupEventListeners();
             checkAuthStatus();
         });
-
-        // Render products
-        function renderProducts() {
-            const grid = document.getElementById('productsGrid');
-            grid.innerHTML = products.map(product => `
-                <div class="product-card">
-                    <div class="product-image"></div>
-                    <div class="product-info">
-                        <h3>${product.name}</h3>
-                        <div class="price">${product.price} €</div>
-                        <p>${product.description}</p>
-                        <ul class="product-features">
-                            ${product.features.map(f => `<li>${f}</li>`).join('')}
-                        </ul>
-                        <div class="size-selector">
-                            <label>Taille</label>
-                            <select id="size-${product.id}">
-                                ${product.sizes.map(size => `<option value="${size}">${size}</option>`).join('')}
-                            </select>
-                        </div>
-                        <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Add to Cart</button>
-                    </div>
-                </div>
-            `).join('');
-        }
 
         // Add to cart
         function addToCart(productId) {
@@ -1246,6 +1181,7 @@
             });
         }
     </script>
+    <script src="js/main.js"></script>
 </body>
 </html>
                 

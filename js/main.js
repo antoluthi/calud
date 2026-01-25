@@ -5,23 +5,29 @@ async function loadProducts() {
         const data = await response.json();
 
         if (data.success && data.produits) {
+            // Remplir la variable globale products pour le panier
+            window.products = data.produits;
             displayProducts(data.produits);
         } else {
             throw new Error('Erreur lors de la récupération des produits');
         }
     } catch (error) {
         console.error('Erreur lors du chargement des produits:', error);
-        document.getElementById('products-grid').innerHTML =
-            '<p style="color: var(--text-secondary); text-align: center;">Erreur lors du chargement des produits.</p>';
+        const grid = document.getElementById('productsGrid') || document.getElementById('products-grid');
+        if (grid) {
+            grid.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">Erreur lors du chargement des produits.</p>';
+        }
     }
 }
 
 // Affichage des produits dans la grille
-function displayProducts(products) {
-    const grid = document.getElementById('products-grid');
+function displayProducts(productsData) {
+    const grid = document.getElementById('productsGrid') || document.getElementById('products-grid');
+    if (!grid) return;
+
     grid.innerHTML = '';
 
-    products.forEach(product => {
+    productsData.forEach(product => {
         const card = createProductCard(product);
         grid.appendChild(card);
     });
@@ -47,8 +53,8 @@ function createProductCard(product) {
     // Size selector
     const sizesHTML = product.sizes && product.sizes.length > 0
         ? `<div class="size-selector">
-            <label for="size-${product.id}">Taille :</label>
-            <select id="size-${product.id}" class="size-select">
+            <label>Taille</label>
+            <select id="size-${product.id}">
                 ${product.sizes.map(size => `<option value="${size}">${size}</option>`).join('')}
             </select>
            </div>`
@@ -57,14 +63,15 @@ function createProductCard(product) {
     card.innerHTML = `
         ${product.image
             ? `<div class="product-image"><img src="${product.image}" alt="${product.name}"></div>`
-            : `<div class="product-image">🧗</div>`
+            : `<div class="product-image"></div>`
         }
         <div class="product-info">
             <h3>${product.name}</h3>
-            <p class="price">${product.price.toFixed(2)}€</p>
+            <div class="price">${product.price.toFixed(2)} €</div>
             <p>${product.description}</p>
             ${featuresHTML}
             ${sizesHTML}
+            <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Ajouter au panier</button>
         </div>
     `;
 
