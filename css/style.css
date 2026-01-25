@@ -5,8 +5,8 @@
     --bg-card: #222222;
     --text-primary: #ffffff;
     --text-secondary: #b0b0b0;
-    --accent: #00d4ff;
-    --accent-hover: #00b8e6;
+    --accent: #e75480;       /* new pink */ 
+    --accent-hover: #d63f6d; /* new pink hover */
     --border-color: #333333;
 }
 
