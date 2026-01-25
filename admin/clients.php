@@ -51,6 +51,8 @@ $clients = $clientsQuery->fetchAll();
                     <li><a href="index.php"><span class="icon">📊</span> Dashboard</a></li>
                     <li><a href="produits.php"><span class="icon">📦</span> Produits</a></li>
                     <li><a href="commandes.php"><span class="icon">🛒</span> Commandes</a></li>
+                    <li><a href="messages.php"><span class="icon">✉️</span> Messages</a></li>
+                    <li><a href="newsletter.php"><span class="icon">📧</span> Newsletter</a></li>
                     <li><a href="clients.php" class="active"><span class="icon">👥</span> Clients</a></li>
                     <li><a href="../index.html"><span class="icon">🏠</span> Retour au site</a></li>
                     <li><a href="../api/auth/logout.php"><span class="icon">🚪</span> Déconnexion</a></li>
@@ -118,6 +120,7 @@ $clients = $clientsQuery->fetchAll();
                                 <th>Dernière connexion</th>
                                 <th>Commandes</th>
                                 <th>Total dépensé</th>
+                                <th>Newsletter</th>
                                 <th>Rôle</th>
                                 <th>Actions</th>
                             </tr>
@@ -150,6 +153,13 @@ $clients = $clientsQuery->fetchAll();
                                         <?php endif; ?>
                                     </td>
                                     <td style="font-weight: 600;"><?= number_format($client['total_depense'], 2, ',', ' ') ?> €</td>
+                                    <td style="text-align: center;">
+                                        <?php if (isset($client['newsletter_subscribed']) && $client['newsletter_subscribed']): ?>
+                                            <span class="badge badge-success">📧 Abonné</span>
+                                        <?php else: ?>
+                                            <span style="color: var(--text-secondary);">-</span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td>
                                         <?php if ($client['is_admin']): ?>
                                             <span class="badge badge-warning">👑 Admin</span>

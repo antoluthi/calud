@@ -713,7 +713,7 @@
         /* ========== Contact Section ========== */
         .contact {
             padding: 5rem 0;
-            background-color: var(--bg-secondary);
+            background-color: var(--bg-primary);
         }
 
         .contact h2 {
@@ -1214,9 +1214,6 @@
             const closeCart = document.getElementById('closeCart');
             const checkoutBtn = document.getElementById('checkoutBtn');
             const contactForm = document.getElementById('contactForm');
-            const loginBtn = document.getElementById('login-btn');
-            const logoutBtn = document.getElementById('logout-btn');
-            const userProfile = document.getElementById('user-profile');
 
             // Open cart
             cartIcon.addEventListener('click', () => {
@@ -1232,25 +1229,6 @@
 
             closeCart.addEventListener('click', closeCartFunc);
             cartOverlay.addEventListener('click', closeCartFunc);
-
-            // Login avec Google OAuth (VRAI)
-            loginBtn.addEventListener('click', () => {
-                window.location.href = 'api/auth/login.php';
-            });
-
-            // Logout (VRAI)
-            logoutBtn.addEventListener('click', async () => {
-                try {
-                    await fetch('api/auth/logout.php');
-                    window.currentUser = null;
-                    loginBtn.style.display = 'flex';
-                    userProfile.style.display = 'none';
-                    window.updateContactForm();
-                    location.reload();
-                } catch (error) {
-                    console.error('Erreur logout:', error);
-                }
-            });
 
             // Checkout
             checkoutBtn.addEventListener('click', async () => {
@@ -1281,13 +1259,14 @@
             });
 
             // Contact form
-            contactForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
+            if (contactForm) {
+                contactForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
 
-                if (!window.currentUser) {
-                    alert('Veuillez vous connecter pour envoyer un message');
-                    return;
-                }
+                    if (!window.currentUser) {
+                        alert('Veuillez vous connecter pour envoyer un message');
+                        return;
+                    }
 
                 const formMessage = document.getElementById('formMessage');
                 const message = document.getElementById('message').value;
@@ -1310,7 +1289,7 @@
                     const result = await response.json();
 
                     if (response.ok && result.success) {
-                        formMessage.textContent = 'Message envoyé avec succès ! Nous vous répondrons rapidement.';
+                        formMessage.textContent = 'Message envoyé avec succès ! Nous vous répondrons rapidement par email.';
                         formMessage.className = 'form-message success';
                         formMessage.style.display = 'block';
 
@@ -1329,7 +1308,8 @@
                     formMessage.style.display = 'block';
                     console.error('Error saving message:', error);
                 }
-            });
+                });
+            }
 
             // Character counter for message textarea
             const messageTextarea = document.getElementById('message');

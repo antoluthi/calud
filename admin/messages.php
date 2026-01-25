@@ -38,6 +38,7 @@ $user = getCurrentUser();
                     <li><a href="produits.php"><span class="icon">📦</span> Produits</a></li>
                     <li><a href="commandes.php"><span class="icon">🛒</span> Commandes</a></li>
                     <li><a href="messages.php" class="active"><span class="icon">✉️</span> Messages</a></li>
+                    <li><a href="newsletter.php"><span class="icon">📧</span> Newsletter</a></li>
                     <li><a href="clients.php"><span class="icon">👥</span> Clients</a></li>
                     <li><a href="../index.html"><span class="icon">🏠</span> Retour au site</a></li>
                     <li><a href="../api/auth/logout.php"><span class="icon">🚪</span> Déconnexion</a></li>
