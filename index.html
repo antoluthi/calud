@@ -60,6 +60,15 @@
             font-weight: 700;
             color: var(--accent);
             letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .logo:hover {
+            transform: scale(1.05) rotate(-2deg);
+            text-shadow: 0 0 20px rgba(231, 84, 128, 0.5);
         }
 
         .nav-links {
@@ -461,6 +470,23 @@
             margin-bottom: 1rem;
         }
 
+        .highlight-text {
+            color: var(--accent);
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
         /* ========== Products Section ========== */
         .products {
             padding: 5rem 0;
@@ -797,7 +823,7 @@
     <!-- Header -->
     <header>
         <nav class="container">
-            <div class="logo">AL</div>
+            <a href="#accueil" class="logo">AL</a>
             <ul class="nav-links">
                 <li><a href="#accueil">Accueil</a></li>
                 <li><a href="#produits">Articles</a></li>
@@ -864,8 +890,8 @@
             <div class="mission-content">
                 <h2>Mon but ?</h2>
                 <p>L'optimisation de l'entraînement et la réduction des blessures.</p>
-                <p>Je veux rendre les outils d'entraînement plus accessibles et plus simples d'utilisation pour TOUT LE MONDE.</p>
-                <p>Peut importe la morphologie et le niveau, tout le monde devrait avoir accès aux bons outils d'entraînement afin de prévenir des blessures, et de progresser plus vite.</p>
+                <p>Je veux rendre les outils d'entraînement plus accessibles et plus simples d'utilisation pour <span class="highlight-text">tout le monde</span>.</p>
+                <p>Peu importe la morphologie et le niveau, chacun devrait avoir accès aux bons outils d'entraînement afin de prévenir les blessures et de progresser plus vite.</p>
             </div>
         </div>
     </section>
@@ -899,7 +925,10 @@
                 <form id="contactForm" style="display:none">
                     <div class="form-group">
                         <label for="message">Votre message</label>
-                        <textarea id="message" name="message" required placeholder="Écrivez votre message ici..."></textarea>
+                        <textarea id="message" name="message" required maxlength="1000" placeholder="Écrivez votre message ici..."></textarea>
+                        <div style="text-align: right; color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
+                            <span id="charCount">0</span> / 1000 caractères
+                        </div>
                     </div>
                     <button type="submit" class="submit-btn">Send</button>
                     <div class="form-message" id="formMessage"></div>
@@ -1152,26 +1181,36 @@
                 const message = document.getElementById('message').value;
 
                 const messageData = {
-                    date: new Date().toISOString(),
                     userName: currentUser.name,
                     userEmail: currentUser.email,
-                    message: message,
-                    read: false
+                    message: message
                 };
 
                 try {
-                    const messageId = `message_${Date.now()}`;
-                    await window.storage.set(messageId, JSON.stringify(messageData));
-                    
-                    formMessage.textContent = 'Message envoyé avec succès ! Nous vous répondrons rapidement.';
-                    formMessage.className = 'form-message success';
-                    formMessage.style.display = 'block';
-                    
-                    contactForm.reset();
-                    
-                    setTimeout(() => {
-                        formMessage.style.display = 'none';
-                    }, 5000);
+                    const response = await fetch('api/messages.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(messageData)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        formMessage.textContent = 'Message envoyé avec succès ! Nous vous répondrons rapidement.';
+                        formMessage.className = 'form-message success';
+                        formMessage.style.display = 'block';
+
+                        contactForm.reset();
+                        document.getElementById('charCount').textContent = '0';
+
+                        setTimeout(() => {
+                            formMessage.style.display = 'none';
+                        }, 5000);
+                    } else {
+                        throw new Error(result.error || 'Erreur lors de l\'envoi');
+                    }
                 } catch (error) {
                     formMessage.textContent = 'Erreur lors de l\'envoi du message. Veuillez réessayer.';
                     formMessage.className = 'form-message error';
@@ -1179,6 +1218,15 @@
                     console.error('Error saving message:', error);
                 }
             });
+
+            // Character counter for message textarea
+            const messageTextarea = document.getElementById('message');
+            const charCount = document.getElementById('charCount');
+            if (messageTextarea && charCount) {
+                messageTextarea.addEventListener('input', () => {
+                    charCount.textContent = messageTextarea.value.length;
+                });
+            }
         }
     </script>
     <script src="js/main.js"></script>
