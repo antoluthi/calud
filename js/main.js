@@ -1,9 +1,14 @@
 // Chargement et affichage des produits
 async function loadProducts() {
     try {
-        const response = await fetch('data/produits.json');
-        const products = await response.json();
-        displayProducts(products);
+        const response = await fetch('api/produits.php');
+        const data = await response.json();
+
+        if (data.success && data.produits) {
+            displayProducts(data.produits);
+        } else {
+            throw new Error('Erreur lors de la récupération des produits');
+        }
     } catch (error) {
         console.error('Erreur lors du chargement des produits:', error);
         document.getElementById('products-grid').innerHTML =
@@ -29,24 +34,24 @@ function createProductCard(product) {
 
     // Image (ou placeholder si pas d'image)
     const imageHTML = product.image
-        ? `<img src="${product.image}" alt="${product.nom}">`
+        ? `<img src="${product.image}" alt="${product.name}">`
         : `<div class="product-image">🧗</div>`;
 
     // Features list
-    const featuresHTML = product.caracteristiques
+    const featuresHTML = product.features && product.features.length > 0
         ? `<ul class="product-features">
-            ${product.caracteristiques.map(feature => `<li>${feature}</li>`).join('')}
+            ${product.features.map(feature => `<li>${feature}</li>`).join('')}
            </ul>`
         : '';
 
     card.innerHTML = `
         ${product.image
-            ? `<div class="product-image"><img src="${product.image}" alt="${product.nom}"></div>`
+            ? `<div class="product-image"><img src="${product.image}" alt="${product.name}"></div>`
             : `<div class="product-image">🧗</div>`
         }
         <div class="product-info">
-            <h3>${product.nom}</h3>
-            <p class="price">${product.prix}</p>
+            <h3>${product.name}</h3>
+            <p class="price">${product.price.toFixed(2)}€</p>
             <p>${product.description}</p>
             ${featuresHTML}
         </div>
