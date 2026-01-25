@@ -58,6 +58,7 @@ $dernieresCommandes = $commandesQuery->fetchAll();
                     <li><a href="index.php" class="active"><span class="icon">📊</span> Dashboard</a></li>
                     <li><a href="produits.php"><span class="icon">📦</span> Produits</a></li>
                     <li><a href="commandes.php"><span class="icon">🛒</span> Commandes</a></li>
+                    <li><a href="clients.php"><span class="icon">👥</span> Clients</a></li>
                     <li><a href="../index.html"><span class="icon">🏠</span> Retour au site</a></li>
                     <li><a href="../api/auth/logout.php"><span class="icon">🚪</span> Déconnexion</a></li>
                 </ul>
