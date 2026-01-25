@@ -96,81 +96,116 @@
         }
 
         #user-section {
+            position: relative;
             display: flex;
             align-items: center;
         }
 
-        .login-btn {
+        .profile-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-color);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.7rem 1.2rem;
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            font-weight: 500;
+            justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
         }
 
-        .login-btn:hover {
-            background-color: var(--accent);
+        .profile-icon:hover {
             border-color: var(--accent);
-            color: var(--bg-primary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(231, 84, 128, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(231, 84, 128, 0.3);
         }
 
-        .login-btn svg {
-            width: 18px;
-            height: 18px;
+        .profile-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
         }
 
-        #user-profile {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 0.5rem 1rem;
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
-        .user-avatar {
-            width: 36px;
-            height: 36px;
+        .profile-icon img {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            border: 2px solid var(--accent);
             object-fit: cover;
         }
 
-        .user-name {
-            color: var(--text-primary);
-            font-weight: 500;
-            font-size: 0.95rem;
-            max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .logout-btn {
-            padding: 0.5rem 1rem;
-            background-color: transparent;
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background-color: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            padding: 0.5rem;
+            min-width: 220px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 1000;
         }
 
-        .logout-btn:hover {
-            background-color: var(--accent);
-            border-color: var(--accent);
-            color: var(--bg-primary);
+        .profile-dropdown.active {
+            display: block;
+        }
+
+        .profile-dropdown-header {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .profile-dropdown-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+        }
+
+        .profile-dropdown-info {
+            flex: 1;
+        }
+
+        .profile-dropdown-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .profile-dropdown-email {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .profile-dropdown-item {
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            text-align: left;
+        }
+
+        .profile-dropdown-item:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .profile-dropdown-item svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-secondary);
         }
 
         /* ========== Cart Icon ========== */
@@ -447,19 +482,24 @@
 
         /* ========== Mission Section ========== */
         .mission {
-            padding: 4rem 0;
-            background-color: var(--bg-secondary);
+            padding: 5rem 0;
+            background-color: var(--bg-primary);
         }
 
         .mission-content {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             text-align: center;
+            background-color: var(--bg-secondary);
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
         .mission h2 {
             color: var(--accent);
-            font-size: 2rem;
+            font-size: 2.2rem;
             margin-bottom: 1.5rem;
         }
 
@@ -773,14 +813,111 @@
 
         /* ========== Footer ========== */
         footer {
-            background-color: var(--bg-primary);
+            background-color: var(--bg-secondary);
             border-top: 1px solid var(--border-color);
-            padding: 2rem 0;
+            padding: 3rem 0 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(231, 84, 128, 0.1);
+        }
+
+        .newsletter-btn {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-primary);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .newsletter-btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231, 84, 128, 0.4);
+        }
+
+        .newsletter-message {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .newsletter-message.success {
+            background-color: rgba(52, 168, 83, 0.2);
+            color: #34a853;
+            border: 1px solid #34a853;
+        }
+
+        .newsletter-message.error {
+            background-color: rgba(231, 84, 128, 0.2);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
             text-align: center;
         }
 
-        footer p {
+        .footer-bottom p {
             color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
         }
 
         /* ========== Responsive ========== */
@@ -831,19 +968,14 @@
             </ul>
             <div class="nav-right">
                 <div id="user-section">
-                    <button id="login-btn" class="login-btn" style="display:none">
-                        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
-                            <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.18L12.05 13.56c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.438 15.983 5.482 18 9.003 18z" fill="#34A853"/>
-                            <path d="M3.964 10.712c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.96H.957C.347 6.175 0 7.55 0 9.002c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-                            <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.428 0 9.002 0 5.48 0 2.438 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
+                    <div class="profile-icon" id="profileIcon">
+                        <svg id="profileIconDefault" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
                         </svg>
-                        Se connecter avec Google
-                    </button>
-                    <div id="user-profile" style="display:none">
-                        <img id="user-avatar" class="user-avatar" alt="Avatar" />
-                        <span id="user-name" class="user-name"></span>
-                        <button id="logout-btn" class="logout-btn">Déconnexion</button>
+                        <img id="profileIconAvatar" style="display:none;" alt="Avatar" />
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <!-- Contenu injecté dynamiquement -->
                     </div>
                 </div>
                 <div class="cart-icon" id="cartIcon">
@@ -879,7 +1011,7 @@
     <!-- Hero Section -->
     <section id="accueil" class="hero">
         <div class="container">
-            <h1>Équipement d'Escalade Portable</h1>
+            <h1>The Climbing Shop</h1>
             <p class="hero-subtitle">Des outils de grimpe pour les grimpeurs, par les grimpeurs</p>
         </div>
     </section>
@@ -940,7 +1072,24 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>&copy; 2026 Antonin Lüthi - Tous droits réservés</p>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>À propos</h3>
+                    <p>The Climbing Shop propose des équipements d'escalade de qualité pour tous les niveaux. Notre mission est de rendre l'entraînement accessible à tous les grimpeurs.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Newsletter</h3>
+                    <p>Restez informé des nouveaux produits et promotions</p>
+                    <form class="newsletter-form" id="newsletterForm">
+                        <input type="email" class="newsletter-input" placeholder="Votre email" required id="newsletterEmail">
+                        <button type="submit" class="newsletter-btn">S'abonner</button>
+                    </form>
+                    <div class="newsletter-message" id="newsletterMessage"></div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Antonin Lüthi - Tous droits réservés</p>
+            </div>
         </div>
     </footer>
 
@@ -1188,6 +1337,68 @@
             if (messageTextarea && charCount) {
                 messageTextarea.addEventListener('input', () => {
                     charCount.textContent = messageTextarea.value.length;
+                });
+            }
+
+            // Newsletter form
+            const newsletterForm = document.getElementById('newsletterForm');
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const emailInput = document.getElementById('newsletterEmail');
+                    const messageDiv = document.getElementById('newsletterMessage');
+                    const submitBtn = newsletterForm.querySelector('.newsletter-btn');
+
+                    const email = emailInput.value.trim();
+
+                    if (!email) {
+                        messageDiv.textContent = 'Veuillez entrer votre email';
+                        messageDiv.className = 'newsletter-message error';
+                        messageDiv.style.display = 'block';
+                        return;
+                    }
+
+                    // Désactiver le bouton pendant l'envoi
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Envoi...';
+
+                    try {
+                        const response = await fetch('api/newsletter.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ email })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            messageDiv.textContent = result.message;
+                            messageDiv.className = 'newsletter-message success';
+                            messageDiv.style.display = 'block';
+                            newsletterForm.reset();
+                        } else {
+                            messageDiv.textContent = result.message || 'Erreur lors de l\'inscription';
+                            messageDiv.className = 'newsletter-message error';
+                            messageDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        messageDiv.textContent = 'Erreur de connexion au serveur';
+                        messageDiv.className = 'newsletter-message error';
+                        messageDiv.style.display = 'block';
+                        console.error('Error:', error);
+                    } finally {
+                        // Réactiver le bouton
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'S\'abonner';
+
+                        // Masquer le message après 5 secondes
+                        setTimeout(() => {
+                            messageDiv.style.display = 'none';
+                        }, 5000);
+                    }
                 });
             }
         }

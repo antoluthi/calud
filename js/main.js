@@ -84,17 +84,32 @@ async function checkAuthStatus() {
         const response = await fetch('api/auth/status.php');
         const data = await response.json();
 
-        const loginBtn = document.getElementById('login-btn');
-        const userProfile = document.getElementById('user-profile');
-        const userAvatar = document.getElementById('user-avatar');
-        const userName = document.getElementById('user-name');
+        const profileIconDefault = document.getElementById('profileIconDefault');
+        const profileIconAvatar = document.getElementById('profileIconAvatar');
+        const profileDropdown = document.getElementById('profileDropdown');
 
         if (data.authenticated && data.user) {
-            // Utilisateur connecté - afficher le profil
-            loginBtn.style.display = 'none';
-            userProfile.style.display = 'flex';
-            userAvatar.src = data.user.picture;
-            userName.textContent = data.user.name;
+            // Utilisateur connecté - afficher l'avatar
+            profileIconDefault.style.display = 'none';
+            profileIconAvatar.style.display = 'block';
+            profileIconAvatar.src = data.user.picture;
+
+            // Contenu du dropdown pour utilisateur connecté
+            profileDropdown.innerHTML = `
+                <div class="profile-dropdown-header">
+                    <img src="${data.user.picture}" alt="Avatar" class="profile-dropdown-avatar">
+                    <div class="profile-dropdown-info">
+                        <div class="profile-dropdown-name">${data.user.name}</div>
+                        <div class="profile-dropdown-email">${data.user.email}</div>
+                    </div>
+                </div>
+                <button class="profile-dropdown-item" onclick="handleLogout()">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                    </svg>
+                    Déconnexion
+                </button>
+            `;
 
             // Mettre à jour currentUser pour le reste de l'app (panier, contact)
             if (typeof window.currentUser !== 'undefined') {
@@ -110,9 +125,22 @@ async function checkAuthStatus() {
                 window.updateContactForm();
             }
         } else {
-            // Utilisateur non connecté - afficher le bouton de connexion
-            loginBtn.style.display = 'flex';
-            userProfile.style.display = 'none';
+            // Utilisateur non connecté - afficher l'icône par défaut
+            profileIconDefault.style.display = 'block';
+            profileIconAvatar.style.display = 'none';
+
+            // Contenu du dropdown pour utilisateur non connecté
+            profileDropdown.innerHTML = `
+                <button class="profile-dropdown-item" onclick="handleLogin()">
+                    <svg width="20" height="20" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                        <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.18L12.05 13.56c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.438 15.983 5.482 18 9.003 18z" fill="#34A853"/>
+                        <path d="M3.964 10.712c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.96H.957C.347 6.175 0 7.55 0 9.002c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                        <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.428 0 9.002 0 5.48 0 2.438 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
+                    </svg>
+                    Se connecter avec Google
+                </button>
+            `;
 
             if (typeof window.currentUser !== 'undefined') {
                 window.currentUser = null;
@@ -124,8 +152,6 @@ async function checkAuthStatus() {
         }
     } catch (error) {
         console.error('Erreur lors de la vérification de l\'authentification:', error);
-        // En cas d'erreur, afficher le bouton de connexion
-        document.getElementById('login-btn').style.display = 'flex';
         if (typeof window.currentUser !== 'undefined') {
             window.currentUser = null;
         }
@@ -152,6 +178,22 @@ async function handleLogout() {
     }
 }
 
+// Toggle profile dropdown
+function toggleProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    dropdown.classList.toggle('active');
+}
+
+// Fermer le dropdown si on clique ailleurs
+document.addEventListener('click', (e) => {
+    const profileIcon = document.getElementById('profileIcon');
+    const dropdown = document.getElementById('profileDropdown');
+
+    if (profileIcon && !profileIcon.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('active');
+    }
+});
+
 // Smooth scroll pour la navigation
 document.addEventListener('DOMContentLoaded', () => {
     // Charger les produits
@@ -160,16 +202,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Vérifier l'état d'authentification
     checkAuthStatus();
 
-    // Event listeners pour les boutons d'authentification
-    const loginBtn = document.getElementById('login-btn');
-    const logoutBtn = document.getElementById('logout-btn');
-
-    if (loginBtn) {
-        loginBtn.addEventListener('click', handleLogin);
-    }
-
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', handleLogout);
+    // Event listener pour l'icône de profil
+    const profileIcon = document.getElementById('profileIcon');
+    if (profileIcon) {
+        profileIcon.addEventListener('click', toggleProfileDropdown);
     }
 
     // Smooth scroll pour les liens de navigation
