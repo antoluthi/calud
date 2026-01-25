@@ -13,25 +13,33 @@ function openProductModal() {
 
 // Ouvrir la modal pour éditer un produit
 function editProduct(produit) {
-    document.getElementById('modalTitle').textContent = 'Modifier le Produit';
-    document.getElementById('submitBtnText').textContent = 'Enregistrer';
+    console.log('editProduct appelé avec:', produit);
+    try {
+        document.getElementById('modalTitle').textContent = 'Modifier le Produit';
+        document.getElementById('submitBtnText').textContent = 'Enregistrer';
 
-    document.getElementById('productId').value = produit.id;
-    document.getElementById('nom').value = produit.nom;
-    document.getElementById('prix').value = produit.prix;
-    document.getElementById('description').value = produit.description || '';
-    document.getElementById('image').value = produit.image || '';
+        document.getElementById('productId').value = produit.id;
+        document.getElementById('nom').value = produit.nom;
+        document.getElementById('prix').value = produit.prix;
+        document.getElementById('description').value = produit.description || '';
+        document.getElementById('image').value = produit.image || '';
 
-    // Convertir JSON array en texte multiligne
-    if (produit.caracteristiques) {
-        const carac = typeof produit.caracteristiques === 'string'
-            ? JSON.parse(produit.caracteristiques)
-            : produit.caracteristiques;
-        document.getElementById('caracteristiques').value = carac.join('\n');
+        // Convertir JSON array en texte multiligne
+        if (produit.caracteristiques) {
+            const carac = typeof produit.caracteristiques === 'string'
+                ? JSON.parse(produit.caracteristiques)
+                : produit.caracteristiques;
+            document.getElementById('caracteristiques').value = carac.join('\n');
+        } else {
+            document.getElementById('caracteristiques').value = '';
+        }
+
+        document.getElementById('actif').checked = produit.actif == 1;
+        document.getElementById('productModal').classList.add('active');
+    } catch (error) {
+        console.error('Erreur lors de l\'édition du produit:', error);
+        showAlert('Erreur lors du chargement du produit', 'error');
     }
-
-    document.getElementById('actif').checked = produit.actif == 1;
-    document.getElementById('productModal').classList.add('active');
 }
 
 // Fermer la modal

@@ -21,6 +21,13 @@ $produitsQuery = $db->query("
     ORDER BY created_at DESC
 ");
 $produits = $produitsQuery->fetchAll();
+
+// Décoder le JSON des caractéristiques pour chaque produit
+foreach ($produits as &$produit) {
+    if ($produit['caracteristiques']) {
+        $produit['caracteristiques'] = json_decode($produit['caracteristiques']);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
