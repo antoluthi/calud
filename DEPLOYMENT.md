@@ -19,10 +19,36 @@ Pour que le workflow fonctionne, vous devez configurer les secrets suivants dans
 | Nom du Secret | Description | Exemple |
 |--------------|-------------|---------|
 | `SFTP_USERNAME` | Votre nom d'utilisateur SFTP (celui que vous utilisez dans Filezilla) | `mon_username` |
-| `SFTP_PASSWORD` | Votre mot de passe SFTP | `mon_mot_de_passe` |
+| `SSH_PRIVATE_KEY` | Votre clé privée SSH (voir section "Génération clé SSH" ci-dessous) | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
 | `SFTP_SERVER` | L'adresse de votre serveur SFTP | `ftp.monserveur.com` ou `192.168.1.100` |
 | `SFTP_PORT` | Le port SFTP (généralement 22) | `22` |
 | `SFTP_REMOTE_PATH` | Le chemin sur votre serveur où déployer les fichiers | `/var/www/html` ou `/home/user/public_html` |
+
+### Génération de la clé SSH (Plus sécurisé que le mot de passe)
+
+1. Sur votre ordinateur local, générez une paire de clés SSH:
+```bash
+ssh-keygen -t ed25519 -C "github-deploy" -f ~/.ssh/github_deploy
+```
+Appuyez sur Entrée pour le passphrase (laissez vide).
+
+2. Copiez la clé **publique** sur votre serveur:
+```bash
+# Option A: Automatiquement
+ssh-copy-id -i ~/.ssh/github_deploy.pub votre_user@votre-serveur.com
+
+# Option B: Manuellement - ajoutez le contenu de la clé publique à ~/.ssh/authorized_keys sur le serveur
+cat ~/.ssh/github_deploy.pub
+# Puis collez ce contenu dans ~/.ssh/authorized_keys sur votre serveur
+```
+
+3. Récupérez la clé **privée** pour le secret GitHub:
+```bash
+cat ~/.ssh/github_deploy
+```
+Copiez **tout le contenu** (y compris `-----BEGIN OPENSSH PRIVATE KEY-----` et `-----END OPENSSH PRIVATE KEY-----`)
+
+4. Ajoutez ce contenu comme secret `SSH_PRIVATE_KEY` dans GitHub
 
 ## Comment ça fonctionne?
 
@@ -75,13 +101,11 @@ git push origin main
 
 ## Sécurité
 
-- ✅ Les mots de passe sont stockés de manière sécurisée dans GitHub Secrets
-- ✅ Ils ne sont jamais visibles dans les logs ou le code
+- ✅ Utilise l'authentification SSH (plus sécurisée qu'un mot de passe)
+- ✅ La clé privée est stockée de manière sécurisée dans GitHub Secrets
+- ✅ Les secrets ne sont jamais visibles dans les logs ou le code
 - ✅ Seuls les propriétaires du repository peuvent les voir/modifier
-
-## Alternative: Déploiement par clé SSH
-
-Pour plus de sécurité, vous pouvez utiliser une clé SSH au lieu d'un mot de passe. Si vous souhaitez cette option, je peux modifier le workflow pour utiliser `ssh_private_key` au lieu de `password`.
+- ✅ La clé SSH peut être révoquée facilement si compromise
 
 ## Problèmes courants
 

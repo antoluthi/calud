@@ -21,7 +21,7 @@ jobs:
           username: ${{ secrets.SFTP_USERNAME }}
           server: ${{ secrets.SFTP_SERVER }}
           port: ${{ secrets.SFTP_PORT }}
-          password: ${{ secrets.SFTP_PASSWORD }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           local_path: './*'  # Tous les fichiers du repo
           remote_path: ${{ secrets.SFTP_REMOTE_PATH }}  # Chemin sur le serveur (ex: /var/www/html)
           sftp_only: true
