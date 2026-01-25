@@ -95,15 +95,40 @@ async function checkAuthStatus() {
             userProfile.style.display = 'flex';
             userAvatar.src = data.user.picture;
             userName.textContent = data.user.name;
+
+            // Mettre à jour currentUser pour le reste de l'app (panier, contact)
+            if (typeof window.currentUser !== 'undefined') {
+                window.currentUser = {
+                    name: data.user.name,
+                    email: data.user.email,
+                    avatar: data.user.picture
+                };
+            }
+
+            // Mettre à jour le formulaire de contact
+            if (typeof window.updateContactForm === 'function') {
+                window.updateContactForm();
+            }
         } else {
             // Utilisateur non connecté - afficher le bouton de connexion
             loginBtn.style.display = 'flex';
             userProfile.style.display = 'none';
+
+            if (typeof window.currentUser !== 'undefined') {
+                window.currentUser = null;
+            }
+
+            if (typeof window.updateContactForm === 'function') {
+                window.updateContactForm();
+            }
         }
     } catch (error) {
         console.error('Erreur lors de la vérification de l\'authentification:', error);
         // En cas d'erreur, afficher le bouton de connexion
         document.getElementById('login-btn').style.display = 'flex';
+        if (typeof window.currentUser !== 'undefined') {
+            window.currentUser = null;
+        }
     }
 }
 
