@@ -79,6 +79,91 @@
             color: var(--accent);
         }
 
+        /* ========== User Section ========== */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #user-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .login-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.2rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: var(--bg-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231, 84, 128, 0.3);
+        }
+
+        .login-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        #user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            object-fit: cover;
+        }
+
+        .user-name {
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: var(--bg-primary);
+        }
+
         /* ========== Cart Icon ========== */
         .cart-icon {
             position: relative;
@@ -300,7 +385,7 @@
             transition: all 0.3s ease;
         }
 
-        .checkout-btn:hover {
+        .checkout-btn:hover:not(:disabled) {
             background-color: var(--accent-hover);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(231, 84, 128, 0.4);
@@ -309,7 +394,6 @@
         .checkout-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
 
         /* ========== Hero Section ========== */
@@ -425,7 +509,6 @@
             align-items: center;
             justify-content: center;
             font-size: 3rem;
-            color: var(--accent);
             position: relative;
             overflow: hidden;
         }
@@ -548,6 +631,17 @@
             border: 1px solid var(--border-color);
         }
 
+        .login-prompt {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .login-prompt p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -559,7 +653,6 @@
             font-size: 0.95rem;
         }
 
-        .form-group input,
         .form-group textarea {
             width: 100%;
             padding: 0.8rem;
@@ -569,17 +662,13 @@
             color: var(--text-primary);
             font-size: 1rem;
             font-family: inherit;
+            min-height: 120px;
+            resize: vertical;
         }
 
-        .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
             border-color: var(--accent);
-        }
-
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
         }
 
         .submit-btn {
@@ -661,6 +750,11 @@
             .products-grid {
                 grid-template-columns: 1fr;
             }
+
+            .nav-right {
+                width: 100%;
+                justify-content: space-between;
+            }
         }
     </style>
 </head>
@@ -674,12 +768,30 @@
                 <li><a href="#produits">Articles</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
-            <div class="cart-icon" id="cartIcon">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 2L7 6H3C1.9 6 1 6.9 1 8V20C1 21.1 1.9 22 3 22H21C22.1 22 23 21.1 23 20V8C23 6.9 22.1 6 21 6H17L15 2H9Z"/>
-                    <circle cx="12" cy="13" r="3"/>
-                </svg>
-                <span class="cart-badge" id="cartBadge">0</span>
+            <div class="nav-right">
+                <div id="user-section">
+                    <button id="login-btn" class="login-btn">
+                        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                            <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.18L12.05 13.56c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.438 15.983 5.482 18 9.003 18z" fill="#34A853"/>
+                            <path d="M3.964 10.712c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.96H.957C.347 6.175 0 7.55 0 9.002c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                            <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.428 0 9.002 0 5.48 0 2.438 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
+                        </svg>
+                        Se connecter avec Google
+                    </button>
+                    <div id="user-profile" style="display:none">
+                        <img id="user-avatar" class="user-avatar" alt="Avatar" />
+                        <span id="user-name" class="user-name"></span>
+                        <button id="logout-btn" class="logout-btn">Déconnexion</button>
+                    </div>
+                </div>
+                <div class="cart-icon" id="cartIcon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 2L7 6H3C1.9 6 1 6.9 1 8V20C1 21.1 1.9 22 3 22H21C22.1 22 23 21.1 23 20V8C23 6.9 22.1 6 21 6H17L15 2H9Z"/>
+                        <circle cx="12" cy="13" r="3"/>
+                    </svg>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </div>
             </div>
         </nav>
     </header>
@@ -736,22 +848,28 @@
     <section id="contact" class="contact">
         <div class="container">
             <h2>Contactez-moi</h2>
-            <form class="contact-form" id="contactForm">
-                <div class="form-group">
-                    <label for="name">Nom</label>
-                    <input type="text" id="name" name="name" required>
+            <div class="contact-form" id="contactContainer">
+                <div id="loginPrompt" class="login-prompt">
+                    <p>Veuillez vous connecter avec Google pour nous envoyer un message</p>
+                    <button class="login-btn" onclick="document.getElementById('login-btn').click()">
+                        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                            <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.18L12.05 13.56c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.438 15.983 5.482 18 9.003 18z" fill="#34A853"/>
+                            <path d="M3.964 10.712c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.96H.957C.347 6.175 0 7.55 0 9.002c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                            <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.428 0 9.002 0 5.48 0 2.438 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
+                        </svg>
+                        Se connecter avec Google
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Votre message</label>
-                    <textarea id="message" name="message" required></textarea>
-                </div>
-                <button type="submit" class="submit-btn">Send</button>
-                <div class="form-message" id="formMessage"></div>
-            </form>
+                <form id="contactForm" style="display:none">
+                    <div class="form-group">
+                        <label for="message">Votre message</label>
+                        <textarea id="message" name="message" required placeholder="Écrivez votre message ici..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Send</button>
+                    <div class="form-message" id="formMessage"></div>
+                </form>
+            </div>
         </div>
     </section>
 
@@ -806,13 +924,15 @@
             }
         ];
 
-        // Cart state
+        // State
         let cart = [];
+        let currentUser = null;
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             renderProducts();
             setupEventListeners();
+            updateContactForm();
         });
 
         // Render products
@@ -925,6 +1045,20 @@
             }
         }
 
+        // Update contact form visibility
+        function updateContactForm() {
+            const loginPrompt = document.getElementById('loginPrompt');
+            const contactForm = document.getElementById('contactForm');
+            
+            if (currentUser) {
+                loginPrompt.style.display = 'none';
+                contactForm.style.display = 'block';
+            } else {
+                loginPrompt.style.display = 'block';
+                contactForm.style.display = 'none';
+            }
+        }
+
         // Setup event listeners
         function setupEventListeners() {
             const cartIcon = document.getElementById('cartIcon');
@@ -933,6 +1067,9 @@
             const closeCart = document.getElementById('closeCart');
             const checkoutBtn = document.getElementById('checkoutBtn');
             const contactForm = document.getElementById('contactForm');
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const userProfile = document.getElementById('user-profile');
 
             // Open cart
             cartIcon.addEventListener('click', () => {
@@ -949,6 +1086,31 @@
             closeCart.addEventListener('click', closeCartFunc);
             cartOverlay.addEventListener('click', closeCartFunc);
 
+            // Login (simulation)
+            loginBtn.addEventListener('click', () => {
+                // Simulate Google login
+                currentUser = {
+                    name: 'Utilisateur Test',
+                    email: 'user@example.com',
+                    avatar: 'https://via.placeholder.com/36'
+                };
+                
+                loginBtn.style.display = 'none';
+                userProfile.style.display = 'flex';
+                document.getElementById('user-name').textContent = currentUser.name;
+                document.getElementById('user-avatar').src = currentUser.avatar;
+                
+                updateContactForm();
+            });
+
+            // Logout
+            logoutBtn.addEventListener('click', () => {
+                currentUser = null;
+                loginBtn.style.display = 'flex';
+                userProfile.style.display = 'none';
+                updateContactForm();
+            });
+
             // Checkout
             checkoutBtn.addEventListener('click', async () => {
                 if (cart.length === 0) return;
@@ -956,6 +1118,7 @@
                 const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 const orderData = {
                     date: new Date().toISOString(),
+                    user: currentUser ? currentUser.email : 'anonymous',
                     items: cart,
                     total: total,
                     status: 'pending'
@@ -980,15 +1143,18 @@
             contactForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
+                if (!currentUser) {
+                    alert('Veuillez vous connecter pour envoyer un message');
+                    return;
+                }
+                
                 const formMessage = document.getElementById('formMessage');
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
                 const message = document.getElementById('message').value;
 
                 const messageData = {
                     date: new Date().toISOString(),
-                    name: name,
-                    email: email,
+                    userName: currentUser.name,
+                    userEmail: currentUser.email,
                     message: message,
                     read: false
                 };
@@ -1014,3 +1180,7 @@
                 }
             });
         }
+    </script>
+</body>
+</html>
+                
