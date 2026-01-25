@@ -34,6 +34,16 @@ function editProduct(produit) {
             document.getElementById('caracteristiques').value = '';
         }
 
+        // Convertir JSON array des tailles en texte multiligne
+        if (produit.tailles) {
+            const tailles = typeof produit.tailles === 'string'
+                ? JSON.parse(produit.tailles)
+                : produit.tailles;
+            document.getElementById('tailles').value = tailles.join('\n');
+        } else {
+            document.getElementById('tailles').value = '';
+        }
+
         document.getElementById('actif').checked = produit.actif == 1;
         document.getElementById('productModal').classList.add('active');
     } catch (error) {
@@ -73,6 +83,10 @@ document.getElementById('productForm').addEventListener('submit', async function
         description: formData.get('description'),
         image: formData.get('image'),
         caracteristiques: formData.get('caracteristiques')
+            .split('\n')
+            .filter(line => line.trim())
+            .map(line => line.trim()),
+        tailles: formData.get('tailles')
             .split('\n')
             .filter(line => line.trim())
             .map(line => line.trim()),

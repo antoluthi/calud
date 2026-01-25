@@ -17,7 +17,7 @@ if ($method === 'GET') {
     try {
         // Récupérer seulement les produits actifs
         $stmt = $db->query("
-            SELECT id, nom, prix, description, image, caracteristiques, actif
+            SELECT id, nom, prix, description, image, caracteristiques, tailles, actif
             FROM produits
             WHERE actif = 1
             ORDER BY created_at DESC
@@ -32,6 +32,11 @@ if ($method === 'GET') {
                 ? json_decode($produit['caracteristiques'], true)
                 : [];
 
+            // Décoder le JSON des tailles
+            $tailles = $produit['tailles']
+                ? json_decode($produit['tailles'], true)
+                : ["S (15mm)", "M (20mm)", "L (25mm)", "XL (30mm)"];
+
             $produitsFormates[] = [
                 'id' => (int)$produit['id'],
                 'name' => $produit['nom'],
@@ -39,8 +44,7 @@ if ($method === 'GET') {
                 'description' => $produit['description'],
                 'image' => $produit['image'],
                 'features' => $caracteristiques,
-                // Tailles par défaut (à adapter selon vos besoins)
-                'sizes' => ["S (15mm)", "M (20mm)", "L (25mm)", "XL (30mm)"]
+                'sizes' => $tailles
             ];
         }
 

@@ -44,6 +44,16 @@ function createProductCard(product) {
            </ul>`
         : '';
 
+    // Size selector
+    const sizesHTML = product.sizes && product.sizes.length > 0
+        ? `<div class="size-selector">
+            <label for="size-${product.id}">Taille :</label>
+            <select id="size-${product.id}" class="size-select">
+                ${product.sizes.map(size => `<option value="${size}">${size}</option>`).join('')}
+            </select>
+           </div>`
+        : '';
+
     card.innerHTML = `
         ${product.image
             ? `<div class="product-image"><img src="${product.image}" alt="${product.name}"></div>`
@@ -54,6 +64,7 @@ function createProductCard(product) {
             <p class="price">${product.price.toFixed(2)}€</p>
             <p>${product.description}</p>
             ${featuresHTML}
+            ${sizesHTML}
         </div>
     `;
 

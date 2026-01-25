@@ -25,6 +25,9 @@ if ($method === 'GET') {
             if ($produit['caracteristiques']) {
                 $produit['caracteristiques'] = json_decode($produit['caracteristiques']);
             }
+            if ($produit['tailles']) {
+                $produit['tailles'] = json_decode($produit['tailles']);
+            }
             sendJSON($produit);
         } else {
             sendJSON(['error' => 'Produit non trouvé'], 404);
@@ -38,6 +41,9 @@ if ($method === 'GET') {
         foreach ($produits as &$produit) {
             if ($produit['caracteristiques']) {
                 $produit['caracteristiques'] = json_decode($produit['caracteristiques']);
+            }
+            if ($produit['tailles']) {
+                $produit['tailles'] = json_decode($produit['tailles']);
             }
         }
 
@@ -59,10 +65,15 @@ if ($method === 'POST') {
         ? json_encode($data['caracteristiques'], JSON_UNESCAPED_UNICODE)
         : '[]';
 
+    // Préparer les tailles (convertir en JSON)
+    $tailles = isset($data['tailles']) && is_array($data['tailles'])
+        ? json_encode($data['tailles'], JSON_UNESCAPED_UNICODE)
+        : json_encode(["S (15mm)", "M (20mm)", "L (25mm)", "XL (30mm)"], JSON_UNESCAPED_UNICODE);
+
     try {
         $stmt = $db->prepare("
-            INSERT INTO produits (nom, prix, description, image, caracteristiques, actif)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO produits (nom, prix, description, image, caracteristiques, tailles, actif)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
@@ -71,6 +82,7 @@ if ($method === 'POST') {
             $data['description'] ?? '',
             $data['image'] ?? '',
             $caracteristiques,
+            $tailles,
             isset($data['actif']) ? ($data['actif'] ? 1 : 0) : 1
         ]);
 
@@ -134,6 +146,14 @@ if ($method === 'PUT') {
                 ? json_encode($data['caracteristiques'], JSON_UNESCAPED_UNICODE)
                 : $data['caracteristiques'];
             $params[] = $carac;
+        }
+
+        if (isset($data['tailles'])) {
+            $updates[] = "tailles = ?";
+            $tailles = is_array($data['tailles'])
+                ? json_encode($data['tailles'], JSON_UNESCAPED_UNICODE)
+                : $data['tailles'];
+            $params[] = $tailles;
         }
 
         if (isset($data['actif'])) {

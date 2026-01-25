@@ -155,6 +155,12 @@ foreach ($produits as &$produit) {
                 </div>
 
                 <div class="form-group">
+                    <label for="tailles">Tailles disponibles (une par ligne)</label>
+                    <textarea id="tailles" name="tailles" class="form-control" placeholder="S (15mm)&#10;M (20mm)&#10;L (25mm)&#10;XL (30mm)"></textarea>
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Exemples: S (15mm), M (20mm), L (25mm), XL (30mm)</small>
+                </div>
+
+                <div class="form-group">
                     <label>
                         <input type="checkbox" id="actif" name="actif" checked>
                         Produit actif
