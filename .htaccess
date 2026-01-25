@@ -1,0 +1,12 @@
+# Forcer index.html et index.php comme pages par défaut
+DirectoryIndex index.html index.php
+
+# Forcer le bon content-type pour PHP
+<FilesMatch "\.php$">
+    ForceType application/x-httpd-php
+    Header set Content-Type "text/html; charset=UTF-8"
+</FilesMatch>
+
+# S'assurer que PHP est traité
+AddType application/x-httpd-php .php
+AddHandler application/x-httpd-php .php
