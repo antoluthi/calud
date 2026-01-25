@@ -1,8 +1,8 @@
 <?php
 /**
  * Configuration de l'application
- * Ce fichier contient les paramètres de connexion à la base de données
- * et les credentials Google OAuth
+ * Ce fichier lit les credentials depuis un fichier .env sur le serveur
+ * pour éviter d'exposer les credentials dans Git
  */
 
 // Démarrer la session si pas déjà démarrée
@@ -10,22 +10,30 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Configuration de la base de données
-define('DB_HOST', 'localhost');          // Adresse du serveur MySQL
-define('DB_NAME', 'site_escalade');      // Nom de la base de données
-define('DB_USER', 'root');               // Utilisateur MySQL (à changer pour production)
-define('DB_PASS', '');                   // Mot de passe MySQL (à changer pour production)
+// Charger le fichier .env s'il existe (sur le serveur uniquement)
+$envFile = __DIR__ . '/.env';
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue; // Ignorer les commentaires
+        list($name, $value) = explode('=', $line, 2);
+        $_ENV[trim($name)] = trim($value);
+    }
+}
+
+// Configuration de la base de données (lire depuis .env ou valeurs par défaut)
+define('DB_HOST', $_ENV['DB_HOST'] ?? 'localhost');
+define('DB_NAME', $_ENV['DB_NAME'] ?? 'site_escalade');
+define('DB_USER', $_ENV['DB_USER'] ?? 'root');
+define('DB_PASS', $_ENV['DB_PASS'] ?? '');
 define('DB_CHARSET', 'utf8mb4');
 
-// Configuration Google OAuth
-define('GOOGLE_CLIENT_ID', 'VOTRE_CLIENT_ID_ICI');           // Remplacer par votre Client ID
-define('GOOGLE_CLIENT_SECRET', 'VOTRE_CLIENT_SECRET_ICI');   // Remplacer par votre Client Secret
+// Configuration Google OAuth (lire depuis .env ou valeurs par défaut)
+define('GOOGLE_CLIENT_ID', $_ENV['GOOGLE_CLIENT_ID'] ?? 'VOTRE_CLIENT_ID_ICI');
+define('GOOGLE_CLIENT_SECRET', $_ENV['GOOGLE_CLIENT_SECRET'] ?? 'VOTRE_CLIENT_SECRET_ICI');
 
-// URL de base (à adapter selon votre environnement)
-// Pour le développement local
-define('BASE_URL', 'http://localhost:8000');
-// Pour la production, décommenter et modifier:
-// define('BASE_URL', 'https://votre-domaine.com');
+// URL de base (lire depuis .env ou valeur par défaut)
+define('BASE_URL', $_ENV['BASE_URL'] ?? 'http://localhost:8000');
 
 define('REDIRECT_URI', BASE_URL . '/api/auth/callback.php');
 
