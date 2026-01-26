@@ -949,6 +949,337 @@
             }
         }
 
+        /* ========== Product Modal ========== */
+        .product-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 3000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .product-modal-overlay.active {
+            display: flex;
+            opacity: 1;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .product-modal {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            max-width: 1100px;
+            width: 100%;
+            position: relative;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease;
+            margin: auto;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close-btn:hover {
+            background-color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .modal-content {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .modal-gallery {
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .main-image-container {
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .main-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .main-image-container .placeholder {
+            font-size: 5rem;
+            opacity: 0.3;
+        }
+
+        .thumbnails {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .thumbnail {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            background-color: var(--bg-card);
+        }
+
+        .thumbnail:hover {
+            border-color: var(--accent);
+        }
+
+        .thumbnail.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(231, 84, 128, 0.4);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .modal-price {
+            font-size: 2rem;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .modal-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .modal-specs {
+            background-color: var(--bg-card);
+            padding: 1.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-specs h4 {
+            color: var(--accent);
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .spec-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .spec-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .modal-materials {
+            background-color: var(--bg-card);
+            padding: 1.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-materials h4 {
+            color: var(--accent);
+            margin: 0 0 0.75rem 0;
+            font-size: 1rem;
+        }
+
+        .modal-materials p {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .modal-size-guide {
+            background-color: var(--bg-card);
+            padding: 1.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-size-guide h4 {
+            color: var(--accent);
+            margin: 0 0 0.75rem 0;
+            font-size: 1rem;
+        }
+
+        .modal-size-guide p {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .modal-video {
+            border-radius: 10px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+
+        .modal-video iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            margin-top: auto;
+            padding-top: 1rem;
+        }
+
+        .modal-size-selector {
+            flex: 1;
+        }
+
+        .modal-size-selector label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .modal-size-selector select {
+            width: 100%;
+            padding: 0.875rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .modal-size-selector select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .modal-add-to-cart {
+            flex: 1;
+            padding: 0.875rem 1.5rem;
+            background-color: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-add-to-cart:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231, 84, 128, 0.4);
+        }
+
+        /* Product card click indicator */
+        .product-card {
+            cursor: pointer;
+        }
+
+        .product-card .product-image {
+            position: relative;
+        }
+
+        .product-card .product-image::after {
+            content: 'Voir details';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 2rem 1rem 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .product-card:hover .product-image::after {
+            opacity: 1;
+        }
+
         /* ========== Responsive ========== */
         @media (max-width: 768px) {
             .hero h1 {
@@ -1003,6 +1334,45 @@
                 min-width: auto;
                 max-width: calc(100vw - 20px);
             }
+
+            /* Modal responsive */
+            .product-modal-overlay {
+                padding: 1rem;
+            }
+
+            .modal-content {
+                flex-direction: column;
+                padding: 1.5rem;
+            }
+
+            .modal-gallery {
+                flex: none;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .modal-price {
+                font-size: 1.5rem;
+            }
+
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .modal-close-btn {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+
+            .thumbnails {
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -1055,6 +1425,62 @@
                 <span class="cart-total-amount" id="cartTotal">0 €</span>
             </div>
             <button class="checkout-btn" id="checkoutBtn" disabled>Check out</button>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div class="product-modal-overlay" id="productModalOverlay">
+        <div class="product-modal" id="productModal">
+            <button class="modal-close-btn" id="closeProductModal">&times;</button>
+            <div class="modal-content">
+                <div class="modal-gallery">
+                    <div class="main-image-container" id="modalMainImage">
+                        <span class="placeholder">🧗</span>
+                    </div>
+                    <div class="thumbnails" id="modalThumbnails"></div>
+                </div>
+                <div class="modal-info">
+                    <h2 class="modal-title" id="modalProductTitle">Nom du produit</h2>
+                    <div class="modal-price" id="modalProductPrice">0.00 €</div>
+                    <p class="modal-description" id="modalProductDescription">Description du produit</p>
+
+                    <div class="modal-specs" id="modalSpecs" style="display: none;">
+                        <h4>Specifications</h4>
+                        <div class="specs-grid">
+                            <div class="spec-item" id="specDimensions">
+                                <span class="spec-label">Dimensions</span>
+                                <span class="spec-value" id="modalDimensions">-</span>
+                            </div>
+                            <div class="spec-item" id="specPoids">
+                                <span class="spec-label">Poids</span>
+                                <span class="spec-value" id="modalPoids">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-materials" id="modalMaterials" style="display: none;">
+                        <h4>Materiaux</h4>
+                        <p id="modalMateriauxText"></p>
+                    </div>
+
+                    <div class="modal-size-guide" id="modalSizeGuide" style="display: none;">
+                        <h4>Guide des tailles</h4>
+                        <p id="modalSizeGuideText"></p>
+                    </div>
+
+                    <div class="modal-video" id="modalVideo" style="display: none;">
+                        <iframe id="modalVideoFrame" src="" allowfullscreen></iframe>
+                    </div>
+
+                    <div class="modal-actions">
+                        <div class="modal-size-selector">
+                            <label for="modalSizeSelect">Taille</label>
+                            <select id="modalSizeSelect"></select>
+                        </div>
+                        <button class="modal-add-to-cart" id="modalAddToCart">Ajouter au panier</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

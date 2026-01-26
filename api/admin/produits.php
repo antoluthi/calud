@@ -28,6 +28,10 @@ if ($method === 'GET') {
             if ($produit['tailles']) {
                 $produit['tailles'] = json_decode($produit['tailles']);
             }
+            // Décoder le JSON des images
+            if (isset($produit['images']) && $produit['images']) {
+                $produit['images'] = json_decode($produit['images']);
+            }
             sendJSON($produit);
         } else {
             sendJSON(['error' => 'Produit non trouvé'], 404);
@@ -44,6 +48,10 @@ if ($method === 'GET') {
             }
             if ($produit['tailles']) {
                 $produit['tailles'] = json_decode($produit['tailles']);
+            }
+            // Décoder le JSON des images
+            if (isset($produit['images']) && $produit['images']) {
+                $produit['images'] = json_decode($produit['images']);
             }
         }
 
@@ -70,10 +78,15 @@ if ($method === 'POST') {
         ? json_encode($data['tailles'], JSON_UNESCAPED_UNICODE)
         : json_encode(["S (15mm)", "M (20mm)", "L (25mm)", "XL (30mm)"], JSON_UNESCAPED_UNICODE);
 
+    // Préparer les images (convertir en JSON)
+    $images = isset($data['images']) && is_array($data['images'])
+        ? json_encode($data['images'], JSON_UNESCAPED_UNICODE)
+        : null;
+
     try {
         $stmt = $db->prepare("
-            INSERT INTO produits (nom, prix, description, image, caracteristiques, tailles, actif)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO produits (nom, prix, description, image, caracteristiques, tailles, actif, images, dimensions, poids, materiaux, guide_tailles, video_url)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
@@ -83,7 +96,13 @@ if ($method === 'POST') {
             $data['image'] ?? '',
             $caracteristiques,
             $tailles,
-            isset($data['actif']) ? ($data['actif'] ? 1 : 0) : 1
+            isset($data['actif']) ? ($data['actif'] ? 1 : 0) : 1,
+            $images,
+            $data['dimensions'] ?? null,
+            $data['poids'] ?? null,
+            $data['materiaux'] ?? null,
+            $data['guide_tailles'] ?? null,
+            $data['video_url'] ?? null
         ]);
 
         $id = $db->lastInsertId();
@@ -159,6 +178,39 @@ if ($method === 'PUT') {
         if (isset($data['actif'])) {
             $updates[] = "actif = ?";
             $params[] = $data['actif'] ? 1 : 0;
+        }
+
+        if (isset($data['images'])) {
+            $updates[] = "images = ?";
+            $imgs = is_array($data['images'])
+                ? json_encode($data['images'], JSON_UNESCAPED_UNICODE)
+                : $data['images'];
+            $params[] = $imgs;
+        }
+
+        if (isset($data['dimensions'])) {
+            $updates[] = "dimensions = ?";
+            $params[] = $data['dimensions'];
+        }
+
+        if (isset($data['poids'])) {
+            $updates[] = "poids = ?";
+            $params[] = $data['poids'];
+        }
+
+        if (isset($data['materiaux'])) {
+            $updates[] = "materiaux = ?";
+            $params[] = $data['materiaux'];
+        }
+
+        if (isset($data['guide_tailles'])) {
+            $updates[] = "guide_tailles = ?";
+            $params[] = $data['guide_tailles'];
+        }
+
+        if (isset($data['video_url'])) {
+            $updates[] = "video_url = ?";
+            $params[] = $data['video_url'];
         }
 
         if (empty($updates)) {

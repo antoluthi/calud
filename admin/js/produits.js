@@ -44,6 +44,23 @@ function editProduct(produit) {
             document.getElementById('tailles').value = '';
         }
 
+        // Convertir JSON array des images en texte multiligne
+        if (produit.images) {
+            const images = typeof produit.images === 'string'
+                ? JSON.parse(produit.images)
+                : produit.images;
+            document.getElementById('images').value = images.join('\n');
+        } else {
+            document.getElementById('images').value = '';
+        }
+
+        // Remplir les nouveaux champs
+        document.getElementById('dimensions').value = produit.dimensions || '';
+        document.getElementById('poids').value = produit.poids || '';
+        document.getElementById('materiaux').value = produit.materiaux || '';
+        document.getElementById('guide_tailles').value = produit.guide_tailles || '';
+        document.getElementById('video_url').value = produit.video_url || '';
+
         document.getElementById('actif').checked = produit.actif == 1;
         document.getElementById('productModal').classList.add('active');
     } catch (error) {
@@ -90,6 +107,15 @@ document.getElementById('productForm').addEventListener('submit', async function
             .split('\n')
             .filter(line => line.trim())
             .map(line => line.trim()),
+        images: formData.get('images')
+            .split('\n')
+            .filter(line => line.trim())
+            .map(line => line.trim()),
+        dimensions: formData.get('dimensions') || '',
+        poids: formData.get('poids') || '',
+        materiaux: formData.get('materiaux') || '',
+        guide_tailles: formData.get('guide_tailles') || '',
+        video_url: formData.get('video_url') || '',
         actif: formData.get('actif') ? 1 : 0
     };
 

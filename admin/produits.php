@@ -162,6 +162,42 @@ foreach ($produits as &$produit) {
                     <small style="color: var(--text-secondary); font-size: 0.85rem;">Exemples: S (15mm), M (20mm), L (25mm), XL (30mm)</small>
                 </div>
 
+                <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
+                <h4 style="color: var(--accent); margin-bottom: 1rem;">Informations detaillees (Modal)</h4>
+
+                <div class="form-group">
+                    <label for="images">Images supplementaires (une URL par ligne)</label>
+                    <textarea id="images" name="images" class="form-control" placeholder="images/produit-1.jpg&#10;images/produit-2.jpg&#10;images/produit-3.jpg"></textarea>
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Ces images apparaitront dans la galerie de la modal produit</small>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="dimensions">Dimensions</label>
+                        <input type="text" id="dimensions" name="dimensions" class="form-control" placeholder="20 x 15 x 3 cm">
+                    </div>
+                    <div class="form-group">
+                        <label for="poids">Poids</label>
+                        <input type="text" id="poids" name="poids" class="form-control" placeholder="850g">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="materiaux">Materiaux</label>
+                    <textarea id="materiaux" name="materiaux" class="form-control" placeholder="Bois de hetre, resine epoxy..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="guide_tailles">Guide des tailles</label>
+                    <textarea id="guide_tailles" name="guide_tailles" class="form-control" placeholder="S: convient aux mains de moins de 17cm&#10;M: convient aux mains de 17-19cm&#10;L: convient aux mains de 19-21cm&#10;XL: convient aux mains de plus de 21cm"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="video_url">URL Video YouTube (optionnel)</label>
+                    <input type="text" id="video_url" name="video_url" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Coller l'URL complete de la video YouTube</small>
+                </div>
+
                 <div class="form-group">
                     <label>
                         <input type="checkbox" id="actif" name="actif" checked>

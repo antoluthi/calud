@@ -71,11 +71,214 @@ function createProductCard(product) {
             <p>${product.description}</p>
             ${featuresHTML}
             ${sizesHTML}
-            <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Ajouter au panier</button>
+            <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart(${product.id})">Ajouter au panier</button>
         </div>
     `;
 
+    // Ajouter le click pour ouvrir la modal
+    card.addEventListener('click', (e) => {
+        // Ne pas ouvrir si on clique sur le select ou le bouton
+        if (e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION' || e.target.tagName === 'BUTTON') {
+            return;
+        }
+        openProductModal(product.id);
+    });
+
     return card;
+}
+
+// ========== Product Modal Functions ==========
+
+// Variable pour stocker le produit actuellement affiché dans la modal
+let currentModalProduct = null;
+
+// Ouvrir la modal produit
+function openProductModal(productId) {
+    const product = window.products.find(p => p.id === productId);
+    if (!product) return;
+
+    currentModalProduct = product;
+
+    // Titre et prix
+    document.getElementById('modalProductTitle').textContent = product.name;
+    document.getElementById('modalProductPrice').textContent = `${product.price.toFixed(2)} €`;
+    document.getElementById('modalProductDescription').textContent = product.description;
+
+    // Image principale
+    const mainImageContainer = document.getElementById('modalMainImage');
+    const allImages = [];
+
+    // Ajouter l'image principale si elle existe
+    if (product.image) {
+        allImages.push(product.image);
+    }
+
+    // Ajouter les images supplémentaires
+    if (product.images && product.images.length > 0) {
+        product.images.forEach(img => {
+            if (img && !allImages.includes(img)) {
+                allImages.push(img);
+            }
+        });
+    }
+
+    // Afficher l'image principale
+    if (allImages.length > 0) {
+        mainImageContainer.innerHTML = `<img src="${allImages[0]}" alt="${product.name}" id="modalMainImg">`;
+    } else {
+        mainImageContainer.innerHTML = '<span class="placeholder">🧗</span>';
+    }
+
+    // Afficher les miniatures
+    const thumbnailsContainer = document.getElementById('modalThumbnails');
+    if (allImages.length > 1) {
+        thumbnailsContainer.innerHTML = allImages.map((img, index) => `
+            <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="setMainImage('${img}', this)">
+                <img src="${img}" alt="Image ${index + 1}">
+            </div>
+        `).join('');
+        thumbnailsContainer.style.display = 'flex';
+    } else {
+        thumbnailsContainer.innerHTML = '';
+        thumbnailsContainer.style.display = 'none';
+    }
+
+    // Specifications
+    const specsSection = document.getElementById('modalSpecs');
+    if (product.dimensions || product.poids) {
+        document.getElementById('modalDimensions').textContent = product.dimensions || '-';
+        document.getElementById('modalPoids').textContent = product.poids || '-';
+        specsSection.style.display = 'block';
+    } else {
+        specsSection.style.display = 'none';
+    }
+
+    // Materiaux
+    const materialsSection = document.getElementById('modalMaterials');
+    if (product.materiaux) {
+        document.getElementById('modalMateriauxText').textContent = product.materiaux;
+        materialsSection.style.display = 'block';
+    } else {
+        materialsSection.style.display = 'none';
+    }
+
+    // Guide des tailles
+    const sizeGuideSection = document.getElementById('modalSizeGuide');
+    if (product.guide_tailles) {
+        document.getElementById('modalSizeGuideText').textContent = product.guide_tailles;
+        sizeGuideSection.style.display = 'block';
+    } else {
+        sizeGuideSection.style.display = 'none';
+    }
+
+    // Video YouTube
+    const videoSection = document.getElementById('modalVideo');
+    if (product.video_url) {
+        const videoId = extractYouTubeId(product.video_url);
+        if (videoId) {
+            document.getElementById('modalVideoFrame').src = `https://www.youtube.com/embed/${videoId}`;
+            videoSection.style.display = 'block';
+        } else {
+            videoSection.style.display = 'none';
+        }
+    } else {
+        videoSection.style.display = 'none';
+        document.getElementById('modalVideoFrame').src = '';
+    }
+
+    // Selecteur de taille
+    const sizeSelect = document.getElementById('modalSizeSelect');
+    if (product.sizes && product.sizes.length > 0) {
+        sizeSelect.innerHTML = product.sizes.map(size =>
+            `<option value="${size}">${size}</option>`
+        ).join('');
+    } else {
+        sizeSelect.innerHTML = '<option value="Unique">Taille unique</option>';
+    }
+
+    // Afficher la modal
+    document.getElementById('productModalOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Fermer la modal produit
+function closeProductModal() {
+    document.getElementById('productModalOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+    // Arrêter la vidéo si elle est en cours
+    document.getElementById('modalVideoFrame').src = '';
+    currentModalProduct = null;
+}
+
+// Changer l'image principale au clic sur une miniature
+function setMainImage(imageUrl, thumbnailElement) {
+    // Mettre à jour l'image principale
+    const mainImg = document.getElementById('modalMainImg');
+    if (mainImg) {
+        mainImg.src = imageUrl;
+    }
+
+    // Mettre à jour la classe active des miniatures
+    document.querySelectorAll('.thumbnail').forEach(thumb => {
+        thumb.classList.remove('active');
+    });
+    if (thumbnailElement) {
+        thumbnailElement.classList.add('active');
+    }
+}
+
+// Extraire l'ID YouTube d'une URL
+function extractYouTubeId(url) {
+    if (!url) return null;
+
+    const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+        /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+    ];
+
+    for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1]) {
+            return match[1];
+        }
+    }
+    return null;
+}
+
+// Ajouter au panier depuis la modal
+function addToCartFromModal() {
+    if (!currentModalProduct) return;
+
+    const sizeSelect = document.getElementById('modalSizeSelect');
+    const selectedSize = sizeSelect.value;
+
+    const existingItem = window.cart.find(item =>
+        item.id === currentModalProduct.id && item.size === selectedSize
+    );
+
+    if (existingItem) {
+        existingItem.quantity++;
+    } else {
+        window.cart.push({
+            id: currentModalProduct.id,
+            name: currentModalProduct.name,
+            price: currentModalProduct.price,
+            size: selectedSize,
+            quantity: 1
+        });
+    }
+
+    updateCart();
+
+    // Visual feedback
+    const btn = document.getElementById('modalAddToCart');
+    const originalText = btn.textContent;
+    btn.textContent = '✓ Ajouté !';
+    btn.style.backgroundColor = '#34a853';
+    setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.backgroundColor = '';
+    }, 1000);
 }
 
 // Vérifier l'état d'authentification
@@ -207,6 +410,37 @@ document.addEventListener('DOMContentLoaded', () => {
     if (profileIcon) {
         profileIcon.addEventListener('click', toggleProfileDropdown);
     }
+
+    // Event listeners pour la modal produit
+    const productModalOverlay = document.getElementById('productModalOverlay');
+    const closeProductModalBtn = document.getElementById('closeProductModal');
+    const modalAddToCartBtn = document.getElementById('modalAddToCart');
+
+    if (closeProductModalBtn) {
+        closeProductModalBtn.addEventListener('click', closeProductModal);
+    }
+
+    if (productModalOverlay) {
+        productModalOverlay.addEventListener('click', (e) => {
+            if (e.target === productModalOverlay) {
+                closeProductModal();
+            }
+        });
+    }
+
+    if (modalAddToCartBtn) {
+        modalAddToCartBtn.addEventListener('click', addToCartFromModal);
+    }
+
+    // Fermer la modal avec Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('productModalOverlay');
+            if (modal && modal.classList.contains('active')) {
+                closeProductModal();
+            }
+        }
+    });
 
     // Smooth scroll pour les liens de navigation
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
