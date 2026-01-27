@@ -209,6 +209,12 @@ unset($produit); // Casser la référence
                 </div>
 
                 <div class="form-group">
+                    <label for="guide_pdf">Guide d'utilisation PDF (optionnel)</label>
+                    <input type="text" id="guide_pdf" name="guide_pdf" class="form-control" placeholder="guides/mon-guide.pdf">
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Chemin vers le fichier PDF du guide d'utilisation (ex: guides/poutre-pro.pdf)</small>
+                </div>
+
+                <div class="form-group">
                     <label>
                         <input type="checkbox" id="actif" name="actif" checked>
                         Produit actif

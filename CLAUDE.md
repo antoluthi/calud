@@ -64,6 +64,7 @@ site-escalade/
 │   ├── clients.php         # Gestion clients
 │   ├── messages.php        # Gestion messages
 │   └── newsletter.php      # Gestion newsletter
+├── guides/                 # Guides d'utilisation PDF des produits
 ├── database/               # Schéma et migrations SQL
 └── .github/workflows/      # GitHub Actions
 ```
@@ -87,6 +88,8 @@ Les migrations sont dans `/database/`. À exécuter dans l'ordre:
 5. `migration_newsletter.sql`
 6. `migration_modal_produit.sql`
 7. `migration_users_newsletter.sql`
+8. `migration_guide_pdf.sql` - Champ guide PDF pour les produits
+9. `fix_duplicates.sql` - Script de diagnostic/nettoyage des doublons
 
 ## Configuration Serveur
 

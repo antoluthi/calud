@@ -186,6 +186,16 @@ function openProductModal(productId) {
         document.getElementById('modalVideoFrame').src = '';
     }
 
+    // Guide PDF
+    const guidePdfSection = document.getElementById('modalGuidePdf');
+    const guidePdfLink = document.getElementById('modalGuidePdfLink');
+    if (product.guide_pdf) {
+        guidePdfLink.href = product.guide_pdf;
+        guidePdfSection.style.display = 'block';
+    } else {
+        guidePdfSection.style.display = 'none';
+    }
+
     // Selecteur de taille
     const sizeSelect = document.getElementById('modalSizeSelect');
     if (product.sizes && product.sizes.length > 0) {

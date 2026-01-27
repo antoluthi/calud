@@ -360,3 +360,31 @@ footer p {
         grid-template-columns: 1fr;
     }
 }
+
+/* Guide PDF dans la modal produit */
+.modal-guide-pdf {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, rgba(231, 84, 128, 0.1), rgba(231, 84, 128, 0.05));
+    border: 1px solid rgba(231, 84, 128, 0.3);
+    border-radius: 8px;
+}
+
+.guide-pdf-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.guide-pdf-link:hover {
+    color: #ff6b9d;
+    transform: translateX(3px);
+}
+
+.guide-pdf-link svg {
+    flex-shrink: 0;
+}
