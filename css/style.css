@@ -364,27 +364,73 @@ footer p {
 /* Guide PDF dans la modal produit */
 .modal-guide-pdf {
     margin-top: 1rem;
-    padding: 0.75rem 1rem;
-    background: linear-gradient(135deg, rgba(231, 84, 128, 0.1), rgba(231, 84, 128, 0.05));
-    border: 1px solid rgba(231, 84, 128, 0.3);
-    border-radius: 8px;
 }
 
-.guide-pdf-link {
+.guide-pdf-box {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, rgba(231, 84, 128, 0.12), rgba(231, 84, 128, 0.05));
+    border: 1px solid rgba(231, 84, 128, 0.25);
+    border-radius: 12px;
+}
+
+.guide-pdf-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: rgba(231, 84, 128, 0.15);
+    border-radius: 10px;
     color: var(--accent);
+}
+
+.guide-pdf-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.guide-pdf-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.guide-pdf-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.guide-pdf-btn {
+    flex-shrink: 0;
+    padding: 0.6rem 1.2rem;
+    background: var(--accent);
+    color: white;
     text-decoration: none;
+    border-radius: 8px;
     font-weight: 500;
+    font-size: 0.85rem;
     transition: all 0.2s ease;
 }
 
-.guide-pdf-link:hover {
-    color: #ff6b9d;
-    transform: translateX(3px);
+.guide-pdf-btn:hover {
+    background: #ff6b9d;
+    transform: translateY(-2px);
 }
 
-.guide-pdf-link svg {
-    flex-shrink: 0;
+@media (max-width: 500px) {
+    .guide-pdf-box {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+
+    .guide-pdf-btn {
+        width: 100%;
+    }
 }
