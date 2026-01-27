@@ -22,12 +22,19 @@ $produitsQuery = $db->query("
 ");
 $produits = $produitsQuery->fetchAll();
 
-// Décoder le JSON des caractéristiques pour chaque produit
+// Décoder le JSON des caractéristiques, tailles et images pour chaque produit
 foreach ($produits as &$produit) {
     if ($produit['caracteristiques']) {
         $produit['caracteristiques'] = json_decode($produit['caracteristiques']);
     }
+    if ($produit['tailles']) {
+        $produit['tailles'] = json_decode($produit['tailles']);
+    }
+    if (isset($produit['images']) && $produit['images']) {
+        $produit['images'] = json_decode($produit['images']);
+    }
 }
+unset($produit); // Casser la référence
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -75,7 +82,10 @@ foreach ($produits as &$produit) {
             <div class="table-container">
                 <div class="table-header">
                     <h2>Liste des Produits</h2>
-                    <button class="btn btn-primary" onclick="openProductModal()">➕ Nouveau Produit</button>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" onclick="checkDuplicates()" style="background-color: var(--bg-secondary); color: var(--text-primary);">🔍 Vérifier doublons</button>
+                        <button class="btn btn-primary" onclick="openProductModal()">➕ Nouveau Produit</button>
+                    </div>
                 </div>
                 <?php if (empty($produits)): ?>
                     <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">

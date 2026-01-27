@@ -82,13 +82,24 @@ document.getElementById('productModal').addEventListener('click', function(e) {
 });
 
 // Soumettre le formulaire
+let isSubmitting = false; // Flag pour éviter les double-soumissions
+
 document.getElementById('productForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
+    // Éviter les double-soumissions
+    if (isSubmitting) {
+        console.log('Soumission déjà en cours, ignorée');
+        return;
+    }
+    isSubmitting = true;
+
     const submitBtn = document.getElementById('submitBtnText');
     const loader = document.getElementById('submitBtnLoader');
+    const submitButton = submitBtn.closest('button');
 
-    // Afficher le loader
+    // Désactiver le bouton et afficher le loader
+    if (submitButton) submitButton.disabled = true;
     submitBtn.style.display = 'none';
     loader.style.display = 'inline-block';
 
@@ -151,7 +162,10 @@ document.getElementById('productForm').addEventListener('submit', async function
         console.error('Erreur:', error);
         showAlert('Erreur de connexion au serveur', 'error');
     } finally {
-        // Cacher le loader
+        // Réactiver le bouton et cacher le loader
+        isSubmitting = false;
+        const submitButton = submitBtn.closest('button');
+        if (submitButton) submitButton.disabled = false;
         submitBtn.style.display = 'inline';
         loader.style.display = 'none';
     }
@@ -218,4 +232,54 @@ function showAlert(message, type) {
     setTimeout(() => {
         alert.remove();
     }, 5000);
+}
+
+// Vérifier et nettoyer les doublons
+async function checkDuplicates() {
+    try {
+        const response = await fetch('../api/admin/check-duplicates.php');
+        const result = await response.json();
+
+        if (result.success) {
+            if (result.duplicates_found === 0) {
+                showAlert('Aucun doublon trouvé !', 'success');
+            } else {
+                // Afficher les doublons trouvés
+                let message = `${result.duplicates_found} groupe(s) de doublons trouvé(s):\n\n`;
+                result.duplicates.forEach(dup => {
+                    message += `- "${dup.nom}" (${dup.count} fois, IDs: ${dup.produits.map(p => p.id).join(', ')})\n`;
+                });
+                message += '\nVoulez-vous supprimer les doublons ? (seul le plus récent sera conservé)';
+
+                if (confirm(message)) {
+                    await deleteDuplicates();
+                }
+            }
+        } else {
+            showAlert(result.error || 'Erreur lors de la vérification', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showAlert('Erreur de connexion au serveur', 'error');
+    }
+}
+
+// Supprimer les doublons
+async function deleteDuplicates() {
+    try {
+        const response = await fetch('../api/admin/check-duplicates.php', {
+            method: 'DELETE'
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            showAlert(`${result.deleted_count} doublon(s) supprimé(s) avec succès!`, 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showAlert(result.error || 'Erreur lors de la suppression', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showAlert('Erreur de connexion au serveur', 'error');
+    }
 }
