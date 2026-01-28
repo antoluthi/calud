@@ -131,12 +131,25 @@ function openProductModal(productId) {
 
     // Afficher les miniatures
     const thumbnailsContainer = document.getElementById('modalThumbnails');
-    if (allImages.length > 1) {
-        thumbnailsContainer.innerHTML = allImages.map((img, index) => `
-            <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="setMainImage('${img}', this)">
-                <img src="${img}" alt="Image ${index + 1}">
+
+    // Build thumbnails HTML
+    let thumbnailsHTML = allImages.map((img, index) => `
+        <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="setMainImage('${img}', this)">
+            <img src="${img}" alt="Image ${index + 1}">
+        </div>
+    `).join('');
+
+    // Add 360° thumbnail if product has it (check for has_360 property or add for all for now)
+    if (product.has_360 || true) { // TODO: remove "|| true" when has_360 is in DB
+        thumbnailsHTML += `
+            <div class="thumbnail thumbnail-360" onclick="setMainImage('360', this)">
+                <img src="images/360/thumbnail.png" alt="Vue 360°">
             </div>
-        `).join('');
+        `;
+    }
+
+    if (allImages.length > 0 || product.has_360) {
+        thumbnailsContainer.innerHTML = thumbnailsHTML;
         thumbnailsContainer.style.display = 'flex';
     } else {
         thumbnailsContainer.innerHTML = '';
@@ -223,9 +236,14 @@ function closeProductModal() {
 // Changer l'image principale au clic sur une miniature
 function setMainImage(imageUrl, thumbnailElement) {
     // Mettre à jour l'image principale
-    const mainImg = document.getElementById('modalMainImg');
-    if (mainImg) {
-        mainImg.src = imageUrl;
+    const mainImageContainer = document.getElementById('modalMainImage');
+
+    // Si c'est le viewer 360°, le charger
+    if (imageUrl === '360') {
+        load360Viewer(mainImageContainer);
+    } else {
+        // Image normale
+        mainImageContainer.innerHTML = `<img src="${imageUrl}" alt="Product" id="modalMainImg">`;
     }
 
     // Mettre à jour la classe active des miniatures
@@ -235,6 +253,119 @@ function setMainImage(imageUrl, thumbnailElement) {
     if (thumbnailElement) {
         thumbnailElement.classList.add('active');
     }
+}
+
+// ========== 360 Viewer ==========
+const viewer360Config = {
+    basePath: 'images/360/',
+    frameCount: 32,
+    framePrefix: 'frame_',
+    loaded: false,
+    images: [],
+    currentFrame: 0
+};
+
+function load360Viewer(container) {
+    container.innerHTML = `
+        <div class="viewer-360-container" id="viewer360">
+            <div class="viewer-360-loading">Chargement 360°...</div>
+        </div>
+    `;
+
+    const viewer = document.getElementById('viewer360');
+    const images = [];
+    let loadedCount = 0;
+
+    // Preload all frames
+    for (let i = 1; i <= viewer360Config.frameCount; i++) {
+        const img = new Image();
+        const frameNum = i.toString().padStart(2, '0');
+        img.src = `${viewer360Config.basePath}${viewer360Config.framePrefix}${frameNum}.png`;
+
+        img.onload = () => {
+            loadedCount++;
+            if (loadedCount === viewer360Config.frameCount) {
+                // All images loaded, initialize viewer
+                init360Viewer(viewer, images);
+            }
+        };
+
+        images.push(img);
+    }
+
+    viewer360Config.images = images;
+}
+
+function init360Viewer(viewer, images) {
+    let currentFrame = 0;
+    let isDragging = false;
+    let startX = 0;
+    let hintHidden = false;
+
+    // Create viewer HTML
+    viewer.innerHTML = `
+        <img src="${images[0].src}" alt="Vue 360°" id="viewer360Img">
+        <div class="viewer-360-hint" id="viewer360Hint">
+            <span>↔</span> Glissez pour tourner
+        </div>
+    `;
+
+    const viewerImg = document.getElementById('viewer360Img');
+    const hint = document.getElementById('viewer360Hint');
+
+    function updateFrame(delta) {
+        currentFrame = (currentFrame + delta + images.length) % images.length;
+        viewerImg.src = images[currentFrame].src;
+
+        // Hide hint after first interaction
+        if (!hintHidden) {
+            hint.classList.add('hidden');
+            hintHidden = true;
+        }
+    }
+
+    // Mouse events
+    viewer.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        const deltaX = e.clientX - startX;
+        if (Math.abs(deltaX) > 10) {
+            const frameDelta = deltaX > 0 ? 1 : -1;
+            updateFrame(frameDelta);
+            startX = e.clientX;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    // Touch events
+    viewer.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        startX = e.touches[0].clientX;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+
+        const deltaX = e.touches[0].clientX - startX;
+        if (Math.abs(deltaX) > 10) {
+            const frameDelta = deltaX > 0 ? 1 : -1;
+            updateFrame(frameDelta);
+            startX = e.touches[0].clientX;
+        }
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+        isDragging = false;
+    });
 }
 
 // Extraire l'ID YouTube d'une URL
