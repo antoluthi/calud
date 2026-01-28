@@ -64,15 +64,10 @@
             position: fixed;
             top: 1.5rem;
             left: 50%;
-            transform: translateX(-50%) translateY(0);
+            transform: translateX(-50%);
             z-index: 1000;
             width: calc(100% - 3rem);
             max-width: 500px;
-            transition: transform 0.3s ease;
-        }
-
-        header.hidden {
-            transform: translateX(-50%) translateY(-150%);
         }
 
         nav {
@@ -369,14 +364,11 @@
             bottom: 0;
             background-color: rgba(0, 0, 0, 0.6);
             z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+            display: none;
         }
 
         .cart-overlay.active {
-            opacity: 1;
-            visibility: visible;
+            display: block;
         }
 
         .cart-sidebar {
@@ -1864,21 +1856,26 @@
                 });
             });
 
-            // Header hide/show on scroll
+            // Header hide/show on scroll - "sticky background" effect
             const header = document.querySelector('header');
+            const headerBaseTop = 24; // 1.5rem in pixels
+            const headerHeight = header.offsetHeight + headerBaseTop + 20; // total height to hide
+            let headerOffset = 0;
             let lastScrollY = window.scrollY;
             let ticking = false;
 
             function updateHeader() {
                 const currentScrollY = window.scrollY;
+                const scrollDelta = currentScrollY - lastScrollY;
 
-                if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                    // Scrolling down & past threshold - hide header
-                    header.classList.add('hidden');
-                } else {
-                    // Scrolling up - show header
-                    header.classList.remove('hidden');
-                }
+                // Update header offset based on scroll direction
+                headerOffset += scrollDelta;
+
+                // Clamp the offset: min 0 (fully visible), max headerHeight (fully hidden)
+                headerOffset = Math.max(0, Math.min(headerOffset, headerHeight));
+
+                // Apply the offset as negative top
+                header.style.top = (headerBaseTop - headerOffset) + 'px';
 
                 lastScrollY = currentScrollY;
                 ticking = false;
@@ -1889,7 +1886,7 @@
                     requestAnimationFrame(updateHeader);
                     ticking = true;
                 }
-            });
+            }, { passive: true });
 
             // Open cart
             cartIcon.addEventListener('click', () => {
