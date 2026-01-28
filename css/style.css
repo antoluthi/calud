@@ -1,13 +1,13 @@
 /* ========== Variables ========== */
 :root {
     --bg-primary: #0a0a0a;
-    --bg-secondary: #1a1a1a;
-    --bg-card: #222222;
+    --bg-secondary: #111111;
+    --bg-card: #181818;
     --text-primary: #ffffff;
-    --text-secondary: #b0b0b0;
-    --accent: #e75480;       /* new pink : e75480 */ 
-    --accent-hover: #d63f6d; /* new pink hover */
-    --border-color: #333333;
+    --text-secondary: #888888;
+    --accent: #ffffff;
+    --accent-hover: #cccccc;
+    --border-color: #2a2a2a;
 }
 
 /* ========== Reset & Base ========== */
@@ -372,9 +372,9 @@ footer p {
     align-items: center;
     gap: 1rem;
     padding: 1rem 1.25rem;
-    background: linear-gradient(135deg, rgba(231, 84, 128, 0.12), rgba(231, 84, 128, 0.05));
-    border: 1px solid rgba(231, 84, 128, 0.25);
-    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
 }
 
 .guide-pdf-icon {
@@ -382,11 +382,11 @@ footer p {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 50px;
-    height: 50px;
-    background: rgba(231, 84, 128, 0.15);
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
-    color: var(--accent);
+    color: var(--text-secondary);
 }
 
 .guide-pdf-content {
@@ -399,7 +399,7 @@ footer p {
 .guide-pdf-title {
     font-weight: 600;
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .guide-pdf-subtitle {
@@ -411,17 +411,18 @@ footer p {
     flex-shrink: 0;
     padding: 0.6rem 1.2rem;
     background: var(--accent);
-    color: white;
+    color: var(--bg-primary);
     text-decoration: none;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 0.85rem;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 0.8rem;
     transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .guide-pdf-btn:hover {
-    background: #ff6b9d;
-    transform: translateY(-2px);
+    background: var(--accent-hover);
 }
 
 @media (max-width: 500px) {
