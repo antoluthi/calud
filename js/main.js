@@ -131,25 +131,12 @@ function openProductModal(productId) {
 
     // Afficher les miniatures
     const thumbnailsContainer = document.getElementById('modalThumbnails');
-
-    // Build thumbnails HTML
-    let thumbnailsHTML = allImages.map((img, index) => `
-        <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="setMainImage('${img}', this)">
-            <img src="${img}" alt="Image ${index + 1}">
-        </div>
-    `).join('');
-
-    // Add 360° thumbnail if product has it (check for has_360 property or add for all for now)
-    if (product.has_360 || true) { // TODO: remove "|| true" when has_360 is in DB
-        thumbnailsHTML += `
-            <div class="thumbnail thumbnail-360" onclick="setMainImage('360', this)">
-                <img src="images/360/thumbnail.png" alt="Vue 360°">
+    if (allImages.length > 1) {
+        thumbnailsContainer.innerHTML = allImages.map((img, index) => `
+            <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="setMainImage('${img}', this)">
+                <img src="${img}" alt="Image ${index + 1}">
             </div>
-        `;
-    }
-
-    if (allImages.length > 0 || product.has_360) {
-        thumbnailsContainer.innerHTML = thumbnailsHTML;
+        `).join('');
         thumbnailsContainer.style.display = 'flex';
     } else {
         thumbnailsContainer.innerHTML = '';
@@ -236,14 +223,9 @@ function closeProductModal() {
 // Changer l'image principale au clic sur une miniature
 function setMainImage(imageUrl, thumbnailElement) {
     // Mettre à jour l'image principale
-    const mainImageContainer = document.getElementById('modalMainImage');
-
-    // Si c'est le viewer 360°, le charger
-    if (imageUrl === '360') {
-        load360Viewer(mainImageContainer);
-    } else {
-        // Image normale
-        mainImageContainer.innerHTML = `<img src="${imageUrl}" alt="Product" id="modalMainImg">`;
+    const mainImg = document.getElementById('modalMainImg');
+    if (mainImg) {
+        mainImg.src = imageUrl;
     }
 
     // Mettre à jour la classe active des miniatures
@@ -253,126 +235,6 @@ function setMainImage(imageUrl, thumbnailElement) {
     if (thumbnailElement) {
         thumbnailElement.classList.add('active');
     }
-}
-
-// ========== 360 Viewer ==========
-const viewer360Config = {
-    basePath: 'images/360/',
-    frameCount: 32,
-    framePrefix: 'frame_',
-    loaded: false,
-    images: [],
-    currentFrame: 0
-};
-
-function load360Viewer(container) {
-    container.innerHTML = `
-        <div class="viewer-360-container" id="viewer360">
-            <div class="viewer-360-loading">Chargement 360°...</div>
-        </div>
-    `;
-
-    const viewer = document.getElementById('viewer360');
-    const images = [];
-    let loadedCount = 0;
-
-    // Preload all frames
-    for (let i = 1; i <= viewer360Config.frameCount; i++) {
-        const img = new Image();
-        const frameNum = i.toString().padStart(2, '0');
-        img.src = `${viewer360Config.basePath}${viewer360Config.framePrefix}${frameNum}.png`;
-
-        img.onload = () => {
-            loadedCount++;
-            if (loadedCount === viewer360Config.frameCount) {
-                // All images loaded, initialize viewer
-                init360Viewer(viewer, images);
-            }
-        };
-
-        images.push(img);
-    }
-
-    viewer360Config.images = images;
-}
-
-function init360Viewer(viewer, images) {
-    let currentFrame = 0;
-    let isDragging = false;
-    let startX = 0;
-    let hintHidden = false;
-
-    // Create viewer HTML
-    viewer.innerHTML = `
-        <img src="${images[0].src}" alt="Vue 360°" id="viewer360Img">
-        <div class="viewer-360-hint" id="viewer360Hint">
-            <span>↔</span> Glissez pour tourner
-        </div>
-    `;
-
-    const viewerImg = document.getElementById('viewer360Img');
-    const hint = document.getElementById('viewer360Hint');
-
-    function updateFrame(delta) {
-        currentFrame = (currentFrame + delta + images.length) % images.length;
-        viewerImg.src = images[currentFrame].src;
-
-        // Hide hint after first interaction
-        if (!hintHidden) {
-            hint.classList.add('hidden');
-            hintHidden = true;
-        }
-    }
-
-    // Sensitivity: pixels needed to change 1 frame
-    // ~350px slide = 2 tours max = 64 frames → ~5.5px per frame
-    // But we want it smoother, so calculate based on drag distance
-    const sensitivity = 5; // pixels per frame change
-
-    // Mouse events
-    viewer.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        startX = e.clientX;
-        e.preventDefault();
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-
-        const deltaX = e.clientX - startX;
-        const framesToMove = Math.floor(deltaX / sensitivity);
-
-        if (framesToMove !== 0) {
-            updateFrame(framesToMove);
-            startX = e.clientX - (deltaX % sensitivity);
-        }
-    });
-
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-    });
-
-    // Touch events
-    viewer.addEventListener('touchstart', (e) => {
-        isDragging = true;
-        startX = e.touches[0].clientX;
-    }, { passive: true });
-
-    document.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-
-        const deltaX = e.touches[0].clientX - startX;
-        const framesToMove = Math.floor(deltaX / sensitivity);
-
-        if (framesToMove !== 0) {
-            updateFrame(framesToMove);
-            startX = e.touches[0].clientX - (deltaX % sensitivity);
-        }
-    }, { passive: true });
-
-    document.addEventListener('touchend', () => {
-        isDragging = false;
-    });
 }
 
 // Extraire l'ID YouTube d'une URL
@@ -446,6 +308,15 @@ async function checkAuthStatus() {
             profileIconAvatar.src = data.user.picture;
 
             // Contenu du dropdown pour utilisateur connecté
+            const adminButton = data.user.is_admin ? `
+                <a href="admin/" class="profile-dropdown-item">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Administration
+                </a>
+            ` : '';
+
             profileDropdown.innerHTML = `
                 <div class="profile-dropdown-header">
                     <img src="${data.user.picture}" alt="Avatar" class="profile-dropdown-avatar">
@@ -454,6 +325,7 @@ async function checkAuthStatus() {
                         <div class="profile-dropdown-email">${data.user.email}</div>
                     </div>
                 </div>
+                ${adminButton}
                 <button class="profile-dropdown-item" onclick="handleLogout()">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>

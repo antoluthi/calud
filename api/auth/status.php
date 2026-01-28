@@ -16,7 +16,8 @@ if ($user) {
             'id' => $user['id'],
             'email' => $user['email'],
             'name' => $user['name'],
-            'picture' => $user['picture']
+            'picture' => $user['picture'],
+            'is_admin' => (bool)($user['is_admin'] ?? false)
         ]
     ]);
 } else {
