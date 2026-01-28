@@ -324,6 +324,11 @@ function init360Viewer(viewer, images) {
         }
     }
 
+    // Sensitivity: pixels needed to change 1 frame
+    // ~350px slide = 2 tours max = 64 frames → ~5.5px per frame
+    // But we want it smoother, so calculate based on drag distance
+    const sensitivity = 5; // pixels per frame change
+
     // Mouse events
     viewer.addEventListener('mousedown', (e) => {
         isDragging = true;
@@ -335,10 +340,11 @@ function init360Viewer(viewer, images) {
         if (!isDragging) return;
 
         const deltaX = e.clientX - startX;
-        if (Math.abs(deltaX) > 10) {
-            const frameDelta = deltaX > 0 ? 1 : -1;
-            updateFrame(frameDelta);
-            startX = e.clientX;
+        const framesToMove = Math.floor(deltaX / sensitivity);
+
+        if (framesToMove !== 0) {
+            updateFrame(framesToMove);
+            startX = e.clientX - (deltaX % sensitivity);
         }
     });
 
@@ -356,10 +362,11 @@ function init360Viewer(viewer, images) {
         if (!isDragging) return;
 
         const deltaX = e.touches[0].clientX - startX;
-        if (Math.abs(deltaX) > 10) {
-            const frameDelta = deltaX > 0 ? 1 : -1;
-            updateFrame(frameDelta);
-            startX = e.touches[0].clientX;
+        const framesToMove = Math.floor(deltaX / sensitivity);
+
+        if (framesToMove !== 0) {
+            updateFrame(framesToMove);
+            startX = e.touches[0].clientX - (deltaX % sensitivity);
         }
     }, { passive: true });
 
