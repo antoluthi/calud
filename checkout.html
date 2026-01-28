@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
 
     <style>
         :root {
@@ -413,9 +415,74 @@
     </div>
 
     <script>
+        // Stripe configuration - will be loaded from server
+        let stripe = null;
+        let elements = null;
+        let paymentElement = null;
+
         // Get cart from localStorage
         let cart = JSON.parse(localStorage.getItem('alescalade_cart') || '[]');
         let selectedPayment = 'card';
+        let clientSecret = null;
+        let currentOrderId = null;
+
+        // Initialize Stripe
+        async function initStripe(total) {
+            try {
+                // Get publishable key from server
+                const keyResponse = await fetch('api/get-stripe-key.php');
+                const keyData = await keyResponse.json();
+
+                if (!keyData.publishableKey) {
+                    console.log('Stripe not configured, card payments disabled');
+                    return false;
+                }
+
+                stripe = Stripe(keyData.publishableKey);
+
+                // Create PaymentIntent
+                const response = await fetch('api/create-payment-intent.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: Math.round(total * 100), // Convert to cents
+                        email: document.getElementById('email')?.value || ''
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                clientSecret = data.clientSecret;
+
+                // Create Elements
+                elements = stripe.elements({
+                    clientSecret,
+                    appearance: {
+                        theme: 'night',
+                        variables: {
+                            colorPrimary: '#ffffff',
+                            colorBackground: '#181818',
+                            colorText: '#ffffff',
+                            colorDanger: '#f87171',
+                            fontFamily: 'Space Grotesk, sans-serif',
+                            borderRadius: '12px',
+                        }
+                    }
+                });
+
+                paymentElement = elements.create('payment');
+                paymentElement.mount('#payment-element');
+
+                return true;
+            } catch (error) {
+                console.error('Stripe init error:', error);
+                return false;
+            }
+        }
 
         function renderCheckout() {
             const container = document.getElementById('checkoutContent');
@@ -432,7 +499,7 @@
             }
 
             const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const shipping = subtotal >= 100 ? 0 : 8.90;
+            const shipping = subtotal >= 100 ? 0 : 5.90;
             const total = subtotal + shipping;
 
             container.innerHTML = `
@@ -487,14 +554,11 @@
                             <div class="form-group">
                                 <label for="country">Pays</label>
                                 <select id="country" name="country" required>
-                                    <option value="FR">France</option>
-                                    <option value="BE">Belgique</option>
-                                    <option value="CH">Suisse</option>
-                                    <option value="LU">Luxembourg</option>
-                                    <option value="DE">Allemagne</option>
-                                    <option value="IT">Italie</option>
-                                    <option value="ES">Espagne</option>
+                                    <option value="BE" selected>Belgique</option>
                                 </select>
+                                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                    Livraison uniquement en Belgique pour le moment.
+                                </p>
                             </div>
                         </div>
 
@@ -507,16 +571,7 @@
                                 <div class="payment-radio"></div>
                                 <div class="payment-info">
                                     <h3>Carte bancaire</h3>
-                                    <p>Visa, Mastercard, American Express</p>
-                                </div>
-                            </label>
-
-                            <label class="payment-option" onclick="selectPayment('paypal', this)">
-                                <input type="radio" name="payment" value="paypal">
-                                <div class="payment-radio"></div>
-                                <div class="payment-info">
-                                    <h3>PayPal</h3>
-                                    <p>Paiement securise via PayPal</p>
+                                    <p>Visa, Mastercard, Bancontact</p>
                                 </div>
                             </label>
 
@@ -530,9 +585,13 @@
                             </label>
 
                             <div id="cardForm" class="card-form visible">
-                                <p style="color: var(--text-secondary); font-size: 0.85rem; text-align: center;">
-                                    Le paiement par carte sera disponible prochainement.<br>
-                                    En attendant, choisissez le virement bancaire.
+                                <div id="payment-element"></div>
+                                <div id="payment-message" style="color: var(--error); font-size: 0.85rem; margin-top: 0.5rem; display: none;"></div>
+                            </div>
+
+                            <div id="transferInfo" class="card-form">
+                                <p style="color: var(--text-secondary); font-size: 0.85rem;">
+                                    Les informations de virement vous seront envoyees par email apres confirmation de la commande.
                                 </p>
                             </div>
                         </div>
@@ -600,18 +659,23 @@
             });
             element.classList.add('selected');
 
-            // Show/hide card form
+            // Show/hide forms
             const cardForm = document.getElementById('cardForm');
+            const transferInfo = document.getElementById('transferInfo');
+
             if (method === 'card') {
                 cardForm.classList.add('visible');
+                transferInfo.classList.remove('visible');
             } else {
                 cardForm.classList.remove('visible');
+                transferInfo.classList.add('visible');
             }
         }
 
         async function submitOrder() {
             const btn = document.getElementById('submitBtn');
             const messageDiv = document.getElementById('checkoutMessage');
+            const paymentMessage = document.getElementById('payment-message');
 
             // Gather form data
             const formData = {
@@ -629,7 +693,7 @@
                 subtotal: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
             };
 
-            formData.shipping = formData.subtotal >= 100 ? 0 : 8.90;
+            formData.shipping = formData.subtotal >= 100 ? 0 : 5.90;
             formData.total = formData.subtotal + formData.shipping;
 
             // Validate required fields
@@ -639,6 +703,7 @@
                     messageDiv.className = 'checkout-message error';
                     messageDiv.textContent = 'Veuillez remplir tous les champs obligatoires.';
                     messageDiv.style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
             }
@@ -648,44 +713,53 @@
             btn.textContent = 'Traitement...';
 
             try {
+                // First save the order
                 const response = await fetch('api/checkout.php', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
 
                 const result = await response.json();
 
-                if (result.success) {
-                    // Clear cart
-                    localStorage.removeItem('alescalade_cart');
-
-                    // Show success message
-                    messageDiv.className = 'checkout-message success';
-
-                    if (selectedPayment === 'transfer') {
-                        messageDiv.innerHTML = `
-                            <strong>Commande confirmee !</strong><br><br>
-                            Numero de commande: <strong>${result.orderId}</strong><br><br>
-                            Veuillez effectuer un virement de <strong>${formData.total.toFixed(2)} €</strong> sur le compte suivant:<br>
-                            IBAN: <strong>CH XX XXXX XXXX XXXX XXXX X</strong><br>
-                            Reference: <strong>${result.orderId}</strong><br><br>
-                            Un email de confirmation vous a ete envoye.
-                        `;
-                    } else {
-                        messageDiv.innerHTML = `
-                            <strong>Commande confirmee !</strong><br><br>
-                            Numero de commande: <strong>${result.orderId}</strong><br><br>
-                            Un email de confirmation vous a ete envoye.
-                        `;
-                    }
-
-                    // Hide form
-                    document.querySelector('.checkout-content').style.display = 'none';
-                } else {
+                if (!result.success) {
                     throw new Error(result.error || 'Erreur lors de la commande');
+                }
+
+                currentOrderId = result.orderId;
+
+                // If card payment, process with Stripe
+                if (selectedPayment === 'card' && stripe && elements) {
+                    const { error } = await stripe.confirmPayment({
+                        elements,
+                        confirmParams: {
+                            return_url: window.location.origin + '/checkout-success.html?order=' + currentOrderId,
+                            receipt_email: formData.email,
+                        },
+                    });
+
+                    if (error) {
+                        paymentMessage.textContent = error.message;
+                        paymentMessage.style.display = 'block';
+                        btn.disabled = false;
+                        btn.textContent = 'Confirmer la commande';
+                        return;
+                    }
+                } else {
+                    // Bank transfer - show success
+                    localStorage.removeItem('alescalade_cart');
+                    messageDiv.className = 'checkout-message success';
+                    messageDiv.innerHTML = `
+                        <strong>Commande confirmee !</strong><br><br>
+                        Numero de commande: <strong>${result.orderId}</strong><br><br>
+                        Veuillez effectuer un virement de <strong>${formData.total.toFixed(2)} €</strong> sur le compte suivant:<br>
+                        IBAN: <strong>BE XX XXXX XXXX XXXX</strong><br>
+                        BIC: <strong>XXXXXXXX</strong><br>
+                        Reference: <strong>${result.orderId}</strong><br><br>
+                        Votre commande sera expediee des reception du paiement.
+                    `;
+                    document.querySelector('.checkout-content').style.display = 'none';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             } catch (error) {
                 messageDiv.className = 'checkout-message error';
@@ -693,6 +767,7 @@
                 messageDiv.style.display = 'block';
                 btn.disabled = false;
                 btn.textContent = 'Confirmer la commande';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
@@ -705,6 +780,29 @@
 
         // Initialize
         renderCheckout();
+
+        // Initialize Stripe after page load
+        setTimeout(async () => {
+            if (cart.length > 0) {
+                const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const shipping = subtotal >= 100 ? 0 : 5.90;
+                const total = subtotal + shipping;
+
+                const stripeReady = await initStripe(total);
+                if (!stripeReady) {
+                    // Stripe not available, show message
+                    const cardForm = document.getElementById('cardForm');
+                    if (cardForm) {
+                        cardForm.innerHTML = `
+                            <p style="color: var(--text-secondary); font-size: 0.85rem; text-align: center;">
+                                Paiement par carte temporairement indisponible.<br>
+                                Veuillez choisir le virement bancaire.
+                            </p>
+                        `;
+                    }
+                }
+            }
+        }, 100);
     </script>
 </body>
 </html>
