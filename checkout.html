@@ -7,8 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Stripe.js -->
-    <script src="https://js.stripe.com/v3/"></script>
 
     <style>
         :root {
@@ -24,11 +22,7 @@
             --error: #f87171;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -41,10 +35,7 @@
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-image:
                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
@@ -54,18 +45,18 @@
         }
 
         .checkout-container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 2rem 1rem;
         }
 
         .checkout-header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
         }
 
         .checkout-header h1 {
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 600;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -79,23 +70,18 @@
             transition: color 0.3s ease;
         }
 
-        .checkout-header a:hover {
-            color: var(--accent);
-        }
+        .checkout-header a:hover { color: var(--accent); }
 
         .checkout-content {
             display: grid;
-            grid-template-columns: 1fr 400px;
+            grid-template-columns: 1fr 380px;
             gap: 2rem;
         }
 
         @media (max-width: 900px) {
-            .checkout-content {
-                grid-template-columns: 1fr;
-            }
+            .checkout-content { grid-template-columns: 1fr; }
         }
 
-        /* Forms */
         .checkout-section {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -105,12 +91,11 @@
         }
 
         .checkout-section h2 {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 1.25rem;
-            color: var(--text-primary);
         }
 
         .form-row {
@@ -120,26 +105,21 @@
         }
 
         @media (max-width: 600px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
+            .form-row { grid-template-columns: 1fr; }
         }
 
-        .form-group {
-            margin-bottom: 1rem;
-        }
+        .form-group { margin-bottom: 1rem; }
 
         .form-group label {
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
             margin-bottom: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .form-group input,
-        .form-group select {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 0.875rem 1rem;
             background: var(--bg-card);
@@ -151,24 +131,18 @@
             transition: border-color 0.3s ease;
         }
 
-        .form-group input:focus,
-        .form-group select:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
             border-color: var(--accent);
         }
 
-        .form-group input::placeholder {
-            color: var(--text-secondary);
-        }
+        .form-group input::placeholder { color: var(--text-secondary); }
 
         /* Order Summary */
-        .order-summary {
-            position: sticky;
-            top: 2rem;
-        }
+        .order-summary { position: sticky; top: 2rem; }
 
         .order-items {
-            max-height: 300px;
+            max-height: 250px;
             overflow-y: auto;
             margin-bottom: 1rem;
         }
@@ -181,28 +155,11 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .order-item:last-child {
-            border-bottom: none;
-        }
+        .order-item:last-child { border-bottom: none; }
 
-        .order-item-info {
-            flex: 1;
-        }
-
-        .order-item-name {
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-
-        .order-item-details {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .order-item-price {
-            font-weight: 600;
-            margin-left: 1rem;
-        }
+        .order-item-name { font-weight: 500; margin-bottom: 0.2rem; }
+        .order-item-details { font-size: 0.8rem; color: var(--text-secondary); }
+        .order-item-price { font-weight: 600; margin-left: 1rem; }
 
         .order-totals {
             border-top: 1px solid var(--border-color);
@@ -224,87 +181,6 @@
             border-top: 1px solid var(--border-color);
         }
 
-        /* Payment Options */
-        .payment-option {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            margin-bottom: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .payment-option:hover {
-            border-color: var(--text-secondary);
-        }
-
-        .payment-option.selected {
-            border-color: var(--accent);
-        }
-
-        .payment-option input {
-            display: none;
-        }
-
-        .payment-radio {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border-color);
-            border-radius: 50%;
-            margin-right: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .payment-option.selected .payment-radio {
-            border-color: var(--accent);
-        }
-
-        .payment-option.selected .payment-radio::after {
-            content: '';
-            width: 10px;
-            height: 10px;
-            background: var(--accent);
-            border-radius: 50%;
-        }
-
-        .payment-info h3 {
-            font-size: 0.95rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .payment-info p {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        /* Card Form */
-        .card-form {
-            display: none;
-            margin-top: 1rem;
-            padding: 1rem;
-            background: var(--bg-card);
-            border-radius: 12px;
-        }
-
-        .card-form.visible {
-            display: block;
-        }
-
-        .card-element {
-            padding: 1rem;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
-        /* Submit Button */
         .checkout-submit {
             width: 100%;
             padding: 1rem;
@@ -327,12 +203,8 @@
             transform: translateY(-2px);
         }
 
-        .checkout-submit:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .checkout-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Messages */
         .checkout-message {
             padding: 1rem;
             border-radius: 12px;
@@ -354,22 +226,9 @@
             color: var(--error);
         }
 
-        /* Empty Cart */
-        .empty-cart {
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-
-        .empty-cart h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .empty-cart p {
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-        }
-
+        .empty-cart { text-align: center; padding: 4rem 2rem; }
+        .empty-cart h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+        .empty-cart p { color: var(--text-secondary); margin-bottom: 2rem; }
         .empty-cart a {
             display: inline-block;
             padding: 0.875rem 2rem;
@@ -378,14 +237,8 @@
             text-decoration: none;
             border-radius: 100px;
             font-weight: 600;
-            transition: all 0.3s ease;
         }
 
-        .empty-cart a:hover {
-            background: var(--accent-hover);
-        }
-
-        /* Secure Badge */
         .secure-badge {
             display: flex;
             align-items: center;
@@ -396,9 +249,13 @@
             font-size: 0.8rem;
         }
 
-        .secure-badge svg {
-            width: 16px;
-            height: 16px;
+        .payment-info {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
         }
     </style>
 </head>
@@ -406,83 +263,14 @@
     <div class="checkout-container">
         <header class="checkout-header">
             <h1>Checkout</h1>
-            <a href="index.html">&larr; Retour à la boutique</a>
+            <a href="index.html">&larr; Retour a la boutique</a>
         </header>
 
-        <div id="checkoutContent">
-            <!-- Content loaded by JS -->
-        </div>
+        <div id="checkoutContent"></div>
     </div>
 
     <script>
-        // Stripe configuration - will be loaded from server
-        let stripe = null;
-        let elements = null;
-        let paymentElement = null;
-
-        // Get cart from localStorage
         let cart = JSON.parse(localStorage.getItem('alescalade_cart') || '[]');
-        let selectedPayment = 'card';
-        let clientSecret = null;
-        let currentOrderId = null;
-
-        // Initialize Stripe
-        async function initStripe(total) {
-            try {
-                // Get publishable key from server
-                const keyResponse = await fetch('api/get-stripe-key.php');
-                const keyData = await keyResponse.json();
-
-                if (!keyData.publishableKey) {
-                    console.log('Stripe not configured, card payments disabled');
-                    return false;
-                }
-
-                stripe = Stripe(keyData.publishableKey);
-
-                // Create PaymentIntent
-                const response = await fetch('api/create-payment-intent.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        amount: Math.round(total * 100), // Convert to cents
-                        email: document.getElementById('email')?.value || ''
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                clientSecret = data.clientSecret;
-
-                // Create Elements
-                elements = stripe.elements({
-                    clientSecret,
-                    appearance: {
-                        theme: 'night',
-                        variables: {
-                            colorPrimary: '#ffffff',
-                            colorBackground: '#181818',
-                            colorText: '#ffffff',
-                            colorDanger: '#f87171',
-                            fontFamily: 'Space Grotesk, sans-serif',
-                            borderRadius: '12px',
-                        }
-                    }
-                });
-
-                paymentElement = elements.create('payment');
-                paymentElement.mount('#payment-element');
-
-                return true;
-            } catch (error) {
-                console.error('Stripe init error:', error);
-                return false;
-            }
-        }
 
         function renderCheckout() {
             const container = document.getElementById('checkoutContent');
@@ -507,53 +295,51 @@
                     <div class="checkout-forms">
                         <div id="checkoutMessage" class="checkout-message"></div>
 
-                        <!-- Contact -->
                         <div class="checkout-section">
                             <h2>Contact</h2>
                             <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" id="email" name="email" required placeholder="votre@email.com">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" required placeholder="votre@email.com">
                             </div>
                             <div class="form-group">
                                 <label for="phone">Telephone</label>
-                                <input type="tel" id="phone" name="phone" placeholder="+33 6 12 34 56 78">
+                                <input type="tel" id="phone" placeholder="+32 4XX XX XX XX">
                             </div>
                         </div>
 
-                        <!-- Shipping Address -->
                         <div class="checkout-section">
                             <h2>Adresse de livraison</h2>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="firstName">Prenom</label>
-                                    <input type="text" id="firstName" name="firstName" required>
+                                    <label for="firstName">Prenom *</label>
+                                    <input type="text" id="firstName" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="lastName">Nom</label>
-                                    <input type="text" id="lastName" name="lastName" required>
+                                    <label for="lastName">Nom *</label>
+                                    <input type="text" id="lastName" required>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="address">Adresse</label>
-                                <input type="text" id="address" name="address" required placeholder="Rue et numero">
+                                <label for="address">Adresse *</label>
+                                <input type="text" id="address" required placeholder="Rue et numero">
                             </div>
                             <div class="form-group">
-                                <label for="address2">Complement d'adresse</label>
-                                <input type="text" id="address2" name="address2" placeholder="Appartement, etage, etc.">
+                                <label for="address2">Complement</label>
+                                <input type="text" id="address2" placeholder="Appartement, boite, etc.">
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="postalCode">Code postal</label>
-                                    <input type="text" id="postalCode" name="postalCode" required>
+                                    <label for="postalCode">Code postal *</label>
+                                    <input type="text" id="postalCode" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="city">Ville</label>
-                                    <input type="text" id="city" name="city" required>
+                                    <label for="city">Ville *</label>
+                                    <input type="text" id="city" required>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="country">Pays</label>
-                                <select id="country" name="country" required>
+                                <select id="country" required>
                                     <option value="BE" selected>Belgique</option>
                                 </select>
                                 <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
@@ -562,42 +348,16 @@
                             </div>
                         </div>
 
-                        <!-- Payment -->
                         <div class="checkout-section">
                             <h2>Paiement</h2>
-
-                            <label class="payment-option selected" onclick="selectPayment('card', this)">
-                                <input type="radio" name="payment" value="card" checked>
-                                <div class="payment-radio"></div>
-                                <div class="payment-info">
-                                    <h3>Carte bancaire</h3>
-                                    <p>Visa, Mastercard, Bancontact</p>
-                                </div>
-                            </label>
-
-                            <label class="payment-option" onclick="selectPayment('transfer', this)">
-                                <input type="radio" name="payment" value="transfer">
-                                <div class="payment-radio"></div>
-                                <div class="payment-info">
-                                    <h3>Virement bancaire</h3>
-                                    <p>Commande expediee apres reception du paiement</p>
-                                </div>
-                            </label>
-
-                            <div id="cardForm" class="card-form visible">
-                                <div id="payment-element"></div>
-                                <div id="payment-message" style="color: var(--error); font-size: 0.85rem; margin-top: 0.5rem; display: none;"></div>
-                            </div>
-
-                            <div id="transferInfo" class="card-form">
-                                <p style="color: var(--text-secondary); font-size: 0.85rem;">
-                                    Les informations de virement vous seront envoyees par email apres confirmation de la commande.
-                                </p>
+                            <div class="payment-info">
+                                <strong>Virement bancaire</strong><br><br>
+                                Apres confirmation de votre commande, vous recevrez les informations de paiement par email.<br><br>
+                                Votre commande sera expediee des reception du virement.
                             </div>
                         </div>
                     </div>
 
-                    <!-- Order Summary -->
                     <div class="order-summary">
                         <div class="checkout-section">
                             <h2>Votre commande</h2>
@@ -605,9 +365,9 @@
                             <div class="order-items">
                                 ${cart.map(item => `
                                     <div class="order-item">
-                                        <div class="order-item-info">
+                                        <div>
                                             <div class="order-item-name">${item.name}</div>
-                                            <div class="order-item-details">${item.size} - Qty: ${item.quantity}</div>
+                                            <div class="order-item-details">${item.size} × ${item.quantity}</div>
                                         </div>
                                         <div class="order-item-price">${(item.price * item.quantity).toFixed(2)} €</div>
                                     </div>
@@ -623,11 +383,7 @@
                                     <span>Livraison</span>
                                     <span>${shipping === 0 ? 'Gratuite' : shipping.toFixed(2) + ' €'}</span>
                                 </div>
-                                ${shipping > 0 ? `
-                                    <div class="order-row" style="color: var(--text-secondary); font-size: 0.8rem;">
-                                        <span>Livraison gratuite des 100€</span>
-                                    </div>
-                                ` : ''}
+                                ${shipping > 0 ? '<div class="order-row" style="font-size:0.75rem;color:var(--text-secondary);">Gratuite des 100€</div>' : ''}
                                 <div class="order-row total">
                                     <span>Total</span>
                                     <span>${total.toFixed(2)} €</span>
@@ -639,10 +395,10 @@
                             </button>
 
                             <div class="secure-badge">
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
                                 </svg>
-                                Paiement 100% securise
+                                Commande securisee
                             </div>
                         </div>
                     </div>
@@ -650,34 +406,10 @@
             `;
         }
 
-        function selectPayment(method, element) {
-            selectedPayment = method;
-
-            // Update visual
-            document.querySelectorAll('.payment-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            element.classList.add('selected');
-
-            // Show/hide forms
-            const cardForm = document.getElementById('cardForm');
-            const transferInfo = document.getElementById('transferInfo');
-
-            if (method === 'card') {
-                cardForm.classList.add('visible');
-                transferInfo.classList.remove('visible');
-            } else {
-                cardForm.classList.remove('visible');
-                transferInfo.classList.add('visible');
-            }
-        }
-
         async function submitOrder() {
             const btn = document.getElementById('submitBtn');
             const messageDiv = document.getElementById('checkoutMessage');
-            const paymentMessage = document.getElementById('payment-message');
 
-            // Gather form data
             const formData = {
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
@@ -688,7 +420,7 @@
                 postalCode: document.getElementById('postalCode').value,
                 city: document.getElementById('city').value,
                 country: document.getElementById('country').value,
-                paymentMethod: selectedPayment,
+                paymentMethod: 'transfer',
                 items: cart,
                 subtotal: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
             };
@@ -696,24 +428,20 @@
             formData.shipping = formData.subtotal >= 100 ? 0 : 5.90;
             formData.total = formData.subtotal + formData.shipping;
 
-            // Validate required fields
             const required = ['email', 'firstName', 'lastName', 'address', 'postalCode', 'city'];
             for (const field of required) {
                 if (!formData[field]) {
                     messageDiv.className = 'checkout-message error';
                     messageDiv.textContent = 'Veuillez remplir tous les champs obligatoires.';
-                    messageDiv.style.display = 'block';
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
             }
 
-            // Disable button
             btn.disabled = true;
             btn.textContent = 'Traitement...';
 
             try {
-                // First save the order
                 const response = await fetch('api/checkout.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -726,83 +454,37 @@
                     throw new Error(result.error || 'Erreur lors de la commande');
                 }
 
-                currentOrderId = result.orderId;
+                localStorage.removeItem('alescalade_cart');
 
-                // If card payment, process with Stripe
-                if (selectedPayment === 'card' && stripe && elements) {
-                    const { error } = await stripe.confirmPayment({
-                        elements,
-                        confirmParams: {
-                            return_url: window.location.origin + '/checkout-success.html?order=' + currentOrderId,
-                            receipt_email: formData.email,
-                        },
-                    });
+                messageDiv.className = 'checkout-message success';
+                messageDiv.innerHTML = `
+                    <strong>Commande confirmee !</strong><br><br>
+                    Numero de commande: <strong>${result.orderId}</strong><br><br>
+                    Effectuez un virement de <strong>${formData.total.toFixed(2)} €</strong> sur:<br><br>
+                    <strong>IBAN:</strong> BE00 0000 0000 0000<br>
+                    <strong>BIC:</strong> GEBABEBB<br>
+                    <strong>Communication:</strong> ${result.orderId}<br><br>
+                    Votre commande sera expediee des reception du paiement.<br>
+                    Un email de confirmation vous a ete envoye.
+                `;
 
-                    if (error) {
-                        paymentMessage.textContent = error.message;
-                        paymentMessage.style.display = 'block';
-                        btn.disabled = false;
-                        btn.textContent = 'Confirmer la commande';
-                        return;
-                    }
-                } else {
-                    // Bank transfer - show success
-                    localStorage.removeItem('alescalade_cart');
-                    messageDiv.className = 'checkout-message success';
-                    messageDiv.innerHTML = `
-                        <strong>Commande confirmee !</strong><br><br>
-                        Numero de commande: <strong>${result.orderId}</strong><br><br>
-                        Veuillez effectuer un virement de <strong>${formData.total.toFixed(2)} €</strong> sur le compte suivant:<br>
-                        IBAN: <strong>BE XX XXXX XXXX XXXX</strong><br>
-                        BIC: <strong>XXXXXXXX</strong><br>
-                        Reference: <strong>${result.orderId}</strong><br><br>
-                        Votre commande sera expediee des reception du paiement.
-                    `;
-                    document.querySelector('.checkout-content').style.display = 'none';
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
+                document.querySelector('.checkout-content').style.display = 'none';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
             } catch (error) {
                 messageDiv.className = 'checkout-message error';
                 messageDiv.textContent = error.message;
-                messageDiv.style.display = 'block';
                 btn.disabled = false;
                 btn.textContent = 'Confirmer la commande';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
-        // Handle Escape key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                window.location.href = 'index.html';
-            }
+            if (e.key === 'Escape') window.location.href = 'index.html';
         });
 
-        // Initialize
         renderCheckout();
-
-        // Initialize Stripe after page load
-        setTimeout(async () => {
-            if (cart.length > 0) {
-                const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                const shipping = subtotal >= 100 ? 0 : 5.90;
-                const total = subtotal + shipping;
-
-                const stripeReady = await initStripe(total);
-                if (!stripeReady) {
-                    // Stripe not available, show message
-                    const cardForm = document.getElementById('cardForm');
-                    if (cardForm) {
-                        cardForm.innerHTML = `
-                            <p style="color: var(--text-secondary); font-size: 0.85rem; text-align: center;">
-                                Paiement par carte temporairement indisponible.<br>
-                                Veuillez choisir le virement bancaire.
-                            </p>
-                        `;
-                    }
-                }
-            }
-        }, 100);
     </script>
 </body>
 </html>
