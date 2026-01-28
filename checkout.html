@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - AL Escalade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-card: #181818;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --accent: #ffffff;
+            --accent-hover: #cccccc;
+            --border-color: #2a2a2a;
+            --success: #4ade80;
+            --error: #f87171;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .checkout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .checkout-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .checkout-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .checkout-header a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .checkout-header a:hover {
+            color: var(--accent);
+        }
+
+        .checkout-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .checkout-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Forms */
+        .checkout-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkout-section h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Order Summary */
+        .order-summary {
+            position: sticky;
+            top: 2rem;
+        }
+
+        .order-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item-info {
+            flex: 1;
+        }
+
+        .order-item-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .order-item-details {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .order-item-price {
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .order-totals {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .order-row.total {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Payment Options */
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-option:hover {
+            border-color: var(--text-secondary);
+        }
+
+        .payment-option.selected {
+            border-color: var(--accent);
+        }
+
+        .payment-option input {
+            display: none;
+        }
+
+        .payment-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .payment-option.selected .payment-radio {
+            border-color: var(--accent);
+        }
+
+        .payment-option.selected .payment-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .payment-info h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .payment-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Card Form */
+        .card-form {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+        }
+
+        .card-form.visible {
+            display: block;
+        }
+
+        .card-element {
+            padding: 1rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        /* Submit Button */
+        .checkout-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent);
+            border: none;
+            border-radius: 100px;
+            color: var(--bg-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 1rem;
+        }
+
+        .checkout-submit:hover:not(:disabled) {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .checkout-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Messages */
+        .checkout-message {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .checkout-message.success {
+            display: block;
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .checkout-message.error {
+            display: block;
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+
+        /* Empty Cart */
+        .empty-cart {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-cart h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-cart p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .empty-cart a {
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            background: var(--accent);
+            color: var(--bg-primary);
+            text-decoration: none;
+            border-radius: 100px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .empty-cart a:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Secure Badge */
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .secure-badge svg {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="checkout-container">
+        <header class="checkout-header">
+            <h1>Checkout</h1>
+            <a href="index.html">&larr; Retour à la boutique</a>
+        </header>
+
+        <div id="checkoutContent">
+            <!-- Content loaded by JS -->
+        </div>
+    </div>
+
+    <script>
+        // Get cart from localStorage
+        let cart = JSON.parse(localStorage.getItem('alescalade_cart') || '[]');
+        let selectedPayment = 'card';
+
+        function renderCheckout() {
+            const container = document.getElementById('checkoutContent');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <h2>Votre panier est vide</h2>
+                        <p>Ajoutez des articles avant de passer commande</p>
+                        <a href="index.html">Voir les produits</a>
+                    </div>
+                `;
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const shipping = subtotal >= 100 ? 0 : 8.90;
+            const total = subtotal + shipping;
+
+            container.innerHTML = `
+                <div class="checkout-content">
+                    <div class="checkout-forms">
+                        <div id="checkoutMessage" class="checkout-message"></div>
+
+                        <!-- Contact -->
+                        <div class="checkout-section">
+                            <h2>Contact</h2>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" required placeholder="votre@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Telephone</label>
+                                <input type="tel" id="phone" name="phone" placeholder="+33 6 12 34 56 78">
+                            </div>
+                        </div>
+
+                        <!-- Shipping Address -->
+                        <div class="checkout-section">
+                            <h2>Adresse de livraison</h2>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="firstName">Prenom</label>
+                                    <input type="text" id="firstName" name="firstName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastName">Nom</label>
+                                    <input type="text" id="lastName" name="lastName" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="address">Adresse</label>
+                                <input type="text" id="address" name="address" required placeholder="Rue et numero">
+                            </div>
+                            <div class="form-group">
+                                <label for="address2">Complement d'adresse</label>
+                                <input type="text" id="address2" name="address2" placeholder="Appartement, etage, etc.">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="postalCode">Code postal</label>
+                                    <input type="text" id="postalCode" name="postalCode" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="city">Ville</label>
+                                    <input type="text" id="city" name="city" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Pays</label>
+                                <select id="country" name="country" required>
+                                    <option value="FR">France</option>
+                                    <option value="BE">Belgique</option>
+                                    <option value="CH">Suisse</option>
+                                    <option value="LU">Luxembourg</option>
+                                    <option value="DE">Allemagne</option>
+                                    <option value="IT">Italie</option>
+                                    <option value="ES">Espagne</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Payment -->
+                        <div class="checkout-section">
+                            <h2>Paiement</h2>
+
+                            <label class="payment-option selected" onclick="selectPayment('card', this)">
+                                <input type="radio" name="payment" value="card" checked>
+                                <div class="payment-radio"></div>
+                                <div class="payment-info">
+                                    <h3>Carte bancaire</h3>
+                                    <p>Visa, Mastercard, American Express</p>
+                                </div>
+                            </label>
+
+                            <label class="payment-option" onclick="selectPayment('paypal', this)">
+                                <input type="radio" name="payment" value="paypal">
+                                <div class="payment-radio"></div>
+                                <div class="payment-info">
+                                    <h3>PayPal</h3>
+                                    <p>Paiement securise via PayPal</p>
+                                </div>
+                            </label>
+
+                            <label class="payment-option" onclick="selectPayment('transfer', this)">
+                                <input type="radio" name="payment" value="transfer">
+                                <div class="payment-radio"></div>
+                                <div class="payment-info">
+                                    <h3>Virement bancaire</h3>
+                                    <p>Commande expediee apres reception du paiement</p>
+                                </div>
+                            </label>
+
+                            <div id="cardForm" class="card-form visible">
+                                <p style="color: var(--text-secondary); font-size: 0.85rem; text-align: center;">
+                                    Le paiement par carte sera disponible prochainement.<br>
+                                    En attendant, choisissez le virement bancaire.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="order-summary">
+                        <div class="checkout-section">
+                            <h2>Votre commande</h2>
+
+                            <div class="order-items">
+                                ${cart.map(item => `
+                                    <div class="order-item">
+                                        <div class="order-item-info">
+                                            <div class="order-item-name">${item.name}</div>
+                                            <div class="order-item-details">${item.size} - Qty: ${item.quantity}</div>
+                                        </div>
+                                        <div class="order-item-price">${(item.price * item.quantity).toFixed(2)} €</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div class="order-totals">
+                                <div class="order-row">
+                                    <span>Sous-total</span>
+                                    <span>${subtotal.toFixed(2)} €</span>
+                                </div>
+                                <div class="order-row">
+                                    <span>Livraison</span>
+                                    <span>${shipping === 0 ? 'Gratuite' : shipping.toFixed(2) + ' €'}</span>
+                                </div>
+                                ${shipping > 0 ? `
+                                    <div class="order-row" style="color: var(--text-secondary); font-size: 0.8rem;">
+                                        <span>Livraison gratuite des 100€</span>
+                                    </div>
+                                ` : ''}
+                                <div class="order-row total">
+                                    <span>Total</span>
+                                    <span>${total.toFixed(2)} €</span>
+                                </div>
+                            </div>
+
+                            <button class="checkout-submit" onclick="submitOrder()" id="submitBtn">
+                                Confirmer la commande
+                            </button>
+
+                            <div class="secure-badge">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                                </svg>
+                                Paiement 100% securise
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectPayment(method, element) {
+            selectedPayment = method;
+
+            // Update visual
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            // Show/hide card form
+            const cardForm = document.getElementById('cardForm');
+            if (method === 'card') {
+                cardForm.classList.add('visible');
+            } else {
+                cardForm.classList.remove('visible');
+            }
+        }
+
+        async function submitOrder() {
+            const btn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('checkoutMessage');
+
+            // Gather form data
+            const formData = {
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                address: document.getElementById('address').value,
+                address2: document.getElementById('address2').value,
+                postalCode: document.getElementById('postalCode').value,
+                city: document.getElementById('city').value,
+                country: document.getElementById('country').value,
+                paymentMethod: selectedPayment,
+                items: cart,
+                subtotal: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+            };
+
+            formData.shipping = formData.subtotal >= 100 ? 0 : 8.90;
+            formData.total = formData.subtotal + formData.shipping;
+
+            // Validate required fields
+            const required = ['email', 'firstName', 'lastName', 'address', 'postalCode', 'city'];
+            for (const field of required) {
+                if (!formData[field]) {
+                    messageDiv.className = 'checkout-message error';
+                    messageDiv.textContent = 'Veuillez remplir tous les champs obligatoires.';
+                    messageDiv.style.display = 'block';
+                    return;
+                }
+            }
+
+            // Disable button
+            btn.disabled = true;
+            btn.textContent = 'Traitement...';
+
+            try {
+                const response = await fetch('api/checkout.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Clear cart
+                    localStorage.removeItem('alescalade_cart');
+
+                    // Show success message
+                    messageDiv.className = 'checkout-message success';
+
+                    if (selectedPayment === 'transfer') {
+                        messageDiv.innerHTML = `
+                            <strong>Commande confirmee !</strong><br><br>
+                            Numero de commande: <strong>${result.orderId}</strong><br><br>
+                            Veuillez effectuer un virement de <strong>${formData.total.toFixed(2)} €</strong> sur le compte suivant:<br>
+                            IBAN: <strong>CH XX XXXX XXXX XXXX XXXX X</strong><br>
+                            Reference: <strong>${result.orderId}</strong><br><br>
+                            Un email de confirmation vous a ete envoye.
+                        `;
+                    } else {
+                        messageDiv.innerHTML = `
+                            <strong>Commande confirmee !</strong><br><br>
+                            Numero de commande: <strong>${result.orderId}</strong><br><br>
+                            Un email de confirmation vous a ete envoye.
+                        `;
+                    }
+
+                    // Hide form
+                    document.querySelector('.checkout-content').style.display = 'none';
+                } else {
+                    throw new Error(result.error || 'Erreur lors de la commande');
+                }
+            } catch (error) {
+                messageDiv.className = 'checkout-message error';
+                messageDiv.textContent = error.message;
+                messageDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Confirmer la commande';
+            }
+        }
+
+        // Handle Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Initialize
+        renderCheckout();
+    </script>
+</body>
+</html>
