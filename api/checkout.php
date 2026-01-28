@@ -3,18 +3,43 @@
  * API Checkout - Enregistre les commandes
  */
 
-// Désactiver l'affichage des erreurs PHP (retourner JSON propre)
+// Capturer tout output
+ob_start();
+
+// Désactiver l'affichage des erreurs PHP
 ini_set('display_errors', 0);
-error_reporting(E_ALL);
+ini_set('html_errors', 0);
+error_reporting(0);
 
 header('Content-Type: application/json');
 
-require_once 'config.php';
+// Fonction pour retourner une erreur JSON proprement
+function returnError($message) {
+    ob_end_clean();
+    echo json_encode(['success' => false, 'error' => $message]);
+    exit;
+}
+
+// Fonction pour retourner un succès
+function returnSuccess($data) {
+    ob_end_clean();
+    echo json_encode($data);
+    exit;
+}
+
+try {
+    require_once 'config.php';
+    // Re-désactiver les erreurs (config.php les réactive)
+    ini_set('display_errors', 0);
+    ini_set('html_errors', 0);
+    error_reporting(0);
+} catch (Throwable $e) {
+    returnError('Config error: ' . $e->getMessage());
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['success' => false, 'error' => 'Method not allowed']);
-    exit;
+    returnError('Method not allowed');
 }
 
 // Get POST data
@@ -22,8 +47,7 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 if (!$data) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Invalid data']);
-    exit;
+    returnError('Invalid data');
 }
 
 // Validate required fields
@@ -31,13 +55,12 @@ $required = ['email', 'firstName', 'lastName', 'address', 'postalCode', 'city', 
 foreach ($required as $field) {
     if (empty($data[$field])) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'error' => "Missing field: $field"]);
-        exit;
+        returnError("Missing field: $field");
     }
 }
 
 try {
-    $pdo = getPDO();
+    $pdo = getDB();
 
     // Generate order ID
     $orderId = 'AL-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
@@ -92,7 +115,7 @@ try {
 
     // TODO: Send confirmation email
 
-    echo json_encode([
+    returnSuccess([
         'success' => true,
         'orderId' => $orderId,
         'message' => 'Commande enregistrée avec succès'
@@ -101,9 +124,9 @@ try {
 } catch (PDOException $e) {
     error_log("Checkout error: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Erreur base de données: ' . $e->getMessage()]);
+    returnError('Erreur base de données: ' . $e->getMessage());
 } catch (Exception $e) {
     error_log("Checkout error: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Erreur: ' . $e->getMessage()]);
+    returnError('Erreur: ' . $e->getMessage());
 }
