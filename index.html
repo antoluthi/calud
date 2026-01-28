@@ -373,9 +373,9 @@
 
         .cart-sidebar {
             position: fixed;
-            top: 0;
+            top: 1rem;
             left: 50%;
-            transform: translateX(-50%) translateY(-100%);
+            transform: translateX(-50%);
             width: calc(100% - 2rem);
             max-width: 450px;
             max-height: 80vh;
@@ -385,14 +385,12 @@
             border: 1px solid var(--border-color);
             border-radius: 24px;
             z-index: 2001;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
+            display: none;
             flex-direction: column;
-            margin-top: 1rem;
         }
 
         .cart-sidebar.active {
-            transform: translateX(-50%) translateY(0);
+            display: flex;
         }
 
         .cart-header {
