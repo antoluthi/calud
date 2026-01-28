@@ -92,12 +92,16 @@ $commandes = $commandesQuery->fetchAll();
                                     <td>#<?= $commande['id'] ?></td>
                                     <td>
                                         <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <?php if ($commande['client_picture']): ?>
+                                            <?php if (!empty($commande['client_picture'])): ?>
                                                 <img src="<?= htmlspecialchars($commande['client_picture']) ?>" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
                                             <?php endif; ?>
                                             <div>
-                                                <div><?= htmlspecialchars($commande['client_name']) ?></div>
-                                                <div style="font-size: 0.8rem; color: var(--text-secondary);"><?= htmlspecialchars($commande['client_email']) ?></div>
+                                                <?php
+                                                $clientName = $commande['client_name'] ?? trim(($commande['first_name'] ?? '') . ' ' . ($commande['last_name'] ?? ''));
+                                                $clientEmail = $commande['client_email'] ?? $commande['email'] ?? '';
+                                                ?>
+                                                <div><?= htmlspecialchars($clientName ?: 'Client') ?></div>
+                                                <div style="font-size: 0.8rem; color: var(--text-secondary);"><?= htmlspecialchars($clientEmail) ?></div>
                                             </div>
                                         </div>
                                     </td>
@@ -105,6 +109,7 @@ $commandes = $commandesQuery->fetchAll();
                                     <td>
                                         <?php
                                         $badgeClass = [
+                                            'pending' => 'badge-warning',
                                             'en_attente' => 'badge-warning',
                                             'confirmee' => 'badge-info',
                                             'expediee' => 'badge-success',
@@ -113,6 +118,7 @@ $commandes = $commandesQuery->fetchAll();
                                         ][$commande['status']] ?? 'badge-info';
 
                                         $statusLabel = [
+                                            'pending' => 'En attente',
                                             'en_attente' => 'En attente',
                                             'confirmee' => 'Confirmée',
                                             'expediee' => 'Expédiée',

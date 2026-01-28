@@ -74,7 +74,7 @@ try {
         ) VALUES (
             ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, 'pending', NOW()
+            ?, ?, ?, ?, 'en_attente', NOW()
         )
     ");
 

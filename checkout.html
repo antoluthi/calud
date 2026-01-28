@@ -456,19 +456,25 @@
 
                 localStorage.removeItem('alescalade_cart');
 
-                messageDiv.className = 'checkout-message success';
-                messageDiv.innerHTML = `
-                    <strong>Commande confirmee !</strong><br><br>
-                    Numero de commande: <strong>${result.orderId}</strong><br><br>
-                    Effectuez un virement de <strong>${formData.total.toFixed(2)} €</strong> sur:<br><br>
-                    <strong>IBAN:</strong> BE65 0018 1297 8496<br>
-                    <strong>BIC:</strong> GEBABEBB<br>
-                    <strong>Communication:</strong> ${result.orderId}<br><br>
-                    Votre commande sera expediee des reception du paiement.<br>
-                    Un email de confirmation vous a ete envoye.
-                `;
+                // Afficher le message de confirmation à la place du formulaire
+                document.getElementById('checkoutContent').innerHTML = `
+                    <div class="checkout-section" style="max-width: 600px; margin: 0 auto;">
+                        <div class="checkout-message success" style="display: block;">
+                            <h2 style="margin-bottom: 1rem; color: var(--success);">✓ Commande confirmee !</h2>
+                            <p style="margin-bottom: 1.5rem;">Numero de commande: <strong>${result.orderId}</strong></p>
 
-                document.querySelector('.checkout-content').style.display = 'none';
+                            <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                                <p style="margin-bottom: 1rem;"><strong>Effectuez un virement de ${formData.total.toFixed(2)} € sur:</strong></p>
+                                <p style="margin-bottom: 0.5rem;"><strong>IBAN:</strong> BE65 0018 1297 8496</p>
+                                <p style="margin-bottom: 0.5rem;"><strong>BIC:</strong> GEBABEBB</p>
+                                <p><strong>Communication:</strong> ${result.orderId}</p>
+                            </div>
+
+                            <p style="color: var(--text-secondary);">Votre commande sera expediee des reception du paiement.</p>
+                        </div>
+                        <a href="index.html" style="display: block; text-align: center; margin-top: 2rem; padding: 1rem 2rem; background: var(--accent); color: var(--bg-primary); text-decoration: none; border-radius: 100px; font-weight: 600;">Retour a la boutique</a>
+                    </div>
+                `;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
             } catch (error) {
