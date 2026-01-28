@@ -64,10 +64,15 @@
             position: fixed;
             top: 1.5rem;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(0);
             z-index: 1000;
             width: calc(100% - 3rem);
             max-width: 500px;
+            transition: transform 0.3s ease;
+        }
+
+        header.hidden {
+            transform: translateX(-50%) translateY(-150%);
         }
 
         nav {
@@ -355,41 +360,47 @@
             fill: var(--text-secondary);
         }
 
-        /* ========== Cart Sidebar ========== */
+        /* ========== Cart Dropdown ========== */
         .cart-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.6);
             z-index: 2000;
-            display: none;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
 
         .cart-overlay.active {
-            display: block;
             opacity: 1;
+            visibility: visible;
         }
 
         .cart-sidebar {
             position: fixed;
             top: 0;
-            right: -450px;
-            width: 450px;
-            height: 100vh;
-            background-color: var(--bg-secondary);
-            border-left: 1px solid var(--border-color);
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            width: calc(100% - 2rem);
+            max-width: 450px;
+            max-height: 80vh;
+            background-color: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
             z-index: 2001;
-            transition: right 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
+            margin-top: 1rem;
         }
 
         .cart-sidebar.active {
-            right: 0;
+            transform: translateX(-50%) translateY(0);
         }
 
         .cart-header {
@@ -1424,8 +1435,9 @@
             }
 
             .cart-sidebar {
-                width: 100%;
-                right: -100%;
+                width: calc(100% - 1rem);
+                max-height: 85vh;
+                margin-top: 0.5rem;
             }
 
             .products-grid {
@@ -1850,6 +1862,33 @@
                     menuOverlay.classList.remove('active');
                     document.body.style.overflow = '';
                 });
+            });
+
+            // Header hide/show on scroll
+            const header = document.querySelector('header');
+            let lastScrollY = window.scrollY;
+            let ticking = false;
+
+            function updateHeader() {
+                const currentScrollY = window.scrollY;
+
+                if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                    // Scrolling down & past threshold - hide header
+                    header.classList.add('hidden');
+                } else {
+                    // Scrolling up - show header
+                    header.classList.remove('hidden');
+                }
+
+                lastScrollY = currentScrollY;
+                ticking = false;
+            }
+
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(updateHeader);
+                    ticking = true;
+                }
             });
 
             // Open cart
