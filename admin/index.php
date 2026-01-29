@@ -20,7 +20,7 @@ $statsQuery = $db->query("
         (SELECT COUNT(*) FROM produits WHERE actif = 1) as produits_actifs,
         (SELECT COUNT(*) FROM users) as total_utilisateurs,
         (SELECT COUNT(*) FROM commandes) as total_commandes,
-        (SELECT COUNT(*) FROM commandes WHERE status = 'en_attente') as commandes_en_attente
+        (SELECT COUNT(*) FROM commandes WHERE status = 'pending') as commandes_en_attente
 ");
 $stats = $statsQuery->fetch();
 
@@ -143,19 +143,21 @@ $dernieresCommandes = $commandesQuery->fetchAll();
                                     <td>
                                         <?php
                                         $badgeClass = [
-                                            'en_attente' => 'badge-warning',
-                                            'confirmee' => 'badge-info',
-                                            'expediee' => 'badge-success',
-                                            'livree' => 'badge-success',
-                                            'annulee' => 'badge-danger'
+                                            'pending' => 'badge-warning',
+                                            'paid' => 'badge-info',
+                                            'processing' => 'badge-info',
+                                            'shipped' => 'badge-success',
+                                            'delivered' => 'badge-success',
+                                            'cancelled' => 'badge-danger'
                                         ][$commande['status']] ?? 'badge-info';
 
                                         $statusLabel = [
-                                            'en_attente' => 'En attente',
-                                            'confirmee' => 'Confirmée',
-                                            'expediee' => 'Expédiée',
-                                            'livree' => 'Livrée',
-                                            'annulee' => 'Annulée'
+                                            'pending' => 'En attente',
+                                            'paid' => 'Payée',
+                                            'processing' => 'En préparation',
+                                            'shipped' => 'Expédiée',
+                                            'delivered' => 'Livrée',
+                                            'cancelled' => 'Annulée'
                                         ][$commande['status']] ?? $commande['status'];
                                         ?>
                                         <span class="badge <?= $badgeClass ?>"><?= $statusLabel ?></span>

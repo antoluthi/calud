@@ -79,7 +79,7 @@ if ($method === 'PUT') {
     }
 
     // Vérifier que le statut est valide
-    $statusValides = ['en_attente', 'confirmee', 'expediee', 'livree', 'annulee'];
+    $statusValides = ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'];
     if (!in_array($data['status'], $statusValides)) {
         sendJSON(['error' => 'Statut invalide'], 400);
     }
@@ -131,7 +131,7 @@ if ($method === 'POST') {
         $stmt->execute([
             $data['user_id'],
             $total,
-            $data['status'] ?? 'en_attente'
+            $data['status'] ?? 'pending'
         ]);
 
         $commandeId = $db->lastInsertId();

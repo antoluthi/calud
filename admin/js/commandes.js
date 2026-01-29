@@ -26,19 +26,21 @@ async function viewOrder(commande) {
 // Afficher les détails de la commande
 function displayOrderDetails(data) {
     const statusLabels = {
-        'en_attente': 'En attente',
-        'confirmee': 'Confirmée',
-        'expediee': 'Expédiée',
-        'livree': 'Livrée',
-        'annulee': 'Annulée'
+        'pending': 'En attente',
+        'paid': 'Payée',
+        'processing': 'En préparation',
+        'shipped': 'Expédiée',
+        'delivered': 'Livrée',
+        'cancelled': 'Annulée'
     };
 
     const badgeClass = {
-        'en_attente': 'badge-warning',
-        'confirmee': 'badge-info',
-        'expediee': 'badge-success',
-        'livree': 'badge-success',
-        'annulee': 'badge-danger'
+        'pending': 'badge-warning',
+        'paid': 'badge-info',
+        'processing': 'badge-info',
+        'shipped': 'badge-success',
+        'delivered': 'badge-success',
+        'cancelled': 'badge-danger'
     };
 
     let html = `

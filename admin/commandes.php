@@ -109,19 +109,21 @@ $commandes = $commandesQuery->fetchAll();
                                     <td>
                                         <?php
                                         $badgeClass = [
-                                            'en_attente' => 'badge-warning',
-                                            'confirmee' => 'badge-info',
-                                            'expediee' => 'badge-success',
-                                            'livree' => 'badge-success',
-                                            'annulee' => 'badge-danger'
+                                            'pending' => 'badge-warning',
+                                            'paid' => 'badge-info',
+                                            'processing' => 'badge-info',
+                                            'shipped' => 'badge-success',
+                                            'delivered' => 'badge-success',
+                                            'cancelled' => 'badge-danger'
                                         ][$commande['status']] ?? 'badge-info';
 
                                         $statusLabel = [
-                                            'en_attente' => 'En attente',
-                                            'confirmee' => 'Confirmée',
-                                            'expediee' => 'Expédiée',
-                                            'livree' => 'Livrée',
-                                            'annulee' => 'Annulée'
+                                            'pending' => 'En attente',
+                                            'paid' => 'Payée',
+                                            'processing' => 'En préparation',
+                                            'shipped' => 'Expédiée',
+                                            'delivered' => 'Livrée',
+                                            'cancelled' => 'Annulée'
                                         ][$commande['status']] ?? $commande['status'];
                                         ?>
                                         <span class="badge <?= $badgeClass ?>"><?= $statusLabel ?></span>
@@ -164,11 +166,12 @@ $commandes = $commandesQuery->fetchAll();
                 <div class="form-group">
                     <label>Nouveau statut</label>
                     <select id="newStatus" class="form-control">
-                        <option value="en_attente">En attente</option>
-                        <option value="confirmee">Confirmée</option>
-                        <option value="expediee">Expédiée</option>
-                        <option value="livree">Livrée</option>
-                        <option value="annulee">Annulée</option>
+                        <option value="pending">En attente</option>
+                        <option value="paid">Payée</option>
+                        <option value="processing">En préparation</option>
+                        <option value="shipped">Expédiée</option>
+                        <option value="delivered">Livrée</option>
+                        <option value="cancelled">Annulée</option>
                     </select>
                 </div>
 
