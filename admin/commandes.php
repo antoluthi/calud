@@ -109,7 +109,6 @@ $commandes = $commandesQuery->fetchAll();
                                     <td>
                                         <?php
                                         $badgeClass = [
-                                            'pending' => 'badge-warning',
                                             'en_attente' => 'badge-warning',
                                             'confirmee' => 'badge-info',
                                             'expediee' => 'badge-success',
@@ -118,7 +117,6 @@ $commandes = $commandesQuery->fetchAll();
                                         ][$commande['status']] ?? 'badge-info';
 
                                         $statusLabel = [
-                                            'pending' => 'En attente',
                                             'en_attente' => 'En attente',
                                             'confirmee' => 'Confirmée',
                                             'expediee' => 'Expédiée',

@@ -138,7 +138,7 @@ $dernieresCommandes = $commandesQuery->fetchAll();
                             <?php foreach ($dernieresCommandes as $commande): ?>
                                 <tr>
                                     <td>#<?= $commande['id'] ?></td>
-                                    <td><?= htmlspecialchars($commande['client_name']) ?></td>
+                                    <td><?= htmlspecialchars($commande['client_name'] ?? trim(($commande['first_name'] ?? '') . ' ' . ($commande['last_name'] ?? '')) ?: 'Client') ?></td>
                                     <td><?= number_format($commande['total'], 2, ',', ' ') ?> €</td>
                                     <td>
                                         <?php
