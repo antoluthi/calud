@@ -60,22 +60,26 @@ Une fois les secrets configurés, le déploiement se fait automatiquement:
    - Sélectionnez "Déploiement SFTP vers Serveur"
    - Cliquez sur **Run workflow**
 
-## Structure déployée
+## Structure deployee
 
-Tous les fichiers suivants seront déployés sur votre serveur:
+Tous les fichiers du projet sont deployes sur le serveur, notamment :
 ```
-index.html
-css/style.css
-js/main.js
-data/produits.json
-images/
-README.md
+index.html              # Page principale
+checkout.html           # Page checkout
+mes-commandes.html      # Historique commandes
+css/style.css           # Styles
+js/main.js              # Logique frontend
+api/                    # API REST PHP
+admin/                  # Dashboard admin
+database/               # Migrations SQL
+images/                 # Images produits
+guides/                 # Guides PDF
 ```
 
-Les fichiers suivants **ne seront pas** déployés (grâce au .gitignore):
+Les fichiers suivants **ne sont pas** deployes (via .gitignore) :
 - `.git/`
-- `.github/`
-- Fichiers de développement (.vscode, etc.)
+- `.env` (credentials, reste sur le serveur uniquement)
+- Fichiers de developpement (.vscode, etc.)
 
 ## Vérification du déploiement
 
@@ -118,11 +122,6 @@ git push origin main
 - Vérifiez le `SFTP_REMOTE_PATH` (doit pointer vers le bon dossier web)
 - Vérifiez les permissions des fichiers sur le serveur
 
-## Prochaines étapes
+## Etat actuel
 
-Une fois le déploiement configuré, nous pourrons:
-1. ✅ Déploiement automatique (vous êtes ici)
-2. 🔲 Améliorer l'interface graphique
-3. 🔲 Ajouter une base de données
-4. 🔲 Intégrer la connexion Google
-5. 🔲 Autres fonctionnalités
+Le deploiement automatique est fonctionnel. Le site complet (frontend, API, admin) est deploye automatiquement a chaque push sur `main`.

@@ -1,387 +1,221 @@
-# Documentation Backend - Site AL Escalade
-
-Ce document explique comment configurer et utiliser le backend PHP avec MySQL et Google OAuth.
+# Documentation Backend - AL Escalade
 
 ## Architecture
 
-Le backend est construit avec:
-- **PHP 7.4+** avec PDO pour la base de données
-- **MySQL/MariaDB** pour stocker les utilisateurs et produits
+- **PHP 7.4+** avec PDO pour la base de donnees
+- **MySQL/MariaDB** pour le stockage
 - **Google OAuth 2.0** pour l'authentification
-- **API REST** en JSON pour la communication avec le frontend
+- **API REST** en JSON
+- **mail()** PHP pour les emails (confirmation de commande, newsletter)
 
 ## Structure des fichiers
 
 ```
 api/
-├── config.php              # Configuration générale et fonctions utilitaires
+├── config.php              # Configuration et fonctions utilitaires
+├── produits.php            # GET : produits actifs
+├── messages.php            # POST : formulaire contact
+├── newsletter.php          # POST : inscription newsletter
+├── checkout.php            # POST : creer commande + email confirmation
+├── commandes.php           # GET : commandes utilisateur connecte
 ├── auth/
-│   ├── login.php          # Redirection vers Google OAuth
-│   ├── callback.php       # Callback OAuth après autorisation
-│   ├── logout.php         # Déconnexion
-│   └── status.php         # Vérifier l'état de connexion
+│   ├── login.php           # Redirection vers Google OAuth
+│   ├── callback.php        # Callback OAuth (cree/MAJ user en DB)
+│   ├── logout.php          # Deconnexion
+│   └── status.php          # Statut de connexion
+├── admin/
+│   ├── produits.php        # CRUD produits
+│   ├── commandes.php       # GET detail, PUT statut, POST/DELETE
+│   ├── messages.php        # GET/PUT/DELETE messages
+│   ├── newsletter.php      # GET abonnes, POST envoi, DELETE
+│   ├── clients.php         # GET clients
+│   └── check-duplicates.php
 └── users/
-    └── me.php             # Récupérer l'utilisateur connecté
+    └── me.php              # GET : info utilisateur connecte
 
 database/
-└── schema.sql             # Schéma de la base de données
+├── schema.sql              # Schema initial
+├── migration_checkout.sql  # Structure actuelle commandes/commande_items
+└── ...                     # Autres migrations (voir CLAUDE.md)
 ```
 
 ## Installation
 
-### 1. Prérequis serveur
+### Prerequis serveur
 
-Assurez-vous que votre serveur a:
-- PHP 7.4 ou supérieur
+- PHP 7.4+
 - MySQL 5.7+ ou MariaDB 10.2+
-- Extensions PHP activées:
-  - `pdo`
-  - `pdo_mysql`
-  - `curl`
-  - `json`
-  - `session`
+- Extensions PHP : `pdo`, `pdo_mysql`, `curl`, `json`, `session`
 
-### 2. Configuration de la base de données
-
-#### Créer la base de données
-
-Connectez-vous à MySQL et exécutez:
+### Base de donnees
 
 ```bash
 mysql -u root -p < database/schema.sql
+# Puis executer les migrations dans l'ordre (voir CLAUDE.md)
 ```
 
-Ou via phpMyAdmin:
-1. Créez une nouvelle base de données nommée `site_escalade`
-2. Importez le fichier `database/schema.sql`
+### Configuration
 
-#### Configurer les credentials
+Creer un fichier `.env` dans le dossier `api/` (voir `SETUP_ENV.md` pour le guide detaille) :
 
-Éditez le fichier `api/config.php` et mettez à jour:
-
-```php
-define('DB_HOST', 'localhost');          // Adresse du serveur MySQL
-define('DB_NAME', 'site_escalade');      // Nom de la base de données
-define('DB_USER', 'votre_utilisateur');  // Utilisateur MySQL
-define('DB_PASS', 'votre_mot_de_passe'); // Mot de passe MySQL
+```env
+DB_HOST=localhost
+DB_NAME=site_escalade
+DB_USER=xxx
+DB_PASS=xxx
+GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=xxx
+BASE_URL=https://antonin.luthi.eu
 ```
 
-### 3. Configuration Google OAuth
+### Google OAuth
 
-#### Obtenir les credentials
+1. Google Cloud Console > APIs & Services > Credentials > OAuth 2.0 Client ID
+2. Authorized redirect URIs : `https://votre-domaine.com/api/auth/callback.php`
+3. Reporter le Client ID et Secret dans `.env`
 
-1. Allez sur https://console.cloud.google.com/
-2. Créez un nouveau projet (ou sélectionnez-en un)
-3. **APIs & Services** → **Credentials** → **Create Credentials** → **OAuth 2.0 Client ID**
-4. Configurez l'écran de consentement OAuth si demandé
-5. Type: **Web application**
-6. Ajoutez vos URIs:
+## Fonctions utilitaires (config.php)
 
-**Authorized JavaScript origins:**
-```
-http://localhost:8000
-https://votre-domaine.com
-```
-
-**Authorized redirect URIs:**
-```
-http://localhost:8000/api/auth/callback.php
-https://votre-domaine.com/api/auth/callback.php
-```
-
-7. Notez votre **Client ID** et **Client Secret**
-
-#### Configurer dans l'application
-
-Éditez `api/config.php`:
-
-```php
-define('GOOGLE_CLIENT_ID', 'VOTRE_CLIENT_ID.apps.googleusercontent.com');
-define('GOOGLE_CLIENT_SECRET', 'VOTRE_CLIENT_SECRET');
-define('BASE_URL', 'https://votre-domaine.com'); // Adapter selon votre environnement
-```
-
-### 4. Configuration du serveur web
-
-#### Apache (.htaccess)
-
-Si vous utilisez Apache, créez un fichier `.htaccess` dans le dossier `api/`:
-
-```apache
-# Activer le rewrite engine
-RewriteEngine On
-
-# Permettre l'accès depuis n'importe quelle origine (CORS)
-Header set Access-Control-Allow-Origin "*"
-Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-Header set Access-Control-Allow-Headers "Content-Type, Authorization"
-
-# Autoriser les sessions
-php_flag session.auto_start off
-php_flag session.use_cookies on
-php_flag session.use_only_cookies on
-```
-
-#### Nginx
-
-Ajoutez dans votre configuration nginx:
-
-```nginx
-location /api/ {
-    add_header Access-Control-Allow-Origin *;
-    add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS";
-    add_header Access-Control-Allow-Headers "Content-Type, Authorization";
-
-    location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
-        fastcgi_index index.php;
-        include fastcgi_params;
-    }
-}
-```
+| Fonction | Description |
+|----------|-------------|
+| `getDB()` | Retourne une connexion PDO |
+| `sendJSON($data, $code)` | Envoie une reponse JSON et exit |
+| `getCurrentUser()` | Retourne le user connecte ou null |
+| `requireAuth()` | Bloque avec 401 si non connecte |
+| `isAdmin()` | Retourne true/false |
+| `requireAdmin()` | Bloque avec 403 si non admin |
 
 ## API Endpoints
 
+### Public
+
+| Methode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/api/produits.php` | Liste des produits actifs |
+| POST | `/api/messages.php` | Envoyer un message contact |
+| POST | `/api/newsletter.php` | S'inscrire a la newsletter |
+| POST | `/api/checkout.php` | Creer une commande + email confirmation |
+
 ### Authentification
 
-#### `GET /api/auth/login.php`
-Redirige l'utilisateur vers la page de connexion Google.
+| Methode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/api/auth/login.php` | Redirection vers Google OAuth |
+| GET | `/api/auth/callback.php` | Callback OAuth |
+| GET | `/api/auth/logout.php` | Deconnexion |
+| GET | `/api/auth/status.php` | Statut connexion (`authenticated`, `user`) |
 
-**Réponse:** Redirection HTTP vers Google OAuth
+### Utilisateur connecte
 
----
+| Methode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/api/commandes.php` | Commandes de l'utilisateur (par user_id ou email) |
+| GET | `/api/users/me.php` | Informations utilisateur |
 
-#### `GET /api/auth/callback.php`
-Callback OAuth après autorisation Google. Ne pas appeler directement.
+### Admin (requireAdmin)
 
-**Paramètres:**
-- `code`: Code d'autorisation (fourni par Google)
-- `state`: État CSRF (fourni par Google)
+| Methode | Endpoint | Description |
+|---------|----------|-------------|
+| GET/POST/PUT/DELETE | `/api/admin/produits.php` | CRUD produits |
+| GET/PUT/POST/DELETE | `/api/admin/commandes.php` | Commandes (detail, statut, CRUD) |
+| GET/PUT/DELETE | `/api/admin/messages.php` | Messages contact |
+| GET/POST/DELETE | `/api/admin/newsletter.php` | Abonnes + envoi email |
+| GET | `/api/admin/clients.php` | Liste clients |
 
-**Réponse:** Redirection vers `index.html?login=success`
-
----
-
-#### `GET /api/auth/status.php`
-Vérifier si l'utilisateur est connecté.
-
-**Réponse:**
-```json
-{
-  "authenticated": true,
-  "user": {
-    "id": 1,
-    "email": "user@example.com",
-    "name": "John Doe",
-    "picture": "https://lh3.googleusercontent.com/..."
-  }
-}
-```
-
-Ou si non connecté:
-```json
-{
-  "authenticated": false,
-  "user": null
-}
-```
-
----
-
-#### `GET /api/auth/logout.php`
-Déconnecte l'utilisateur.
-
-**Réponse:**
-```json
-{
-  "success": true,
-  "message": "Déconnexion réussie"
-}
-```
-
-### Utilisateurs
-
-#### `GET /api/users/me.php`
-Récupérer les informations de l'utilisateur connecté.
-
-**Authentification:** Requise
-
-**Réponse:**
-```json
-{
-  "id": 1,
-  "email": "user@example.com",
-  "name": "John Doe",
-  "picture": "https://lh3.googleusercontent.com/..."
-}
-```
-
-**Erreur (401):**
-```json
-{
-  "error": "Non authentifié"
-}
-```
-
-## Schéma de base de données
+## Schema de base de donnees
 
 ### Table `users`
 
 | Colonne | Type | Description |
 |---------|------|-------------|
-| `id` | INT | Identifiant unique (auto-increment) |
+| `id` | INT | Auto-increment |
 | `google_id` | VARCHAR(255) | ID Google unique |
-| `email` | VARCHAR(255) | Email de l'utilisateur |
+| `email` | VARCHAR(255) | Email |
 | `name` | VARCHAR(255) | Nom complet |
-| `picture` | VARCHAR(500) | URL de l'avatar |
-| `created_at` | TIMESTAMP | Date de création |
-| `last_login` | TIMESTAMP | Dernière connexion |
+| `picture` | VARCHAR(500) | URL avatar |
+| `is_admin` | TINYINT | 0 ou 1 |
+| `created_at` | TIMESTAMP | Date creation |
+| `last_login` | TIMESTAMP | Derniere connexion |
+
+### Table `commandes` (migration_checkout.sql)
+
+| Colonne | Type | Description |
+|---------|------|-------------|
+| `id` | INT | Auto-increment |
+| `order_id` | VARCHAR(50) | Format AL-YYYYMMDD-XXXXXX |
+| `user_id` | INT NULL | FK users (NULL = guest) |
+| `email` | VARCHAR(255) | Email du client |
+| `first_name`, `last_name` | VARCHAR(100) | Nom du client |
+| `address`, `postal_code`, `city`, `country` | - | Adresse de livraison |
+| `subtotal`, `shipping`, `total` | DECIMAL(10,2) | Montants |
+| `status` | ENUM | pending, paid, processing, shipped, delivered, cancelled |
+
+### Table `commande_items`
+
+| Colonne | Type | Description |
+|---------|------|-------------|
+| `commande_id` | INT | FK commandes |
+| `product_name` | VARCHAR(255) | Nom du produit |
+| `product_size` | VARCHAR(50) | Taille |
+| `quantity` | INT | Quantite |
+| `price` | DECIMAL(10,2) | Prix unitaire |
 
 ### Table `produits`
 
 | Colonne | Type | Description |
 |---------|------|-------------|
-| `id` | INT | Identifiant unique |
+| `id` | INT | Auto-increment |
 | `nom` | VARCHAR(255) | Nom du produit |
-| `prix` | DECIMAL(10,2) | Prix en euros |
+| `prix` | DECIMAL(10,2) | Prix |
 | `description` | TEXT | Description |
-| `image` | VARCHAR(500) | URL de l'image |
-| `caracteristiques` | JSON | Features (tableau) |
-| `actif` | BOOLEAN | Produit actif/inactif |
-| `created_at` | TIMESTAMP | Date de création |
-| `updated_at` | TIMESTAMP | Dernière modification |
+| `image` | VARCHAR(500) | URL image principale |
+| `caracteristiques` | JSON | Features |
+| `actif` | BOOLEAN | Visible sur le site |
+| `dimensions`, `poids`, `materiaux` | - | Specifications |
+| `guide_tailles`, `video_url`, `guide_pdf` | - | Contenu supplementaire |
 
-## Sécurité
+## Checkout et email
 
-### Bonnes pratiques
+Le checkout (`api/checkout.php`) :
+1. Recoit les donnees du formulaire (POST JSON)
+2. Genere un `order_id` unique
+3. Insere la commande avec `user_id` si connecte (guest = NULL)
+4. Insere les items
+5. Envoie un email de confirmation HTML via `mail()` (dans un try/catch)
+6. Retourne `{ success, orderId }`
 
-1. **HTTPS en production**: Activez toujours HTTPS pour protéger les données
-2. **Variables d'environnement**: Ne commitez jamais les credentials réels
-3. **Sessions sécurisées**:
-   ```php
-   session_set_cookie_params([
-       'lifetime' => 0,
-       'path' => '/',
-       'domain' => 'votre-domaine.com',
-       'secure' => true,      // HTTPS uniquement
-       'httponly' => true,    // Pas d'accès JavaScript
-       'samesite' => 'Lax'    // Protection CSRF
-   ]);
-   ```
-4. **SQL Injection**: Utilisez toujours des prepared statements (déjà fait avec PDO)
-5. **XSS**: Échappez toujours les données affichées (JSON encode les données)
+L'email de confirmation contient : recap articles, totaux, infos IBAN (BE65 0018 1297 8496, BIC GEBABEBB), adresse de livraison. Template table-based avec inline styles, design sombre.
 
-### Protection CSRF
+## Securite
 
-Le système utilise un `state` unique pour chaque requête OAuth:
+- Requetes preparees PDO (anti SQL injection)
+- Google OAuth 2.0 (pas de mots de passe)
+- `.env` hors du versioning
+- CORS configure dans `config.php`
+- Verification `is_admin` sur tous les endpoints admin
+- `htmlspecialchars()` pour l'echappement dans les emails
+- Protection CSRF via `state` OAuth
 
-```php
-$state = bin2hex(random_bytes(16));
-$_SESSION['oauth_state'] = $state;
-// Vérification dans le callback
-if ($_GET['state'] !== $_SESSION['oauth_state']) {
-    die('Erreur CSRF');
-}
-```
-
-## Tests
-
-### Test local
-
-1. Démarrer un serveur PHP local:
-```bash
-php -S localhost:8000
-```
-
-2. Ouvrir http://localhost:8000 dans votre navigateur
-
-3. Tester le flux de connexion:
-   - Cliquer sur "Se connecter avec Google"
-   - Autoriser l'application
-   - Vérifier que vous êtes redirigé et connecté
-   - Vérifier que votre profil s'affiche
-   - Cliquer sur "Déconnexion"
-
-### Test de l'API
-
-Avec curl:
+## Debogage
 
 ```bash
-# Vérifier le statut (non connecté)
+# Logs serveur
+tail -f /var/log/apache2/error.log
+
+# Test API
 curl http://localhost:8000/api/auth/status.php
-
-# Vérifier le statut (connecté - avec cookies de session)
-curl -b cookies.txt http://localhost:8000/api/auth/status.php
-
-# Récupérer l'utilisateur connecté
-curl -b cookies.txt http://localhost:8000/api/users/me.php
+curl http://localhost:8000/api/produits.php
 ```
 
-## Débogage
+## Etat des fonctionnalites
 
-### Activer les erreurs PHP
-
-Dans `api/config.php`:
-
-```php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-```
-
-### Logs
-
-Les erreurs PDO sont automatiquement loggées. Pour voir les logs:
-
-```bash
-tail -f /var/log/apache2/error.log  # Apache
-tail -f /var/log/nginx/error.log    # Nginx
-```
-
-### Problèmes courants
-
-#### "Erreur de connexion à la base de données"
-- Vérifier les credentials dans `config.php`
-- Vérifier que MySQL est démarré
-- Vérifier que la base de données existe
-
-#### "État OAuth invalide"
-- Vérifier que les cookies/sessions fonctionnent
-- Vérifier que le `state` n'a pas expiré
-
-#### "Callback OAuth ne fonctionne pas"
-- Vérifier que l'URL de callback est correcte dans Google Console
-- Vérifier que `REDIRECT_URI` dans `config.php` correspond
-
-#### "CORS errors"
-- Vérifier les headers dans `config.php`
-- Vérifier la configuration Apache/Nginx
-
-## Migration vers la production
-
-### Checklist
-
-- [ ] Modifier `DB_USER` et `DB_PASS` avec des credentials sécurisés
-- [ ] Modifier `BASE_URL` avec votre domaine
-- [ ] Ajouter l'URL de production dans Google OAuth Console
-- [ ] Activer HTTPS
-- [ ] Désactiver `display_errors` en production
-- [ ] Configurer les sessions sécurisées (secure, httponly)
-- [ ] Sauvegarder la base de données régulièrement
-- [ ] Monitorer les logs d'erreurs
-
-## Support
-
-Pour toute question ou problème:
-- Consultez les logs d'erreur
-- Vérifiez la configuration Google OAuth Console
-- Testez la connexion à la base de données
-
-## Prochaines étapes
-
-Fonctionnalités à implémenter:
-1. ✅ Authentification Google OAuth
-2. 🔲 Système de panier d'achat
-3. 🔲 Gestion des commandes
-4. 🔲 Interface admin pour gérer les produits
-5. 🔲 Paiement en ligne (Stripe/PayPal)
-6. 🔲 Emails de confirmation
+- [x] Authentification Google OAuth
+- [x] CRUD produits (admin)
+- [x] Panier d'achat
+- [x] Checkout avec commandes en DB
+- [x] Email de confirmation de commande
+- [x] Historique des commandes (utilisateur)
+- [x] Gestion des commandes (admin)
+- [x] Formulaire de contact
+- [x] Newsletter (inscription + envoi)
+- [x] Dashboard admin
