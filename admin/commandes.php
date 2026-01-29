@@ -69,6 +69,10 @@ $commandes = $commandesQuery->fetchAll();
             <div class="table-container">
                 <div class="table-header">
                     <h2>Liste des Commandes</h2>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="hideCancelled" onchange="toggleCancelled()" style="cursor: pointer;">
+                        Masquer les commandes annulees
+                    </label>
                 </div>
                 <?php if (empty($commandes)): ?>
                     <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
@@ -88,7 +92,7 @@ $commandes = $commandesQuery->fetchAll();
                         </thead>
                         <tbody>
                             <?php foreach ($commandes as $commande): ?>
-                                <tr>
+                                <tr data-status="<?= htmlspecialchars($commande['status']) ?>">
                                     <td>#<?= $commande['id'] ?></td>
                                     <td>
                                         <div style="display: flex; align-items: center; gap: 0.5rem;">

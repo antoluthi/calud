@@ -184,6 +184,14 @@ document.getElementById('statusForm').addEventListener('submit', async function(
     }
 });
 
+// Masquer/afficher les commandes annulées
+function toggleCancelled() {
+    const hide = document.getElementById('hideCancelled').checked;
+    document.querySelectorAll('tr[data-status="cancelled"]').forEach(row => {
+        row.style.display = hide ? 'none' : '';
+    });
+}
+
 // Afficher une alerte
 function showAlert(message, type) {
     const container = document.getElementById('alert-container');

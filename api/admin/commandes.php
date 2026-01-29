@@ -34,9 +34,8 @@ if ($method === 'GET') {
 
         // Récupérer les items de la commande
         $stmt = $db->prepare("
-            SELECT ci.*, p.nom as produit_nom
+            SELECT ci.*, ci.product_name as produit_nom, ci.quantity as quantite, ci.price as prix_unitaire
             FROM commande_items ci
-            LEFT JOIN produits p ON ci.produit_id = p.id
             WHERE ci.commande_id = ?
         ");
         $stmt->execute([$commandeId]);
@@ -45,9 +44,9 @@ if ($method === 'GET') {
         sendJSON([
             'commande' => $commande,
             'client' => [
-                'name' => $commande['client_name'],
-                'email' => $commande['client_email'],
-                'picture' => $commande['client_picture']
+                'name' => $commande['client_name'] ?? trim(($commande['first_name'] ?? '') . ' ' . ($commande['last_name'] ?? '')),
+                'email' => $commande['client_email'] ?? $commande['email'] ?? '',
+                'picture' => $commande['client_picture'] ?? null
             ],
             'items' => $items
         ]);
