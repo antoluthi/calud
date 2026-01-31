@@ -76,9 +76,10 @@
         }
 
         nav {
+            position: relative;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            justify-content: space-between;
             padding: 0.75rem 1.25rem;
             background-color: rgba(20, 20, 20, 0.85);
             backdrop-filter: blur(20px);
@@ -86,6 +87,12 @@
             border: 1px solid var(--border-color);
             border-radius: 100px;
             width: 100%;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            width: 80px;
         }
 
         .logo {
@@ -98,15 +105,13 @@
             text-decoration: none;
             display: inline-block;
             text-transform: uppercase;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .logo:hover {
             opacity: 0.7;
-        }
-
-        .nav-spacer {
-            flex: 1;
-            min-width: 2rem;
         }
 
         /* Hidden nav links (moved to overlay) */
@@ -204,7 +209,9 @@
         .nav-right {
             display: flex;
             align-items: center;
+            justify-content: flex-end;
             gap: 0.25rem;
+            width: 80px;
         }
 
         /* ========== Cart Icon ========== */
@@ -1497,8 +1504,14 @@
     <!-- Header -->
     <header>
         <nav>
+            <div class="nav-left">
+                <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
             <a href="#accueil" class="logo">PROJET CRIMP.</a>
-            <div class="nav-spacer"></div>
             <div class="nav-right">
                 <div class="cart-icon" id="cartIcon">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -1520,11 +1533,6 @@
                         <!-- Contenu injecté dynamiquement -->
                     </div>
                 </div>
-                <button class="menu-toggle" id="menuToggle" aria-label="Menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
             </div>
         </nav>
     </header>
