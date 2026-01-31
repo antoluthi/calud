@@ -1,10 +1,10 @@
-# Instructions Claude - AL Escalade
+# Instructions Claude - PROJET CRIMP.
 
 Ce fichier contient toutes les informations essentielles pour travailler sur ce projet.
 
 ## Projet
 
-**AL Escalade** - Site e-commerce pour materiel d'escalade (poutres de suspension portables).
+**PROJET CRIMP.** - Site e-commerce pour materiel d'escalade (poutres de suspension portables).
 Le site est en production sur `https://antonin.luthi.eu`.
 
 ## Infrastructure
@@ -128,7 +128,7 @@ site-escalade/
 - Peut avoir plusieurs images et tailles (tables liees)
 
 **`commandes`** - Commandes clients (structure definie par `migration_checkout.sql`)
-- `id`, `order_id` (format AL-YYYYMMDD-XXXXXX), `user_id` (NULL pour guest), `email`, `phone`, `first_name`, `last_name`
+- `id`, `order_id` (format PC-YYYYMMDD-XXXXXX), `user_id` (NULL pour guest), `email`, `phone`, `first_name`, `last_name`
 - `address`, `address2`, `postal_code`, `city`, `country`
 - `payment_method`, `subtotal`, `shipping`, `total`
 - `status` : ENUM(`pending`, `paid`, `processing`, `shipped`, `delivered`, `cancelled`)
@@ -211,7 +211,7 @@ BASE_URL=https://antonin.luthi.eu
 ### Checkout (api/checkout.php)
 1. L'utilisateur remplit le formulaire sur `checkout.html` (email, adresse, etc.)
 2. Le JS envoie un POST a `api/checkout.php` avec les articles du panier (localStorage)
-3. Le backend genere un `order_id` (format `AL-YYYYMMDD-XXXXXX`)
+3. Le backend genere un `order_id` (format `PC-YYYYMMDD-XXXXXX`)
 4. Insert dans `commandes` avec `user_id` si connecte (NULL sinon = guest checkout)
 5. Insert les items dans `commande_items`
 6. Envoie un email de confirmation HTML (template sombre, recap articles, infos IBAN)
@@ -235,7 +235,7 @@ Quand l'utilisateur est connecte, le dropdown du profil contient :
 ### Email de confirmation (dans api/checkout.php -> sendConfirmationEmail())
 - Template HTML table-based avec inline styles (compatibilite email)
 - Design sombre (bg #0a0a0a, cards #181818, texte blanc/gris)
-- Contenu : logo AL ESCALADE, checkmark vert, recap articles (nom, taille, qte, prix), sous-total/livraison/total, infos IBAN, adresse de livraison
+- Contenu : logo PROJET CRIMP., checkmark vert, recap articles (nom, taille, qte, prix), sous-total/livraison/total, infos IBAN, adresse de livraison
 - Headers : From `noreply@{HTTP_HOST}`, Reply-To `contact@{HTTP_HOST}`
 - Appele dans un try/catch : si l'email echoue, la commande reste valide
 
@@ -307,7 +307,7 @@ La base de donnees est accessible depuis gates.luthi.eu.
 - Le checkout fonctionne en mode connecte (user_id lie) ET guest (user_id = NULL)
 - L'API `api/commandes.php` cherche par `user_id` OU `email` pour retrouver les commandes meme si elles ont ete passees avant la liaison user_id
 - Les emails utilisent `mail()` PHP natif - necessite un serveur mail configure
-- Le panier est stocke dans `localStorage` (`alescalade_cart`)
+- Le panier est stocke dans `localStorage` (`projetcrimp_cart`)
 
 ---
 *Derniere mise a jour : Janvier 2026*

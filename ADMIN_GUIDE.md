@@ -94,7 +94,7 @@ Liste de tous les utilisateurs inscrits via Google OAuth.
 Le site utilise le **virement bancaire** :
 - **IBAN** : BE65 0018 1297 8496
 - **BIC** : GEBABEBB
-- **Communication** : le numero de commande (format AL-YYYYMMDD-XXXXXX)
+- **Communication** : le numero de commande (format PC-YYYYMMDD-XXXXXX)
 
 Un email de confirmation est envoye automatiquement au client avec ces informations apres chaque commande.
 
