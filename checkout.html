@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - AL Escalade</title>
+    <title>Checkout - PROJET CRIMP.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -275,7 +275,7 @@
     </div>
 
     <script>
-        let cart = JSON.parse(localStorage.getItem('alescalade_cart') || '[]');
+        let cart = JSON.parse(localStorage.getItem('projetcrimp_cart') || '[]');
 
         function renderCheckout() {
             const container = document.getElementById('checkoutContent');
@@ -459,7 +459,7 @@
                     throw new Error(result.error || 'Erreur lors de la commande');
                 }
 
-                localStorage.removeItem('alescalade_cart');
+                localStorage.removeItem('projetcrimp_cart');
 
                 // Afficher le message de confirmation à la place du formulaire
                 document.getElementById('checkoutContent').innerHTML = `
