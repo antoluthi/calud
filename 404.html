@@ -15,7 +15,6 @@
             --text-primary: #ffffff;
             --text-secondary: #888888;
             --border-color: #2a2a2a;
-            --grid-color: rgba(255, 255, 255, 0.07);
         }
 
         * {
@@ -45,8 +44,8 @@
             right: 0;
             bottom: 0;
             background-image:
-                linear-gradient(var(--grid-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+                linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
             background-size: 50px 50px;
             pointer-events: none;
             z-index: 0;
@@ -70,24 +69,13 @@
             perspective: 800px;
         }
 
-        .logo {
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-            user-select: none;
-            transition: color 0.4s;
-        }
-
         .code {
             font-size: clamp(100px, 20vw, 200px);
             font-weight: 700;
             line-height: 1;
             letter-spacing: -4px;
             color: var(--text-primary);
-            transition: transform 0.15s ease-out, color 0.4s;
+            transition: transform 0.15s ease-out;
             will-change: transform;
         }
 
@@ -124,41 +112,12 @@
 <body>
     <canvas id="particles"></canvas>
     <div class="content">
-        <div class="logo" id="logo">PROJET CRIMP.</div>
         <div class="code">404</div>
         <p class="message">Page introuvable</p>
         <a href="/" class="btn">Retour a l'accueil</a>
     </div>
 
     <script>
-        // --- Easter egg: triple-click on logo cycles accent color ---
-        const themes = [
-            { accent: '#ffffff', grid: 'rgba(255,255,255,0.07)', name: 'white' },
-            { accent: '#e75480', grid: 'rgba(231,84,128,0.12)', name: 'pink' },
-            { accent: '#60a5fa', grid: 'rgba(96,165,250,0.12)', name: 'blue' }
-        ];
-        let themeIndex = 0;
-        let accentColor = themes[0].accent;
-        let clickCount = 0;
-        let clickTimer = null;
-
-        const logo = document.getElementById('logo');
-        logo.addEventListener('click', () => {
-            clickCount++;
-            clearTimeout(clickTimer);
-            clickTimer = setTimeout(() => { clickCount = 0; }, 500);
-            if (clickCount >= 3) {
-                clickCount = 0;
-                themeIndex = (themeIndex + 1) % themes.length;
-                const t = themes[themeIndex];
-                accentColor = t.accent;
-                document.querySelector('.code').style.color = t.accent;
-                logo.style.color = t.accent;
-                document.querySelector('.btn').style.background = t.accent;
-                document.documentElement.style.setProperty('--grid-color', t.grid);
-            }
-        });
-
         // --- Particles ---
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
@@ -186,14 +145,8 @@
             });
         }
 
-        function hexToRgb(hex) {
-            const h = hex.replace('#', '');
-            return [parseInt(h.substring(0, 2), 16), parseInt(h.substring(2, 4), 16), parseInt(h.substring(4, 6), 16)];
-        }
-
         function drawParticles() {
             ctx.clearRect(0, 0, W, H);
-            const [cr, cg, cb] = hexToRgb(accentColor);
 
             for (const p of particles) {
                 p.x += p.vx;
@@ -215,7 +168,7 @@
 
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${p.opacity})`;
+                ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
                 ctx.fill();
             }
 
@@ -231,22 +184,18 @@
             mouseX = e.clientX;
             mouseY = e.clientY;
 
-            // Normalize mouse position to -1..1
             const nx = (e.clientX / W - 0.5) * 2;
             const ny = (e.clientY / H - 0.5) * 2;
 
-            // Tilt the "404" (stronger effect)
             const rotateX = -ny * 18;
             const rotateY = nx * 18;
             code.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 
-            // Subtle shift on the message (weaker parallax)
             const shiftX = nx * 8;
             const shiftY = ny * 8;
             message.style.transform = `translate(${shiftX}px, ${shiftY}px)`;
         });
 
-        // Reset on mouse leave
         document.addEventListener('mouseleave', () => {
             code.style.transform = 'rotateX(0deg) rotateY(0deg)';
             message.style.transform = 'translate(0px, 0px)';

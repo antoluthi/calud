@@ -468,6 +468,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Easter egg: triple-clic sur le logo cycle la couleur d'accent ---
+    (function () {
+        const logoEl = document.querySelector('a.logo');
+        if (!logoEl) return;
+        const themes = [
+            { accent: '#ffffff', hover: '#cccccc' },
+            { accent: '#e75480', hover: '#c44570' },
+            { accent: '#60a5fa', hover: '#4b8bd4' }
+        ];
+        let idx = 0;
+        let clicks = 0;
+        let timer = null;
+        logoEl.addEventListener('click', function () {
+            clicks++;
+            clearTimeout(timer);
+            timer = setTimeout(function () { clicks = 0; }, 500);
+            if (clicks >= 3) {
+                clicks = 0;
+                idx = (idx + 1) % themes.length;
+                var t = themes[idx];
+                document.documentElement.style.setProperty('--accent', t.accent);
+                document.documentElement.style.setProperty('--accent-hover', t.hover);
+            }
+        });
+    })();
+
     // Smooth scroll pour les liens de navigation
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
