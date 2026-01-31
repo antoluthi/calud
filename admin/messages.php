@@ -18,7 +18,7 @@ $user = getCurrentUser();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Messages - AL Admin</title>
+    <title>Gestion des Messages - PRJ CRIMP. Admin</title>
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
@@ -26,7 +26,7 @@ $user = getCurrentUser();
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>AL Admin</h2>
+                <h2>PRJ CRIMP. Admin</h2>
                 <div class="user-info">
                     <img src="<?= htmlspecialchars($user['picture']) ?>" alt="Avatar" class="user-avatar">
                     <span class="user-name"><?= htmlspecialchars($user['name']) ?></span>

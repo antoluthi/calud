@@ -1,4 +1,4 @@
-# Documentation Backend - AL Escalade
+# Documentation Backend - PROJET CRIMP.
 
 ## Architecture
 
@@ -142,7 +142,7 @@ BASE_URL=https://antonin.luthi.eu
 | Colonne | Type | Description |
 |---------|------|-------------|
 | `id` | INT | Auto-increment |
-| `order_id` | VARCHAR(50) | Format AL-YYYYMMDD-XXXXXX |
+| `order_id` | VARCHAR(50) | Format PC-YYYYMMDD-XXXXXX |
 | `user_id` | INT NULL | FK users (NULL = guest) |
 | `email` | VARCHAR(255) | Email du client |
 | `first_name`, `last_name` | VARCHAR(100) | Nom du client |

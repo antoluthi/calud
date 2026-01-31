@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AL - Équipement d'Escalade</title>
+    <title>PROJET CRIMP. - Équipement d'Escalade</title>
     <!-- Google Font: Space Grotesk -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1497,7 +1497,7 @@
     <!-- Header -->
     <header>
         <nav>
-            <a href="#accueil" class="logo">AL</a>
+            <a href="#accueil" class="logo">PROJET CRIMP.</a>
             <div class="nav-spacer"></div>
             <div class="nav-right">
                 <div class="cart-icon" id="cartIcon">
@@ -1637,7 +1637,7 @@
     <!-- Hero Section -->
     <section id="accueil" class="hero">
         <div class="container">
-            <h1>The Climbing Shop</h1>
+            <h1>Train Anywhere.</h1>
             <p class="hero-subtitle">Des outils de grimpe pour les grimpeurs, par les grimpeurs</p>
         </div>
     </section>
@@ -1701,7 +1701,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>À propos</h3>
-                    <p>The Climbing Shop propose des équipements d'escalade de qualité pour tous les niveaux. Notre mission est de rendre l'entraînement accessible à tous les grimpeurs.</p>
+                    <p>PROJET CRIMP. propose des équipements d'escalade de qualité pour tous les niveaux. Notre mission est de rendre l'entraînement accessible à tous les grimpeurs.</p>
                 </div>
                 <div class="footer-section">
                     <h3>Newsletter</h3>
@@ -1724,7 +1724,7 @@
         let products = [];
 
         // State (variables globales accessibles depuis main.js)
-        window.cart = JSON.parse(localStorage.getItem('alescalade_cart') || '[]');
+        window.cart = JSON.parse(localStorage.getItem('projetcrimp_cart') || '[]');
         window.currentUser = null;
 
         // Initialize
@@ -1778,7 +1778,7 @@
             const checkoutBtn = document.getElementById('checkoutBtn');
 
             // Save cart to localStorage
-            localStorage.setItem('alescalade_cart', JSON.stringify(window.cart));
+            localStorage.setItem('projetcrimp_cart', JSON.stringify(window.cart));
 
             const itemCount = window.cart.reduce((sum, item) => sum + item.quantity, 0);
             badge.textContent = itemCount;

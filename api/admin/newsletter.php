@@ -63,7 +63,7 @@ if ($method === 'POST') {
         $headers = [
             'MIME-Version' => '1.0',
             'Content-type' => 'text/html; charset=utf-8',
-            'From' => 'AL Climbing Shop <noreply@' . $_SERVER['HTTP_HOST'] . '>',
+            'From' => 'PROJET CRIMP. <noreply@' . $_SERVER['HTTP_HOST'] . '>',
             'Reply-To' => 'contact@' . $_SERVER['HTTP_HOST'],
             'X-Mailer' => 'PHP/' . phpversion()
         ];
@@ -90,7 +90,7 @@ if ($method === 'POST') {
         <body>
             <div class='container'>
                 <div class='header'>
-                    <h1>The Climbing Shop</h1>
+                    <h1>PROJET CRIMP.</h1>
                 </div>
                 <div class='content'>
                     " . nl2br(htmlspecialchars($message)) . "

@@ -37,7 +37,7 @@
 Les clients paient par virement bancaire :
 - **IBAN** : BE65 0018 1297 8496
 - **BIC** : GEBABEBB
-- **Communication** : numero de commande (AL-YYYYMMDD-XXXXXX)
+- **Communication** : numero de commande (PC-YYYYMMDD-XXXXXX)
 
 Un email de confirmation avec ces infos est envoye automatiquement au client.
 

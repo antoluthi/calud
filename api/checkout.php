@@ -46,7 +46,7 @@ function sendConfirmationEmail($orderId, $data) {
 
     $headers = "MIME-Version: 1.0\r\n";
     $headers .= "Content-type: text/html; charset=utf-8\r\n";
-    $headers .= "From: AL Escalade <noreply@" . $domain . ">\r\n";
+    $headers .= "From: PROJET CRIMP. <noreply@" . $domain . ">\r\n";
     $headers .= "Reply-To: contact@" . $domain . "\r\n";
     $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
 
@@ -84,7 +84,7 @@ function sendConfirmationEmail($orderId, $data) {
 
                     <!-- Header -->
                     <tr><td style="padding: 30px 24px; text-align: center;">
-                        <h1 style="margin: 0; color: #ffffff; font-size: 20px; letter-spacing: 3px; text-transform: uppercase;">AL ESCALADE</h1>
+                        <h1 style="margin: 0; color: #ffffff; font-size: 20px; letter-spacing: 3px; text-transform: uppercase;">PROJET CRIMP.</h1>
                     </td></tr>
 
                     <!-- Confirmation -->
@@ -171,7 +171,7 @@ function sendConfirmationEmail($orderId, $data) {
                     <!-- Footer -->
                     <tr><td style="padding: 24px; text-align: center;">
                         <p style="margin: 0; color: #888888; font-size: 12px;">Votre commande sera expediee des reception du paiement.</p>
-                        <p style="margin: 8px 0 0; color: #555555; font-size: 11px;">AL Escalade - The Climbing Shop</p>
+                        <p style="margin: 8px 0 0; color: #555555; font-size: 11px;">PROJET CRIMP. - Train Anywhere.</p>
                     </td></tr>
 
                 </table>
@@ -209,7 +209,7 @@ try {
     $pdo = getDB();
 
     // Generate order ID
-    $orderId = 'AL-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
+    $orderId = 'PC-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
 
     // Insert order
     $stmt = $pdo->prepare("
