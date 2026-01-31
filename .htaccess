@@ -1,3 +1,6 @@
+# Page 404 personnalisee
+ErrorDocument 404 /404.html
+
 # Forcer index.html et index.php comme pages par défaut
 DirectoryIndex index.html index.php
 
