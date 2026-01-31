@@ -33,6 +33,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         body::before {
@@ -50,11 +51,22 @@
             z-index: 0;
         }
 
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
         .content {
             position: relative;
-            z-index: 1;
+            z-index: 2;
             text-align: center;
             padding: 20px;
+            perspective: 800px;
         }
 
         .code {
@@ -63,6 +75,8 @@
             line-height: 1;
             letter-spacing: -4px;
             color: var(--text-primary);
+            transition: transform 0.15s ease-out;
+            will-change: transform;
         }
 
         .message {
@@ -70,6 +84,8 @@
             color: var(--text-secondary);
             margin-top: 12px;
             margin-bottom: 40px;
+            transition: transform 0.15s ease-out;
+            will-change: transform;
         }
 
         .btn {
@@ -94,10 +110,104 @@
     </style>
 </head>
 <body>
+    <canvas id="particles"></canvas>
     <div class="content">
         <div class="code">404</div>
         <p class="message">Page introuvable</p>
         <a href="/" class="btn">Retour a l'accueil</a>
     </div>
+
+    <script>
+        // --- Particles ---
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let W, H;
+        let mouseX = 0, mouseY = 0;
+
+        function resize() {
+            W = canvas.width = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const PARTICLE_COUNT = 60;
+        const particles = [];
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            particles.push({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                r: Math.random() * 2 + 0.5,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                opacity: Math.random() * 0.4 + 0.1
+            });
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, W, H);
+
+            for (const p of particles) {
+                // Base movement
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Mouse repulsion (parallax-like)
+                const dx = p.x - mouseX;
+                const dy = p.y - mouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 200) {
+                    const force = (200 - dist) / 200 * 0.8;
+                    p.x += (dx / dist) * force;
+                    p.y += (dy / dist) * force;
+                }
+
+                // Wrap around edges
+                if (p.x < -10) p.x = W + 10;
+                if (p.x > W + 10) p.x = -10;
+                if (p.y < -10) p.y = H + 10;
+                if (p.y > H + 10) p.y = -10;
+
+                // Draw
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+                ctx.fill();
+            }
+
+            requestAnimationFrame(drawParticles);
+        }
+        drawParticles();
+
+        // --- Mouse tracking (3D tilt on "404") ---
+        const code = document.querySelector('.code');
+        const message = document.querySelector('.message');
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Normalize mouse position to -1..1
+            const nx = (e.clientX / W - 0.5) * 2;
+            const ny = (e.clientY / H - 0.5) * 2;
+
+            // Tilt the "404" (stronger effect)
+            const rotateX = -ny * 18;
+            const rotateY = nx * 18;
+            code.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+            // Subtle shift on the message (weaker parallax)
+            const shiftX = nx * 8;
+            const shiftY = ny * 8;
+            message.style.transform = `translate(${shiftX}px, ${shiftY}px)`;
+        });
+
+        // Reset on mouse leave
+        document.addEventListener('mouseleave', () => {
+            code.style.transform = 'rotateX(0deg) rotateY(0deg)';
+            message.style.transform = 'translate(0px, 0px)';
+        });
+    </script>
 </body>
 </html>
