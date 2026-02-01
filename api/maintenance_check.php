@@ -29,6 +29,13 @@ foreach ($skipPaths as $path) {
 // Charger la config pour la session et la DB
 require_once __DIR__ . '/config.php';
 
+// Reinitialiser les headers car config.php met Content-Type: application/json (pour l'API)
+// Ici on est dans une page HTML, pas une API
+header('Content-Type: text/html; charset=UTF-8');
+header_remove('Access-Control-Allow-Origin');
+header_remove('Access-Control-Allow-Methods');
+header_remove('Access-Control-Allow-Headers');
+
 // Admin bypass total
 if (isAdmin()) {
     return;
@@ -46,9 +53,6 @@ try {
     // Si la table n'existe pas encore, laisser passer
     return;
 }
-
-// Reinitialiser le Content-Type car config.php met application/json
-header('Content-Type: text/html; charset=UTF-8');
 
 // Check maintenance mode
 $maintenanceEnabled = ($settings['maintenance_enabled'] ?? '0') === '1';
