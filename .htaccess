@@ -13,3 +13,6 @@ DirectoryIndex index.html index.php
 # S'assurer que PHP est traité
 AddType application/x-httpd-php .php
 AddHandler application/x-httpd-php .php
+
+# Permettre l'exécution PHP dans les fichiers .html (pour le middleware maintenance)
+AddType application/x-httpd-php .html

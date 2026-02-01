@@ -63,6 +63,7 @@ unset($produit); // Casser la référence
                     <li><a href="messages.php"><span class="icon">✉️</span> Messages</a></li>
                     <li><a href="newsletter.php"><span class="icon">📧</span> Newsletter</a></li>
                     <li><a href="clients.php"><span class="icon">👥</span> Clients</a></li>
+                    <li><a href="maintenance.php"><span class="icon">🔧</span> Maintenance</a></li>
                     <li><a href="../index.html"><span class="icon">🏠</span> Retour au site</a></li>
                     <li><a href="../api/auth/logout.php"><span class="icon">🚪</span> Déconnexion</a></li>
                 </ul>
