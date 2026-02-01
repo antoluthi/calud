@@ -201,6 +201,35 @@ nav {
     position: relative;
 }
 
+.hero-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 550px;
+    margin: 0.75rem auto 0;
+    position: relative;
+    opacity: 0.7;
+}
+
+.hero-cta {
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 0.9rem 2.5rem;
+    background-color: var(--accent);
+    color: var(--bg-primary);
+    text-decoration: none;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: opacity 0.2s;
+    position: relative;
+}
+
+.hero-cta:hover {
+    opacity: 0.85;
+}
+
 /* ========== Products Section ========== */
 .products {
     padding: 6rem 0;
@@ -340,6 +369,10 @@ footer p {
 
     .hero-subtitle {
         font-size: 1.1rem;
+    }
+
+    .hero-description {
+        font-size: 0.9rem;
     }
 
     nav {

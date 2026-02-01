@@ -605,43 +605,100 @@
             font-weight: 400;
         }
 
-        /* ========== Mission Section ========== */
-        .mission {
+        /* ========== Expertise Section ========== */
+        .expertise {
             padding: 4rem 0;
             background-color: transparent;
         }
 
-        .mission-content {
-            max-width: 800px;
-            margin: 0 auto;
+        .expertise h2 {
             text-align: center;
-            background-color: var(--bg-secondary);
-            padding: 3rem 2.5rem;
-            border-radius: 24px;
-            border: 1px solid var(--border-color);
-        }
-
-        .mission h2 {
             color: var(--text-primary);
             font-size: 1.75rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2.5rem;
             font-weight: 600;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
 
-        .mission p {
-            color: var(--text-secondary);
+        .expertise-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .expertise-card {
+            background-color: var(--bg-secondary);
+            padding: 2rem 1.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .expertise-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .expertise-card h3 {
+            color: var(--text-primary);
             font-size: 1rem;
-            line-height: 1.8;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .expertise-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* ========== Pillars Section ========== */
+        .pillars {
+            padding: 2rem 0 4rem;
+            background-color: transparent;
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .pillar-card {
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .pillar-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .pillar-card h3 {
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             margin-bottom: 0.75rem;
         }
 
-        .highlight-text {
-            color: var(--accent);
-            font-weight: 600;
-            position: relative;
-            display: inline-block;
+        .pillar-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 768px) {
+            .expertise-grid,
+            .pillars-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* ========== Products Section ========== */
@@ -1648,18 +1705,55 @@
     <section id="accueil" class="hero">
         <div class="container">
             <h1>Train <span id="typewriter"></span><span class="typewriter-cursor">|</span></h1>
-            <p class="hero-subtitle">Des outils de grimpe pour les grimpeurs, par les grimpeurs</p>
+            <p class="hero-subtitle">L'ingénierie belge au service de la force de préhension.</p>
+            <p class="hero-description">Des outils d'entraînement nomades, ergonomiques et durables. Conçus par un athlète pour les grimpeurs exigeants.</p>
+            <a href="#produits" class="hero-cta">Découvrir la gamme</a>
         </div>
     </section>
 
-    <!-- Mission Section -->
-    <section class="mission">
+    <!-- Expertise Section -->
+    <section class="expertise">
         <div class="container">
-            <div class="mission-content">
-                <h2>Mon but ?</h2>
-                <p>L'optimisation de l'entraînement et la réduction des blessures.</p>
-                <p>Je veux rendre les outils d'entraînement plus accessibles et plus simples d'utilisation pour <span class="highlight-text">tout le monde</span>.</p>
-                <p>Peu importe la morphologie et le niveau, chacun devrait avoir accès aux bons outils d'entraînement afin de prévenir les blessures et de progresser plus vite.</p>
+            <h2>De l'équipe nationale au bureau d'études</h2>
+            <div class="expertise-grid">
+                <div class="expertise-card">
+                    <span class="expertise-icon">🏔️</span>
+                    <h3>L'expérience du haut niveau</h3>
+                    <p>Ancien athlète de l'équipe belge d'escalade, j'ai conçu CRIMP. pour répondre aux besoins réels de progression et de prévention des blessures.</p>
+                </div>
+                <div class="expertise-card">
+                    <span class="expertise-icon">📐</span>
+                    <h3>La précision de l'ingénieur</h3>
+                    <p>Chaque courbe est étudiée pour offrir une préhension plus ergonomique qu'une réglette classique, permettant de charger plus de poids tout en protégeant tes doigts.</p>
+                </div>
+                <div class="expertise-card">
+                    <span class="expertise-icon">🥇</span>
+                    <h3>Testé par les pros</h3>
+                    <p>Nos outils sont actuellement testés et validés par des athlètes de haut niveau belges.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pillars Section -->
+    <section class="pillars">
+        <div class="container">
+            <div class="pillars-grid">
+                <div class="pillar-card">
+                    <span class="pillar-icon">🌍</span>
+                    <h3>Mobilité totale</h3>
+                    <p>Accroche-le partout. Grâce à son système de corde intégré, entraîne-toi sur un arbre, un poids, ou même avec ton propre pied.</p>
+                </div>
+                <div class="pillar-card">
+                    <span class="pillar-icon">🤲</span>
+                    <h3>Ergonomie avancée</h3>
+                    <p>Charge plus, blesse-toi moins. Une forme étudiée pour respecter l'anatomie de la main et optimiser le recrutement musculaire.</p>
+                </div>
+                <div class="pillar-card">
+                    <span class="pillar-icon">🌱</span>
+                    <h3>Conception biosourcée</h3>
+                    <p>100% amidon de maïs. Nos prises sont imprimées en 3D en PLA, un matériau robuste, léger et respectueux de l'environnement.</p>
+                </div>
             </div>
         </div>
     </section>
