@@ -494,12 +494,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     })();
 
-    // Typewriter animation for hero "Train ___."
+    // Typewriter animation for hero "Grimpe ___."
     (function () {
         var el = document.getElementById('typewriter');
         if (!el) return;
         var cursor = document.querySelector('.typewriter-cursor');
-        var words = ['At Home.', 'Outside.', 'At the Gym.', 'Anywhere.'];
+        var words = ['Chez Toi.', 'Dehors.', 'En Salle.', 'Partout.'];
         var wordIdx = 0;
         var charIdx = 0;
         var deleting = false;
