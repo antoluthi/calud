@@ -1987,7 +1987,7 @@
                         <div class="cart-item-details">
                             <div class="quantity-controls">
                                 <button class="qty-btn" onclick="updateQuantity(${item.id}, '${item.size}', -1)">−</button>
-                                <span class="quantity-display">quantité ${item.quantity}</span>
+                                <span class="quantity-display">${item.quantity}</span>
                                 <button class="qty-btn" onclick="updateQuantity(${item.id}, '${item.size}', 1)">+</button>
                             </div>
                             <span class="item-total">Tot ${item.price * item.quantity} €</span>
@@ -2005,6 +2005,9 @@
         function updateQuantity(productId, size, change) {
             const item = window.cart.find(i => i.id === productId && i.size === size);
             if (item) {
+                if (item.quantity === 1 && change === -1) {
+                    if (!confirm('Supprimer cet article du panier ?')) return;
+                }
                 item.quantity += change;
                 if (item.quantity <= 0) {
                     window.cart = window.cart.filter(i => !(i.id === productId && i.size === size));
