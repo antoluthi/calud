@@ -498,14 +498,15 @@ document.addEventListener('DOMContentLoaded', () => {
     (function () {
         var el = document.getElementById('typewriter');
         if (!el) return;
-        var words = ['At Home.', 'Outside.', 'At the Gym.', 'On the Go.', 'Anywhere.'];
+        var cursor = document.querySelector('.typewriter-cursor');
+        var words = ['At Home.', 'Outside.', 'At the Gym.', 'Anywhere.'];
         var wordIdx = 0;
         var charIdx = 0;
         var deleting = false;
-        var typeSpeed = 100;
-        var deleteSpeed = 60;
-        var pauseEnd = 1500;
-        var pauseDelete = 800;
+        var typeSpeed = 90;
+        var deleteSpeed = 54;
+        var pauseEnd = 1350;
+        var pauseDelete = 720;
 
         function tick() {
             var current = words[wordIdx];
@@ -513,7 +514,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.textContent = current.substring(0, charIdx + 1);
                 charIdx++;
                 if (charIdx === current.length) {
-                    if (wordIdx === words.length - 1) return; // stop on "Anywhere."
+                    if (wordIdx === words.length - 1) {
+                        if (cursor) cursor.style.display = 'none';
+                        return;
+                    }
                     setTimeout(function () { deleting = true; tick(); }, pauseEnd);
                     return;
                 }
@@ -531,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        setTimeout(tick, 600);
+        setTimeout(tick, 540);
     })();
 
     // Smooth scroll pour les liens de navigation
