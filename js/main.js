@@ -494,6 +494,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     })();
 
+    // Typewriter animation for hero "Train ___."
+    (function () {
+        var el = document.getElementById('typewriter');
+        if (!el) return;
+        var words = ['At Home.', 'Outside.', 'At the Gym.', 'On the Go.', 'Anywhere.'];
+        var wordIdx = 0;
+        var charIdx = 0;
+        var deleting = false;
+        var typeSpeed = 100;
+        var deleteSpeed = 60;
+        var pauseEnd = 1500;
+        var pauseDelete = 800;
+
+        function tick() {
+            var current = words[wordIdx];
+            if (!deleting) {
+                el.textContent = current.substring(0, charIdx + 1);
+                charIdx++;
+                if (charIdx === current.length) {
+                    if (wordIdx === words.length - 1) return; // stop on "Anywhere."
+                    setTimeout(function () { deleting = true; tick(); }, pauseEnd);
+                    return;
+                }
+                setTimeout(tick, typeSpeed);
+            } else {
+                el.textContent = current.substring(0, charIdx - 1);
+                charIdx--;
+                if (charIdx === 0) {
+                    deleting = false;
+                    wordIdx++;
+                    setTimeout(tick, pauseDelete);
+                    return;
+                }
+                setTimeout(tick, deleteSpeed);
+            }
+        }
+
+        setTimeout(tick, 600);
+    })();
+
     // Smooth scroll pour les liens de navigation
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {

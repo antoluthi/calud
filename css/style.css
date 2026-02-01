@@ -184,6 +184,15 @@ nav {
     position: relative;
 }
 
+.typewriter-cursor {
+    -webkit-text-fill-color: var(--accent);
+    animation: blink 0.7s step-end infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
 .hero-subtitle {
     font-size: 1.3rem;
     color: var(--text-secondary);
