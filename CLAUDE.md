@@ -58,9 +58,11 @@ site-escalade/
 ├── checkout.html             # Page de checkout (panier -> commande)
 ├── mes-commandes.html        # Historique des commandes (utilisateur connecte)
 ├── 404.html                  # Page 404 custom (particules + tilt 3D)
+├── maintenance.html          # Page maintenance (viewer 3D Three.js, auto-rotation)
+├── password.php              # Page de saisie mot de passe (+ login Google)
 ├── css/style.css             # Styles du site public (theme sombre)
 ├── js/main.js                # Logique frontend (produits, panier, auth, modal, easter egg)
-├── images/                   # Images des produits
+├── images/                   # Images des produits + modele 3D (3d_model_02.glb)
 ├── guides/                   # Guides d'utilisation PDF des produits
 ├── favicon.ico
 │
@@ -71,6 +73,7 @@ site-escalade/
 │   ├── newsletter.php        # POST : inscription newsletter
 │   ├── checkout.php          # POST : creer une commande + envoi email confirmation
 │   ├── commandes.php         # GET : commandes de l'utilisateur connecte (requireAuth)
+│   ├── maintenance_check.php  # Middleware maintenance/password (inclus dans les .html)
 │   ├── auth/
 │   │   ├── login.php         # Redirection vers Google OAuth
 │   │   ├── callback.php      # Callback OAuth (cree/met a jour le user en DB)
@@ -82,6 +85,7 @@ site-escalade/
 │   │   ├── messages.php      # GET/PUT/DELETE messages
 │   │   ├── newsletter.php    # GET abonnes, POST envoi email, DELETE
 │   │   ├── clients.php       # GET liste clients
+│   │   ├── maintenance.php   # GET/PUT settings maintenance/password
 │   │   └── check-duplicates.php
 │   └── users/
 │       └── me.php            # GET : info utilisateur connecte
@@ -93,13 +97,15 @@ site-escalade/
 │   ├── clients.php           # Gestion clients
 │   ├── messages.php          # Gestion messages contact
 │   ├── newsletter.php        # Gestion newsletter + envoi
+│   ├── maintenance.php       # Gestion mode maintenance + protection mot de passe
 │   ├── css/admin.css         # Styles du dashboard admin
 │   └── js/                   # JS specifique a chaque page admin
 │       ├── produits.js
 │       ├── commandes.js
 │       ├── clients.js
 │       ├── messages.js
-│       └── newsletter.js
+│       ├── newsletter.js
+│       └── maintenance.js
 │
 ├── database/                 # Schema et migrations SQL
 │   ├── schema.sql            # Schema initial
@@ -111,6 +117,7 @@ site-escalade/
 │   ├── migration_users_newsletter.sql
 │   ├── migration_guide_pdf.sql
 │   ├── migration_checkout.sql  # Structure actuelle des tables commandes/commande_items
+│   ├── migration_maintenance.sql # Table site_settings (maintenance + password)
 │   └── fix_duplicates.sql
 │
 ├── data/produits.json        # Ancien fichier produits (plus utilise, tout est en DB)
@@ -149,6 +156,10 @@ site-escalade/
 **`newsletter`** - Abonnes newsletter
 - `id`, `email`, `created_at`
 
+**`site_settings`** - Parametres du site (key-value)
+- `setting_key` (PK), `setting_value`, `updated_at`
+- Cles : `maintenance_enabled`, `maintenance_ips` (JSON array), `password_enabled`, `password_hash`
+
 ### Migrations
 Les migrations sont dans `/database/`. A executer dans l'ordre :
 1. `schema.sql` - Schema initial
@@ -161,6 +172,7 @@ Les migrations sont dans `/database/`. A executer dans l'ordre :
 8. `migration_guide_pdf.sql`
 9. `migration_checkout.sql` - Structure actuelle des commandes
 10. `fix_duplicates.sql` - Diagnostic/nettoyage des doublons
+11. `migration_maintenance.sql` - Table site_settings (maintenance + password)
 
 ## Configuration Serveur
 
@@ -201,6 +213,7 @@ BASE_URL=https://antonin.luthi.eu
 - `/api/admin/messages.php` - GET/PUT (marquer lu)/DELETE
 - `/api/admin/newsletter.php` - GET abonnes, POST envoi email a tous, DELETE
 - `/api/admin/clients.php` - GET liste clients
+- `/api/admin/maintenance.php` - GET settings + IP client, PUT update settings
 
 ## Fonctions utilitaires (api/config.php)
 
@@ -250,6 +263,17 @@ Quand l'utilisateur est connecte, le dropdown du profil contient :
 - Bouton changer statut (modal avec select)
 - Checkbox "Masquer les commandes annulees" (filtre cote client via JS)
 
+### Mode maintenance et protection par mot de passe
+- **Middleware** `api/maintenance_check.php` inclus en ligne 1 de `index.html`, `checkout.html`, `mes-commandes.html`
+- `.htaccess` contient `AddType application/x-httpd-php .html` pour executer le PHP dans les .html
+- **Routes jamais bloquees** : `/api/`, `/admin/`, `/css/`, `/js/`, `/images/`, `/guides/`, `/favicon.ico`, `/password.php`, `/maintenance.html`
+- **Admin bypass** : les admins connectes passent toujours
+- **Mode maintenance** : IPs non-autorisees voient `maintenance.html` (503) avec viewer 3D Three.js (modele `images/3d_model_02.glb`)
+- **Protection mot de passe** : redirect vers `password.php` (formulaire + login Google)
+- **Lien admin discret** : en bas a droite de `maintenance.html` (quasi invisible, pointe vers `/api/auth/login.php`)
+- **Gestion** : page admin `admin/maintenance.php` avec toggles et gestion IPs
+- **Important** : `config.php` met `Content-Type: application/json` ; le middleware le reinitialise a `text/html` immediatement apres l'include
+
 ### Page 404 (404.html)
 - Page custom epuree, meme theme sombre que le site
 - Animations interactives :
@@ -271,7 +295,7 @@ Quand l'utilisateur est connecte, le dropdown du profil contient :
 - **Boutons** : border-radius 100px (pills), uppercase, letter-spacing
 - **Cartes** : border-radius 20px, border 1px solid #2a2a2a
 - **Police** : Space Grotesk (Google Fonts)
-- **Curseur** : point blanc SVG inline (`!important`) sur index.html, mes-commandes.html, 404.html
+- **3D** : Three.js (CDN) pour le viewer 3D sur la page maintenance (GLTFLoader + OrbitControls)
 
 ## Easter Egg
 
@@ -313,7 +337,14 @@ La base de donnees est accessible depuis gates.luthi.eu.
 | `admin/js/commandes.js` | JS admin commandes (detail, statut, filtre annulees) |
 | `.htaccess` | Config Apache (ErrorDocument 404, DirectoryIndex, PHP) |
 | `.github/workflows/deploy.yml` | Deploiement SFTP + SCP .htaccess |
+| `api/maintenance_check.php` | Middleware maintenance/password (inclus dans les .html) |
+| `maintenance.html` | Page maintenance (viewer 3D Three.js) |
+| `password.php` | Page saisie mot de passe + login Google |
+| `api/admin/maintenance.php` | API admin settings maintenance/password |
+| `admin/maintenance.php` | Page admin gestion maintenance |
+| `admin/js/maintenance.js` | JS admin maintenance |
 | `database/migration_checkout.sql` | Schema actuel des tables commandes |
+| `database/migration_maintenance.sql` | Table site_settings |
 
 ## Notes de Securite
 
