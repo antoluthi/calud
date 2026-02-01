@@ -1,4 +1,4 @@
-# PROJET CRIMP. - Train Anywhere.
+# CRIMP. - Train Anywhere.
 
 Site e-commerce pour materiel d'escalade (poutres de suspension portables).
 

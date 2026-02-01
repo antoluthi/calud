@@ -1,10 +1,10 @@
-# Instructions Claude - PROJET CRIMP.
+# Instructions Claude - CRIMP.
 
 Ce fichier contient toutes les informations essentielles pour travailler sur ce projet.
 
 ## Projet
 
-**PROJET CRIMP.** - Site e-commerce pour materiel d'escalade (poutres de suspension portables).
+**CRIMP.** - Site e-commerce pour materiel d'escalade (poutres de suspension portables).
 Le site est en production sur `https://antonin.luthi.eu`.
 
 ## Infrastructure
@@ -24,6 +24,10 @@ Le deploiement est **automatique** via GitHub Actions :
 - Push sur `main` -> Deploiement automatique SFTP
 - Workflow : `.github/workflows/deploy.yml`
 - Action utilisee : `wlixcc/SFTP-Deploy-Action@v1.2.4`
+
+**Deux etapes de deploiement :**
+1. **SFTP principal** (`local_path: './*'`) - Deploie tous les fichiers sauf les dotfiles (`.htaccess`, `.gitignore`, etc.) car le glob `*` les exclut
+2. **SCP .htaccess** - Etape separee qui uploade `.htaccess` via `scp` car l'action SFTP avec `local_path: './'` uploaderait le dossier `.git` entier (causant des erreurs "Permission denied")
 
 **Secrets GitHub requis :**
 - `SFTP_USERNAME` - Nom d'utilisateur SSH
@@ -53,8 +57,9 @@ site-escalade/
 ├── index.html                # Site public principal (vitrine + produits + contact)
 ├── checkout.html             # Page de checkout (panier -> commande)
 ├── mes-commandes.html        # Historique des commandes (utilisateur connecte)
+├── 404.html                  # Page 404 custom (particules + tilt 3D)
 ├── css/style.css             # Styles du site public (theme sombre)
-├── js/main.js                # Logique frontend (produits, panier, auth, modal produit)
+├── js/main.js                # Logique frontend (produits, panier, auth, modal, easter egg)
 ├── images/                   # Images des produits
 ├── guides/                   # Guides d'utilisation PDF des produits
 ├── favicon.ico
@@ -110,9 +115,9 @@ site-escalade/
 │
 ├── data/produits.json        # Ancien fichier produits (plus utilise, tout est en DB)
 ├── .env.example              # Exemple de configuration .env
-├── .htaccess                 # Config Apache (racine)
+├── .htaccess                 # Config Apache (racine) : ErrorDocument 404, DirectoryIndex, PHP handlers
 ├── .github/workflows/
-│   └── deploy.yml            # GitHub Actions : deploiement SFTP auto
+│   └── deploy.yml            # GitHub Actions : deploiement SFTP + SCP .htaccess
 └── .gitignore
 ```
 
@@ -235,7 +240,7 @@ Quand l'utilisateur est connecte, le dropdown du profil contient :
 ### Email de confirmation (dans api/checkout.php -> sendConfirmationEmail())
 - Template HTML table-based avec inline styles (compatibilite email)
 - Design sombre (bg #0a0a0a, cards #181818, texte blanc/gris)
-- Contenu : logo PROJET CRIMP., checkmark vert, recap articles (nom, taille, qte, prix), sous-total/livraison/total, infos IBAN, adresse de livraison
+- Contenu : logo CRIMP., checkmark vert, recap articles (nom, taille, qte, prix), sous-total/livraison/total, infos IBAN, adresse de livraison
 - Headers : From `noreply@{HTTP_HOST}`, Reply-To `contact@{HTTP_HOST}`
 - Appele dans un try/catch : si l'email echoue, la commande reste valide
 
@@ -244,6 +249,14 @@ Quand l'utilisateur est connecte, le dropdown du profil contient :
 - Bouton detail (ouvre une modal via `api/admin/commandes.php?id=X`)
 - Bouton changer statut (modal avec select)
 - Checkbox "Masquer les commandes annulees" (filtre cote client via JS)
+
+### Page 404 (404.html)
+- Page custom epuree, meme theme sombre que le site
+- Animations interactives :
+  - **Particules flottantes** : 60 particules blanches qui derivent et sont repoussees par le curseur (rayon 200px)
+  - **Tilt 3D** : le "404" suit le curseur avec une rotation perspective (max 18deg), le message a un leger parallaxe
+- Bouton pill "Retour a l'accueil" vers `/`
+- Configuree via `ErrorDocument 404 /404.html` dans `.htaccess`
 
 ## Design
 
@@ -258,6 +271,14 @@ Quand l'utilisateur est connecte, le dropdown du profil contient :
 - **Boutons** : border-radius 100px (pills), uppercase, letter-spacing
 - **Cartes** : border-radius 20px, border 1px solid #2a2a2a
 - **Police** : Space Grotesk (Google Fonts)
+- **Curseur** : point blanc SVG inline (`!important`) sur index.html, mes-commandes.html, 404.html
+
+## Easter Egg
+
+Triple-clic sur le logo **"CRIMP."** dans le header du site (a.logo) cycle la couleur d'accent :
+- Blanc (`#ffffff`) -> Rose (`#e75480`) -> Bleu (`#60a5fa`) -> retour au blanc
+- Modifie les CSS variables `--accent` et `--accent-hover` sur `:root`, ce qui propage le changement a tout le site automatiquement (logo, boutons, etc.)
+- Implemente dans `js/main.js` (IIFE, compteur de clics avec timeout 500ms)
 
 ## Workflow de Developpement
 
@@ -284,11 +305,14 @@ La base de donnees est accessible depuis gates.luthi.eu.
 | `index.html` | Page principale du site |
 | `checkout.html` | Page checkout |
 | `mes-commandes.html` | Page historique commandes |
-| `js/main.js` | Logique frontend (produits, panier, auth, modal) |
+| `404.html` | Page 404 custom (particules + tilt 3D) |
+| `js/main.js` | Logique frontend (produits, panier, auth, modal, easter egg) |
 | `css/style.css` | Styles du site public |
 | `admin/css/admin.css` | Styles du dashboard admin |
 | `admin/commandes.php` | Page admin commandes |
 | `admin/js/commandes.js` | JS admin commandes (detail, statut, filtre annulees) |
+| `.htaccess` | Config Apache (ErrorDocument 404, DirectoryIndex, PHP) |
+| `.github/workflows/deploy.yml` | Deploiement SFTP + SCP .htaccess |
 | `database/migration_checkout.sql` | Schema actuel des tables commandes |
 
 ## Notes de Securite
@@ -308,6 +332,8 @@ La base de donnees est accessible depuis gates.luthi.eu.
 - L'API `api/commandes.php` cherche par `user_id` OU `email` pour retrouver les commandes meme si elles ont ete passees avant la liaison user_id
 - Les emails utilisent `mail()` PHP natif - necessite un serveur mail configure
 - Le panier est stocke dans `localStorage` (`projetcrimp_cart`)
+- Le deploiement SFTP (`local_path: './*'`) n'uploade pas les dotfiles : `.htaccess` est deploye separement via SCP dans une etape dediee du workflow
+- Si un nouveau dotfile doit etre deploye, ajouter une etape SCP dans `deploy.yml`
 
 ---
-*Derniere mise a jour : Janvier 2026*
+*Derniere mise a jour : Fevrier 2026*

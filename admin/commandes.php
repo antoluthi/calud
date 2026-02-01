@@ -28,7 +28,7 @@ $commandes = $commandesQuery->fetchAll();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Commandes - PRJ CRIMP. Admin</title>
+    <title>Gestion des Commandes - CRIMP. Admin</title>
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
@@ -36,7 +36,7 @@ $commandes = $commandesQuery->fetchAll();
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>PRJ CRIMP. Admin</h2>
+                <h2>CRIMP. Admin</h2>
                 <div class="user-info">
                     <img src="<?= htmlspecialchars($user['picture']) ?>" alt="Avatar" class="user-avatar">
                     <span class="user-name"><?= htmlspecialchars($user['name']) ?></span>

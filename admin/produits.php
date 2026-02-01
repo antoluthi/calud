@@ -41,7 +41,7 @@ unset($produit); // Casser la référence
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Produits - PRJ CRIMP. Admin</title>
+    <title>Gestion des Produits - CRIMP. Admin</title>
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
@@ -49,7 +49,7 @@ unset($produit); // Casser la référence
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>PRJ CRIMP. Admin</h2>
+                <h2>CRIMP. Admin</h2>
                 <div class="user-info">
                     <img src="<?= htmlspecialchars($user['picture']) ?>" alt="Avatar" class="user-avatar">
                     <span class="user-name"><?= htmlspecialchars($user['name']) ?></span>

@@ -1,4 +1,4 @@
-# Documentation Backend - PROJET CRIMP.
+# Documentation Backend - CRIMP.
 
 ## Architecture
 
