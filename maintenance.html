@@ -224,7 +224,11 @@
             const center = box.getCenter(new THREE.Vector3());
             const bsize = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(bsize.x, bsize.y, bsize.z);
-            const scale = 0.3 / maxDim;
+            
+            // Scale adapté selon la taille d'écran
+            const isMobile = window.innerWidth <= 768;
+            const scale = (isMobile ? 0.075 : 0.3) / maxDim;
+            
             model.scale.setScalar(scale);
             model.position.sub(center.multiplyScalar(scale));
 
