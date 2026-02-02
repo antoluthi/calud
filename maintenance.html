@@ -151,7 +151,7 @@
     <div class="content">
         <div class="logo">CRIMP.</div>
         <div class="loader" id="loader"><div class="spinner"></div></div>
-        <div id="viewer" style="display:none;"></div>
+        <div id="viewer"></div>
         <h1 class="title">Site en maintenance</h1>
         <p class="message">Nous serons bientot de retour.</p>
     </div>
@@ -172,7 +172,6 @@
 
         const container = document.getElementById('viewer');
         const loader = document.getElementById('loader');
-        const size = container.clientWidth || 360;
 
         // Scene
         const scene = new THREE.Scene();
@@ -181,13 +180,11 @@
         const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
         camera.position.set(0, 0.15, 0.5);
 
-        // Renderer
+        // Renderer - initialisé sans taille d'abord
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(size, size);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.2;
-        container.appendChild(renderer.domElement);
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -214,6 +211,16 @@
         controls.autoRotate = true;
         controls.autoRotateSpeed = 2.5;
 
+        // Function pour mettre à jour la taille du renderer
+        function updateRendererSize() {
+            const size = container.clientWidth;
+            if (size > 0) {
+                renderer.setSize(size, size);
+                camera.aspect = 1;
+                camera.updateProjectionMatrix();
+            }
+        }
+
         // Load model
         const gltfLoader = new GLTFLoader();
         gltfLoader.load('/images/3d_model_02.glb', (gltf) => {
@@ -224,19 +231,24 @@
             const center = box.getCenter(new THREE.Vector3());
             const bsize = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(bsize.x, bsize.y, bsize.z);
-            
-            // Scale adapté selon la taille d'écran
-            const isMobile = window.innerWidth <= 768;
-            const scale = (isMobile ? 0.075 : 0.3) / maxDim;
-            
+            const scale = 0.3 / maxDim;
             model.scale.setScalar(scale);
-            model.position.sub(center.multiplyScalar(scale));
+            
+            // Centrage correct du modèle
+            model.position.set(
+                -center.x * scale,
+                -center.y * scale,
+                -center.z * scale
+            );
 
             scene.add(model);
 
-            // Show viewer, hide loader
+            // Ajouter le canvas au DOM et afficher le viewer
+            container.appendChild(renderer.domElement);
             loader.style.display = 'none';
-            container.style.display = 'block';
+            
+            // Calculer la taille APRÈS que le container soit visible
+            updateRendererSize();
         }, undefined, (err) => {
             // On error, show emoji fallback
             console.error('3D load error:', err);
@@ -251,14 +263,8 @@
         }
         animate();
 
-        // Resize
-        function onResize() {
-            const s = container.clientWidth;
-            if (s > 0) {
-                renderer.setSize(s, s);
-            }
-        }
-        window.addEventListener('resize', onResize);
+        // Resize avec gestion complète
+        window.addEventListener('resize', updateRendererSize);
     </script>
 </body>
 </html>
