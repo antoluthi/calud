@@ -3,16 +3,14 @@ let viewer3DState = null;
 let threeJSLoaded = false;
 let THREE_MODULE = null;
 
-// Charger Three.js dynamiquement
+// Charger Three.js dynamiquement (resolu via l'importmap dans index.html)
 async function loadThreeJS() {
     if (threeJSLoaded) return;
     try {
-        THREE_MODULE = await import('https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js');
-        // GLTFLoader
-        const gltfMod = await import('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js');
+        THREE_MODULE = await import('three');
+        const gltfMod = await import('three/addons/loaders/GLTFLoader.js');
         THREE_MODULE.GLTFLoader = gltfMod.GLTFLoader;
-        // OrbitControls
-        const orbitMod = await import('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js');
+        const orbitMod = await import('three/addons/controls/OrbitControls.js');
         THREE_MODULE.OrbitControls = orbitMod.OrbitControls;
         threeJSLoaded = true;
     } catch (e) {
