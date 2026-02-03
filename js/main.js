@@ -1,3 +1,169 @@
+// ========== 3D Viewer State ==========
+let viewer3DState = null;
+let threeJSLoaded = false;
+let THREE_MODULE = null;
+
+// Charger Three.js dynamiquement
+async function loadThreeJS() {
+    if (threeJSLoaded) return;
+    try {
+        THREE_MODULE = await import('https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js');
+        // GLTFLoader
+        const gltfMod = await import('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js');
+        THREE_MODULE.GLTFLoader = gltfMod.GLTFLoader;
+        // OrbitControls
+        const orbitMod = await import('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js');
+        THREE_MODULE.OrbitControls = orbitMod.OrbitControls;
+        threeJSLoaded = true;
+    } catch (e) {
+        console.error('Erreur chargement Three.js:', e);
+    }
+}
+
+// Initialiser le viewer 3D dans le conteneur d'image principale
+function init3DViewer(modelUrl) {
+    const container = document.getElementById('modalMainImage');
+    if (!container || !THREE_MODULE) return;
+
+    const T = THREE_MODULE;
+
+    // Spinner
+    const spinner = document.createElement('div');
+    spinner.className = 'viewer3d-spinner';
+    container.appendChild(spinner);
+
+    // Scene
+    const scene = new T.Scene();
+    scene.background = new T.Color(0x181818);
+
+    // Camera
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    const camera = new T.PerspectiveCamera(45, width / height, 0.1, 100);
+    camera.position.set(0, 0.5, 2.5);
+
+    // Renderer
+    const renderer = new T.WebGLRenderer({ antialias: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = T.SRGBColorSpace;
+    container.appendChild(renderer.domElement);
+
+    // Controls
+    const controls = new T.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enableZoom = true;
+    controls.enablePan = false;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 2;
+
+    // Lights
+    const ambientLight = new T.AmbientLight(0xffffff, 0.8);
+    scene.add(ambientLight);
+    const dirLight = new T.DirectionalLight(0xffffff, 1.2);
+    dirLight.position.set(2, 3, 2);
+    scene.add(dirLight);
+    const dirLight2 = new T.DirectionalLight(0xffffff, 0.4);
+    dirLight2.position.set(-2, 1, -1);
+    scene.add(dirLight2);
+
+    // Load model
+    const loader = new T.GLTFLoader();
+    loader.load(modelUrl, (gltf) => {
+        const model = gltf.scene;
+
+        // Center and scale model
+        const box = new T.Box3().setFromObject(model);
+        const center = box.getCenter(new T.Vector3());
+        const size = box.getSize(new T.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 1.5 / maxDim;
+        model.scale.setScalar(scale);
+        model.position.sub(center.multiplyScalar(scale));
+
+        scene.add(model);
+        spinner.remove();
+    }, undefined, (error) => {
+        console.error('Erreur chargement modele 3D:', error);
+        spinner.remove();
+    });
+
+    // Animation loop
+    let animId;
+    function animate() {
+        animId = requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // Resize observer
+    const resizeObserver = new ResizeObserver(() => {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+    });
+    resizeObserver.observe(container);
+
+    // Store state for cleanup
+    viewer3DState = { scene, camera, renderer, controls, animId, resizeObserver, container };
+}
+
+// Detruire le viewer 3D proprement
+function destroy3DViewer() {
+    if (!viewer3DState) return;
+    const { scene, renderer, controls, animId, resizeObserver, container } = viewer3DState;
+
+    cancelAnimationFrame(animId);
+    resizeObserver.disconnect();
+    controls.dispose();
+
+    // Dispose all scene objects
+    scene.traverse((obj) => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+            if (Array.isArray(obj.material)) {
+                obj.material.forEach(m => m.dispose());
+            } else {
+                obj.material.dispose();
+            }
+        }
+    });
+
+    renderer.dispose();
+    if (renderer.domElement && renderer.domElement.parentNode) {
+        renderer.domElement.parentNode.removeChild(renderer.domElement);
+    }
+
+    // Remove spinner if still present
+    const spinner = container.querySelector('.viewer3d-spinner');
+    if (spinner) spinner.remove();
+
+    viewer3DState = null;
+}
+
+// Activer le viewer 3D dans le conteneur principal
+function setMain3DViewer(modelUrl, thumbElement) {
+    // Destroy previous viewer if any
+    destroy3DViewer();
+
+    const container = document.getElementById('modalMainImage');
+    if (!container) return;
+
+    // Clear image content
+    container.innerHTML = '';
+
+    // Update active thumbnail
+    document.querySelectorAll('.thumbnail, .thumbnail-3d').forEach(t => t.classList.remove('active'));
+    if (thumbElement) thumbElement.classList.add('active');
+
+    // Init viewer
+    init3DViewer(modelUrl);
+}
+
 // Chargement et affichage des produits
 async function loadProducts() {
     try {
@@ -131,12 +297,28 @@ function openProductModal(productId) {
 
     // Afficher les miniatures
     const thumbnailsContainer = document.getElementById('modalThumbnails');
-    if (allImages.length > 1) {
-        thumbnailsContainer.innerHTML = allImages.map((img, index) => `
+    const has3D = product.model_3d && product.model_3d.trim() !== '';
+    if (allImages.length > 1 || has3D) {
+        let thumbsHTML = allImages.map((img, index) => `
             <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="setMainImage('${img}', this)">
                 <img src="${img}" alt="Image ${index + 1}">
             </div>
         `).join('');
+
+        if (has3D) {
+            thumbsHTML += `
+                <div class="thumbnail thumbnail-3d" onclick="(async()=>{await loadThreeJS();setMain3DViewer('${product.model_3d}',this)})()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <span class="thumbnail-3d-label">3D</span>
+                </div>
+            `;
+        }
+
+        thumbnailsContainer.innerHTML = thumbsHTML;
         thumbnailsContainer.style.display = 'flex';
     } else {
         thumbnailsContainer.innerHTML = '';
@@ -213,6 +395,7 @@ function openProductModal(productId) {
 
 // Fermer la modal produit
 function closeProductModal() {
+    destroy3DViewer();
     document.getElementById('productModalOverlay').classList.remove('active');
     document.body.style.overflow = '';
     // Arrêter la vidéo si elle est en cours
@@ -222,14 +405,16 @@ function closeProductModal() {
 
 // Changer l'image principale au clic sur une miniature
 function setMainImage(imageUrl, thumbnailElement) {
-    // Mettre à jour l'image principale
-    const mainImg = document.getElementById('modalMainImg');
-    if (mainImg) {
-        mainImg.src = imageUrl;
+    // Destroy 3D viewer if active
+    destroy3DViewer();
+
+    const container = document.getElementById('modalMainImage');
+    if (container) {
+        container.innerHTML = `<img src="${imageUrl}" alt="${currentModalProduct ? currentModalProduct.name : ''}" id="modalMainImg">`;
     }
 
     // Mettre à jour la classe active des miniatures
-    document.querySelectorAll('.thumbnail').forEach(thumb => {
+    document.querySelectorAll('.thumbnail, .thumbnail-3d').forEach(thumb => {
         thumb.classList.remove('active');
     });
     if (thumbnailElement) {

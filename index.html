@@ -1293,6 +1293,59 @@
             object-fit: cover;
         }
 
+        .thumbnail-3d {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            gap: 2px;
+        }
+
+        .thumbnail-3d:hover {
+            color: var(--text-primary);
+        }
+
+        .thumbnail-3d.active {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .thumbnail-3d-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .viewer3d-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 36px;
+            height: 36px;
+            margin: -18px 0 0 -18px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin3d 0.8s linear infinite;
+            z-index: 2;
+        }
+
+        @keyframes spin3d {
+            to { transform: rotate(360deg); }
+        }
+
+        .main-image-container canvas {
+            cursor: grab;
+            border-radius: 12px;
+        }
+
+        .main-image-container canvas:active {
+            cursor: grabbing;
+        }
+
         .modal-info {
             flex: 1;
             display: flex;

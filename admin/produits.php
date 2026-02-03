@@ -216,6 +216,12 @@ unset($produit); // Casser la référence
                 </div>
 
                 <div class="form-group">
+                    <label for="model_3d">Modele 3D GLB (optionnel)</label>
+                    <input type="text" id="model_3d" name="model_3d" class="form-control" placeholder="images/mon-modele.glb">
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Chemin vers le fichier GLB du modele 3D (ex: images/3d_model_02.glb)</small>
+                </div>
+
+                <div class="form-group">
                     <label>
                         <input type="checkbox" id="actif" name="actif" checked>
                         Produit actif

@@ -85,8 +85,8 @@ if ($method === 'POST') {
 
     try {
         $stmt = $db->prepare("
-            INSERT INTO produits (nom, prix, description, image, caracteristiques, tailles, actif, images, dimensions, poids, materiaux, guide_tailles, video_url, guide_pdf)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO produits (nom, prix, description, image, caracteristiques, tailles, actif, images, dimensions, poids, materiaux, guide_tailles, video_url, guide_pdf, model_3d)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
@@ -103,7 +103,8 @@ if ($method === 'POST') {
             $data['materiaux'] ?? null,
             $data['guide_tailles'] ?? null,
             $data['video_url'] ?? null,
-            $data['guide_pdf'] ?? null
+            $data['guide_pdf'] ?? null,
+            $data['model_3d'] ?? null
         ]);
 
         $id = $db->lastInsertId();
@@ -217,6 +218,11 @@ if ($method === 'PUT') {
         if (isset($data['guide_pdf'])) {
             $updates[] = "guide_pdf = ?";
             $params[] = $data['guide_pdf'];
+        }
+
+        if (isset($data['model_3d'])) {
+            $updates[] = "model_3d = ?";
+            $params[] = $data['model_3d'];
         }
 
         if (empty($updates)) {

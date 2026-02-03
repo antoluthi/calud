@@ -61,6 +61,7 @@ function editProduct(produit) {
         document.getElementById('guide_tailles').value = produit.guide_tailles || '';
         document.getElementById('video_url').value = produit.video_url || '';
         document.getElementById('guide_pdf').value = produit.guide_pdf || '';
+        document.getElementById('model_3d').value = produit.model_3d || '';
 
         document.getElementById('actif').checked = produit.actif == 1;
         document.getElementById('productModal').classList.add('active');
@@ -129,6 +130,7 @@ document.getElementById('productForm').addEventListener('submit', async function
         guide_tailles: formData.get('guide_tailles') || '',
         video_url: formData.get('video_url') || '',
         guide_pdf: formData.get('guide_pdf') || '',
+        model_3d: formData.get('model_3d') || '',
         actif: formData.get('actif') ? 1 : 0
     };
 

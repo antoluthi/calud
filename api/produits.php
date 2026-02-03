@@ -18,7 +18,7 @@ if ($method === 'GET') {
         // Récupérer seulement les produits actifs
         $stmt = $db->query("
             SELECT id, nom, prix, description, image, caracteristiques, tailles, actif,
-                   images, dimensions, poids, materiaux, guide_tailles, video_url, guide_pdf
+                   images, dimensions, poids, materiaux, guide_tailles, video_url, guide_pdf, model_3d
             FROM produits
             WHERE actif = 1
             ORDER BY created_at DESC
@@ -57,7 +57,8 @@ if ($method === 'GET') {
                 'materiaux' => $produit['materiaux'] ?? null,
                 'guide_tailles' => $produit['guide_tailles'] ?? null,
                 'video_url' => $produit['video_url'] ?? null,
-                'guide_pdf' => $produit['guide_pdf'] ?? null
+                'guide_pdf' => $produit['guide_pdf'] ?? null,
+                'model_3d' => $produit['model_3d'] ?? null
             ];
         }
 

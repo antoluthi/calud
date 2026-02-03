@@ -118,6 +118,7 @@ site-escalade/
 │   ├── migration_guide_pdf.sql
 │   ├── migration_checkout.sql  # Structure actuelle des tables commandes/commande_items
 │   ├── migration_maintenance.sql # Table site_settings (maintenance + password)
+│   ├── migration_model_3d.sql    # Colonne model_3d pour viewer 3D produit
 │   └── fix_duplicates.sql
 │
 ├── data/produits.json        # Ancien fichier produits (plus utilise, tout est en DB)
@@ -136,7 +137,7 @@ site-escalade/
 - `id`, `google_id`, `email`, `name`, `picture`, `is_admin` (0 ou 1), `created_at`, `last_login`
 
 **`produits`** - Catalogue
-- `id`, `nom`, `prix`, `description`, `image`, `caracteristiques` (JSON), `actif`, `dimensions`, `poids`, `materiaux`, `guide_tailles`, `video_url`, `guide_pdf`, `created_at`, `updated_at`
+- `id`, `nom`, `prix`, `description`, `image`, `caracteristiques` (JSON), `actif`, `dimensions`, `poids`, `materiaux`, `guide_tailles`, `video_url`, `guide_pdf`, `model_3d`, `created_at`, `updated_at`
 - Peut avoir plusieurs images et tailles (tables liees)
 
 **`commandes`** - Commandes clients (structure definie par `migration_checkout.sql`)
@@ -173,6 +174,7 @@ Les migrations sont dans `/database/`. A executer dans l'ordre :
 9. `migration_checkout.sql` - Structure actuelle des commandes
 10. `fix_duplicates.sql` - Diagnostic/nettoyage des doublons
 11. `migration_maintenance.sql` - Table site_settings (maintenance + password)
+12. `migration_model_3d.sql` - Colonne model_3d pour viewer 3D dans la galerie produit
 
 ## Configuration Serveur
 
