@@ -296,11 +296,17 @@ $user = getCurrentUser();
                     <h1>📈 Statistiques</h1>
                     <p>Analyse du trafic et des performances de votre site</p>
                 </div>
-                <div class="periode-selector">
-                    <button class="periode-btn" data-periode="7">7 jours</button>
-                    <button class="periode-btn active" data-periode="30">30 jours</button>
-                    <button class="periode-btn" data-periode="90">90 jours</button>
-                    <button class="periode-btn" data-periode="365">1 an</button>
+                <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+                    <div class="periode-selector">
+                        <button class="periode-btn" data-periode="7">7 jours</button>
+                        <button class="periode-btn active" data-periode="30">30 jours</button>
+                        <button class="periode-btn" data-periode="90">90 jours</button>
+                        <button class="periode-btn" data-periode="365">1 an</button>
+                    </div>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.85rem; color: var(--text-secondary);">
+                        <input type="checkbox" id="hideAdminToggle" style="accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer;">
+                        Cacher traffic admin
+                    </label>
                 </div>
             </div>
 
@@ -401,6 +407,7 @@ $user = getCurrentUser();
                     <thead>
                         <tr>
                             <th>Page</th>
+                            <th>Utilisateur</th>
                             <th>Appareil</th>
                             <th>Navigateur</th>
                             <th>OS</th>
@@ -408,7 +415,7 @@ $user = getCurrentUser();
                         </tr>
                     </thead>
                     <tbody id="recent-visits">
-                        <tr><td colspan="5" style="text-align: center; padding: 2rem;">Chargement...</td></tr>
+                        <tr><td colspan="6" style="text-align: center; padding: 2rem;">Chargement...</td></tr>
                     </tbody>
                 </table>
             </div>

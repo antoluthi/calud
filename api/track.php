@@ -75,13 +75,20 @@ $os = detectOS($userAgent);
 // Session ID basé sur IP hash + UA (empreinte journalière)
 $sessionId = hash('sha256', $ipHash . $userAgent);
 
+// Récupérer le user_id si l'utilisateur est connecté
+$userId = null;
+$user = getCurrentUser();
+if ($user && isset($user['id'])) {
+    $userId = (int)$user['id'];
+}
+
 // Insérer la visite
 try {
     $stmt = $db->prepare("
-        INSERT INTO visites (page, ip_hash, user_agent, referer, device_type, browser, os, session_id)
-        VALUES (:page, :ip_hash, :user_agent, :referer, :device_type, :browser, :os, :session_id)
+        INSERT INTO visites (page, ip_hash, user_agent, referer, device_type, browser, os, session_id, user_id)
+        VALUES (:page, :ip_hash, :user_agent, :referer, :device_type, :browser, :os, :session_id, :user_id)
     ");
-    
+
     $stmt->execute([
         ':page' => substr($page, 0, 500),
         ':ip_hash' => $ipHash,
@@ -90,7 +97,8 @@ try {
         ':device_type' => $deviceType,
         ':browser' => $browser,
         ':os' => $os,
-        ':session_id' => $sessionId
+        ':session_id' => $sessionId,
+        ':user_id' => $userId
     ]);
     
     echo json_encode(['success' => true]);

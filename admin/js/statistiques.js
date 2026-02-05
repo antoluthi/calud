@@ -38,6 +38,7 @@ Chart.defaults.borderColor = chartColors.grid;
 
 // Période sélectionnée
 let currentPeriode = 30;
+let hideAdmin = false;
 
 // Initialisation
 document.addEventListener('DOMContentLoaded', () => {
@@ -51,6 +52,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Event listener pour la checkbox "Cacher traffic admin"
+    const hideAdminToggle = document.getElementById('hideAdminToggle');
+    if (hideAdminToggle) {
+        hideAdminToggle.addEventListener('change', () => {
+            hideAdmin = hideAdminToggle.checked;
+            loadStats();
+        });
+    }
+
     // Charger les stats
     loadStats();
 });
@@ -60,7 +70,7 @@ async function loadStats() {
     showLoading(true);
 
     try {
-        const response = await fetch(`../api/admin/stats.php?periode=${currentPeriode}`);
+        const response = await fetch(`../api/admin/stats.php?periode=${currentPeriode}&hide_admin=${hideAdmin ? '1' : '0'}`);
         const data = await response.json();
 
         if (data.success) {
@@ -424,7 +434,7 @@ function updateRecentVisits(visits) {
     const container = document.getElementById('recent-visits');
 
     if (visits.length === 0) {
-        container.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Aucune visite enregistrée</td></tr>';
+        container.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">Aucune visite enregistrée</td></tr>';
         return;
     }
 
@@ -444,9 +454,19 @@ function updateRecentVisits(visits) {
         });
         const pageName = visit.page.replace(/^\//, '').replace(/\.(html|php)$/, '') || 'Accueil';
 
+        // Affichage utilisateur
+        let userDisplay = '<span style="color: var(--text-secondary); font-style: italic;">Anonyme</span>';
+        if (visit.user_name) {
+            const adminBadge = visit.user_is_admin == 1
+                ? ' <span style="background: rgba(255, 68, 68, 0.15); color: #ff4444; padding: 1px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">ADMIN</span>'
+                : '';
+            userDisplay = `<span title="${visit.user_email || ''}">${visit.user_name}${adminBadge}</span>`;
+        }
+
         return `
             <tr>
                 <td title="${visit.page}">${pageName}</td>
+                <td>${userDisplay}</td>
                 <td><span class="device-icon">${deviceIcons[visit.device_type] || '❓'} ${visit.device_type}</span></td>
                 <td>${visit.browser}</td>
                 <td>${visit.os}</td>

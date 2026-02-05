@@ -18,16 +18,26 @@ $db = getDB();
 $periode = $_GET['periode'] ?? '30';
 $periode = (int)min(max($periode, 7), 365); // Entre 7 et 365 jours
 
+// Paramètre pour cacher le traffic admin
+$hideAdmin = isset($_GET['hide_admin']) && $_GET['hide_admin'] === '1';
+
+// Construire la clause WHERE pour filtrer le traffic admin
+$adminFilter = '';
+if ($hideAdmin) {
+    $adminFilter = ' AND (v.user_id IS NULL OR v.user_id NOT IN (SELECT id FROM users WHERE is_admin = 1))';
+}
+
 try {
     // 1. Visites par jour (pour le graphique)
     $visitesParJour = $db->prepare("
-        SELECT 
-            DATE(created_at) as date,
+        SELECT
+            DATE(v.created_at) as date,
             COUNT(*) as visites,
-            COUNT(DISTINCT session_id) as sessions
-        FROM visites
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
-        GROUP BY DATE(created_at)
+            COUNT(DISTINCT v.session_id) as sessions
+        FROM visites v
+        WHERE v.created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
+        $adminFilter
+        GROUP BY DATE(v.created_at)
         ORDER BY date ASC
     ");
     $visitesParJour->execute([':periode' => $periode]);
@@ -35,42 +45,49 @@ try {
 
     // 2. Statistiques globales
     $today = $db->query("
-        SELECT COUNT(*) as count, COUNT(DISTINCT session_id) as sessions
-        FROM visites 
-        WHERE DATE(created_at) = CURDATE()
+        SELECT COUNT(*) as count, COUNT(DISTINCT v.session_id) as sessions
+        FROM visites v
+        WHERE DATE(v.created_at) = CURDATE()
+        $adminFilter
     ")->fetch();
 
     $yesterday = $db->query("
         SELECT COUNT(*) as count
-        FROM visites 
-        WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+        FROM visites v
+        WHERE DATE(v.created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+        $adminFilter
     ")->fetch();
 
     $thisWeek = $db->query("
-        SELECT COUNT(*) as count, COUNT(DISTINCT session_id) as sessions
-        FROM visites 
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        SELECT COUNT(*) as count, COUNT(DISTINCT v.session_id) as sessions
+        FROM visites v
+        WHERE v.created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        $adminFilter
     ")->fetch();
 
     $thisMonth = $db->query("
-        SELECT COUNT(*) as count, COUNT(DISTINCT session_id) as sessions
-        FROM visites 
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+        SELECT COUNT(*) as count, COUNT(DISTINCT v.session_id) as sessions
+        FROM visites v
+        WHERE v.created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+        $adminFilter
     ")->fetch();
 
     $allTime = $db->query("
-        SELECT COUNT(*) as count, COUNT(DISTINCT session_id) as sessions
-        FROM visites
+        SELECT COUNT(*) as count, COUNT(DISTINCT v.session_id) as sessions
+        FROM visites v
+        WHERE 1=1
+        $adminFilter
     ")->fetch();
 
     // 3. Top pages
     $topPages = $db->prepare("
-        SELECT 
-            page,
+        SELECT
+            v.page,
             COUNT(*) as visites
-        FROM visites
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
-        GROUP BY page
+        FROM visites v
+        WHERE v.created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
+        $adminFilter
+        GROUP BY v.page
         ORDER BY visites DESC
         LIMIT 10
     ");
@@ -78,23 +95,25 @@ try {
 
     // 4. Répartition par device
     $devices = $db->prepare("
-        SELECT 
-            device_type,
+        SELECT
+            v.device_type,
             COUNT(*) as count
-        FROM visites
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
-        GROUP BY device_type
+        FROM visites v
+        WHERE v.created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
+        $adminFilter
+        GROUP BY v.device_type
     ");
     $devices->execute([':periode' => $periode]);
 
     // 5. Répartition par navigateur
     $browsers = $db->prepare("
-        SELECT 
-            browser,
+        SELECT
+            v.browser,
             COUNT(*) as count
-        FROM visites
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
-        GROUP BY browser
+        FROM visites v
+        WHERE v.created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
+        $adminFilter
+        GROUP BY v.browser
         ORDER BY count DESC
         LIMIT 5
     ");
@@ -102,12 +121,13 @@ try {
 
     // 6. Répartition par OS
     $osList = $db->prepare("
-        SELECT 
-            os,
+        SELECT
+            v.os,
             COUNT(*) as count
-        FROM visites
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
-        GROUP BY os
+        FROM visites v
+        WHERE v.created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
+        $adminFilter
+        GROUP BY v.os
         ORDER BY count DESC
         LIMIT 5
     ");
@@ -115,14 +135,15 @@ try {
 
     // 7. Top referrers
     $referrers = $db->prepare("
-        SELECT 
-            CASE 
-                WHEN referer = '' OR referer IS NULL THEN 'Direct'
-                ELSE SUBSTRING_INDEX(SUBSTRING_INDEX(referer, '/', 3), '//', -1)
+        SELECT
+            CASE
+                WHEN v.referer = '' OR v.referer IS NULL THEN 'Direct'
+                ELSE SUBSTRING_INDEX(SUBSTRING_INDEX(v.referer, '/', 3), '//', -1)
             END as source,
             COUNT(*) as count
-        FROM visites
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
+        FROM visites v
+        WHERE v.created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
+        $adminFilter
         GROUP BY source
         ORDER BY count DESC
         LIMIT 10
@@ -131,30 +152,36 @@ try {
 
     // 8. Heures de pointe
     $heures = $db->prepare("
-        SELECT 
-            HOUR(created_at) as heure,
+        SELECT
+            HOUR(v.created_at) as heure,
             COUNT(*) as count
-        FROM visites
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
+        FROM visites v
+        WHERE v.created_at >= DATE_SUB(CURDATE(), INTERVAL :periode DAY)
+        $adminFilter
         GROUP BY heure
         ORDER BY heure
     ");
     $heures->execute([':periode' => $periode]);
 
-    // 9. Dernières visites
+    // 9. Dernières visites (avec info utilisateur)
     $dernieresVisites = $db->query("
-        SELECT page, device_type, browser, os, created_at
-        FROM visites
-        ORDER BY created_at DESC
+        SELECT v.page, v.device_type, v.browser, v.os, v.created_at, v.user_id,
+               u.name as user_name, u.email as user_email, u.is_admin as user_is_admin
+        FROM visites v
+        LEFT JOIN users u ON v.user_id = u.id
+        WHERE 1=1
+        $adminFilter
+        ORDER BY v.created_at DESC
         LIMIT 20
     ")->fetchAll(PDO::FETCH_ASSOC);
 
     // Calculer la tendance (vs période précédente)
     $prevPeriod = $db->prepare("
         SELECT COUNT(*) as count
-        FROM visites 
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL :periode2 DAY)
-          AND created_at < DATE_SUB(CURDATE(), INTERVAL :periode DAY)
+        FROM visites v
+        WHERE v.created_at >= DATE_SUB(CURDATE(), INTERVAL :periode2 DAY)
+          AND v.created_at < DATE_SUB(CURDATE(), INTERVAL :periode DAY)
+        $adminFilter
     ");
     $prevPeriod->execute([':periode' => $periode, ':periode2' => $periode * 2]);
     $prevCount = $prevPeriod->fetch()['count'];
