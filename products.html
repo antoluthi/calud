@@ -1,6 +1,7 @@
 <?php require_once __DIR__ . '/api/maintenance_check.php'; ?>
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,8 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <style>
         /* ========== Variables ========== */
@@ -24,7 +26,11 @@
         }
 
         /* ========== Reset & Base ========== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -38,7 +44,10 @@
         body::before {
             content: '';
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background-image:
                 linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
@@ -47,9 +56,16 @@
             z-index: 0;
         }
 
-        body > * { position: relative; z-index: 1; }
+        body>* {
+            position: relative;
+            z-index: 1;
+        }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
         /* ========== Scroll Progress Bar ========== */
         .scroll-progress {
@@ -89,7 +105,11 @@
             width: 100%;
         }
 
-        .nav-left { display: flex; align-items: center; width: 80px; }
+        .nav-left {
+            display: flex;
+            align-items: center;
+            width: 80px;
+        }
 
         .logo {
             font-size: 1.5rem;
@@ -106,9 +126,13 @@
             transform: translateX(-50%);
         }
 
-        .logo:hover { opacity: 0.7; }
+        .logo:hover {
+            opacity: 0.7;
+        }
 
-        .nav-links { display: none; }
+        .nav-links {
+            display: none;
+        }
 
         /* ========== Menu Hamburger ========== */
         .menu-toggle {
@@ -133,16 +157,29 @@
             transition: all 0.3s ease;
         }
 
-        .menu-toggle:hover span { background-color: var(--accent); }
+        .menu-toggle:hover span {
+            background-color: var(--accent);
+        }
 
-        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
-        .menu-toggle.active span:nth-child(2) { opacity: 0; }
-        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 6px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -6px);
+        }
 
         /* ========== Menu Overlay ========== */
         .menu-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background-color: rgba(10, 10, 10, 0.98);
             z-index: 999;
             display: flex;
@@ -154,7 +191,10 @@
             transition: all 0.4s ease;
         }
 
-        .menu-overlay.active { opacity: 1; visibility: visible; }
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
 
         .menu-overlay-links {
             list-style: none;
@@ -175,7 +215,10 @@
             display: block;
         }
 
-        .menu-overlay-links a:hover { color: var(--accent); transform: scale(1.05); }
+        .menu-overlay-links a:hover {
+            color: var(--accent);
+            transform: scale(1.05);
+        }
 
         /* ========== Nav Right ========== */
         .nav-right {
@@ -198,9 +241,17 @@
             transition: opacity 0.3s ease;
         }
 
-        .cart-icon:hover { opacity: 0.7; }
+        .cart-icon:hover {
+            opacity: 0.7;
+        }
 
-        .cart-icon svg { width: 22px; height: 22px; stroke: var(--text-primary); fill: none; stroke-width: 2; }
+        .cart-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--text-primary);
+            fill: none;
+            stroke-width: 2;
+        }
 
         .cart-badge {
             position: absolute;
@@ -217,7 +268,11 @@
         }
 
         /* ========== User Section ========== */
-        #user-section { position: relative; display: flex; align-items: center; }
+        #user-section {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
 
         .profile-icon {
             width: 36px;
@@ -233,9 +288,22 @@
             position: relative;
         }
 
-        .profile-icon:hover { border-color: var(--accent); }
-        .profile-icon svg { width: 18px; height: 18px; fill: var(--text-secondary); }
-        .profile-icon img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .profile-icon:hover {
+            border-color: var(--accent);
+        }
+
+        .profile-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--text-secondary);
+        }
+
+        .profile-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
 
         .profile-dropdown {
             position: absolute;
@@ -253,7 +321,9 @@
             z-index: 1001;
         }
 
-        .profile-dropdown.active { display: block; }
+        .profile-dropdown.active {
+            display: block;
+        }
 
         .profile-dropdown-header {
             padding: 1rem;
@@ -263,11 +333,27 @@
             gap: 0.75rem;
         }
 
-        .profile-dropdown-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); }
+        .profile-dropdown-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+        }
 
-        .profile-dropdown-info { flex: 1; }
-        .profile-dropdown-name { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
-        .profile-dropdown-email { color: var(--text-secondary); font-size: 0.8rem; }
+        .profile-dropdown-info {
+            flex: 1;
+        }
+
+        .profile-dropdown-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .profile-dropdown-email {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
 
         .profile-dropdown-item {
             padding: 0.75rem 1rem;
@@ -287,19 +373,31 @@
             text-decoration: none;
         }
 
-        .profile-dropdown-item:hover { background-color: rgba(255, 255, 255, 0.05); }
-        .profile-dropdown-item svg { width: 18px; height: 18px; fill: var(--text-secondary); }
+        .profile-dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .profile-dropdown-item svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--text-secondary);
+        }
 
         /* ========== Cart Sidebar ========== */
         .cart-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background-color: rgba(0, 0, 0, 0.6);
             z-index: 2000;
             display: none;
         }
 
-        .cart-overlay.active { display: block; }
+        .cart-overlay.active {
+            display: block;
+        }
 
         .cart-sidebar {
             position: fixed;
@@ -319,7 +417,9 @@
             flex-direction: column;
         }
 
-        .cart-sidebar.active { display: flex; }
+        .cart-sidebar.active {
+            display: flex;
+        }
 
         .cart-header {
             padding: 1.5rem;
@@ -348,9 +448,15 @@
             transition: color 0.3s ease;
         }
 
-        .close-cart:hover { color: var(--accent); }
+        .close-cart:hover {
+            color: var(--accent);
+        }
 
-        .cart-items { flex: 1; overflow-y: auto; padding: 1rem; }
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
 
         .cart-item {
             background-color: var(--bg-card);
@@ -360,9 +466,21 @@
             margin-bottom: 1rem;
         }
 
-        .cart-item-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
-        .cart-item-name { font-weight: 600; color: var(--text-primary); }
-        .cart-item-price { color: var(--text-primary); font-weight: 700; }
+        .cart-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .cart-item-price {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
 
         .cart-item-details {
             display: flex;
@@ -371,9 +489,16 @@
             margin-top: 0.8rem;
         }
 
-        .cart-item-size { color: var(--text-secondary); font-size: 0.9rem; }
+        .cart-item-size {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
 
-        .quantity-controls { display: flex; align-items: center; gap: 0.8rem; }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
 
         .qty-btn {
             background-color: transparent;
@@ -397,9 +522,22 @@
             color: var(--bg-primary);
         }
 
-        .quantity-display { font-weight: 600; min-width: 30px; text-align: center; }
-        .item-total { color: var(--text-secondary); font-size: 0.95rem; }
-        .cart-empty { text-align: center; padding: 3rem 1rem; color: var(--text-secondary); }
+        .quantity-display {
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .item-total {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .cart-empty {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
 
         .cart-footer {
             border-top: 1px solid var(--border-color);
@@ -415,8 +553,17 @@
             font-size: 1.1rem;
         }
 
-        .cart-total-label { font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
-        .cart-total-amount { color: var(--text-primary); font-weight: 700; font-size: 1.3rem; }
+        .cart-total-label {
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cart-total-amount {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
 
         .checkout-btn {
             width: 100%;
@@ -440,7 +587,10 @@
             box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
         }
 
-        .checkout-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .checkout-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
 
         /* ========== Products Hero ========== */
         .products-hero {
@@ -494,7 +644,9 @@
             transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        .hero-underline.visible { width: 120px; }
+        .hero-underline.visible {
+            width: 120px;
+        }
 
         /* ========== Products Grid ========== */
         .products-section {
@@ -550,7 +702,9 @@
             transition: transform 0.5s ease;
         }
 
-        .product-card:hover .card-image img { transform: scale(1.05); }
+        .product-card:hover .card-image img {
+            transform: scale(1.05);
+        }
 
         .card-image-placeholder {
             width: 100%;
@@ -620,7 +774,10 @@
         /* ========== Product Modal ========== */
         .product-modal-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background-color: rgba(0, 0, 0, 0.9);
             z-index: 3000;
             display: none;
@@ -649,8 +806,15 @@
         }
 
         @keyframes modalSlideIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-close-btn {
@@ -678,9 +842,18 @@
             color: var(--bg-primary);
         }
 
-        .modal-content { display: flex; gap: 2rem; padding: 2rem; }
+        .modal-content {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+        }
 
-        .modal-gallery { flex: 0 0 45%; display: flex; flex-direction: column; gap: 1rem; }
+        .modal-gallery {
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
 
         .main-image-container {
             position: relative;
@@ -695,10 +868,22 @@
             border: 1px solid var(--border-color);
         }
 
-        .main-image-container img { width: 100%; height: 100%; object-fit: contain; }
-        .main-image-container .placeholder { font-size: 5rem; opacity: 0.3; }
+        .main-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
 
-        .thumbnails { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .main-image-container .placeholder {
+            font-size: 5rem;
+            opacity: 0.3;
+        }
+
+        .thumbnails {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
 
         .thumbnail {
             width: 70px;
@@ -711,9 +896,19 @@
             background-color: var(--bg-card);
         }
 
-        .thumbnail:hover { border-color: var(--accent); }
-        .thumbnail.active { border-color: var(--accent); }
-        .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+        .thumbnail:hover {
+            border-color: var(--accent);
+        }
+
+        .thumbnail.active {
+            border-color: var(--accent);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
         .thumbnail-3d {
             display: flex;
@@ -725,8 +920,14 @@
             gap: 2px;
         }
 
-        .thumbnail-3d:hover { color: var(--text-primary); }
-        .thumbnail-3d.active { border-color: var(--accent); color: var(--text-primary); }
+        .thumbnail-3d:hover {
+            color: var(--text-primary);
+        }
+
+        .thumbnail-3d.active {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
 
         .thumbnail-3d-label {
             font-size: 0.6rem;
@@ -749,15 +950,45 @@
             z-index: 2;
         }
 
-        @keyframes spin3d { to { transform: rotate(360deg); } }
+        @keyframes spin3d {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
-        .main-image-container canvas { cursor: grab; border-radius: 12px; }
-        .main-image-container canvas:active { cursor: grabbing; }
+        .main-image-container canvas {
+            cursor: grab;
+            border-radius: 12px;
+        }
 
-        .modal-info { flex: 1; display: flex; flex-direction: column; gap: 1.25rem; }
-        .modal-title { font-size: 2rem; color: var(--text-primary); margin: 0; }
-        .modal-price { font-size: 1.75rem; color: var(--text-primary); font-weight: 700; }
-        .modal-description { color: var(--text-secondary); line-height: 1.7; font-size: 0.95rem; }
+        .main-image-container canvas:active {
+            cursor: grabbing;
+        }
+
+        .modal-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .modal-price {
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .modal-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
 
         .modal-specs {
             background-color: var(--bg-card);
@@ -774,10 +1005,27 @@
             letter-spacing: 0.5px;
         }
 
-        .specs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-        .spec-item { display: flex; flex-direction: column; gap: 0.25rem; }
-        .spec-label { color: var(--text-secondary); font-size: 0.85rem; }
-        .spec-value { color: var(--text-primary); font-weight: 500; }
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .spec-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .spec-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
 
         .modal-materials {
             background-color: var(--bg-card);
@@ -786,8 +1034,20 @@
             border: 1px solid var(--border-color);
         }
 
-        .modal-materials h4 { color: var(--text-primary); margin: 0 0 0.75rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .modal-materials p { color: var(--text-secondary); margin: 0; line-height: 1.6; font-size: 0.9rem; }
+        .modal-materials h4 {
+            color: var(--text-primary);
+            margin: 0 0 0.75rem 0;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-materials p {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
 
         .modal-size-guide {
             background-color: var(--bg-card);
@@ -796,8 +1056,21 @@
             border: 1px solid var(--border-color);
         }
 
-        .modal-size-guide h4 { color: var(--text-primary); margin: 0 0 0.75rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .modal-size-guide p { color: var(--text-secondary); margin: 0; line-height: 1.6; white-space: pre-line; font-size: 0.9rem; }
+        .modal-size-guide h4 {
+            color: var(--text-primary);
+            margin: 0 0 0.75rem 0;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-size-guide p {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.6;
+            white-space: pre-line;
+            font-size: 0.9rem;
+        }
 
         .guide-pdf-box {
             display: flex;
@@ -809,11 +1082,28 @@
             border-radius: 14px;
         }
 
-        .guide-pdf-icon { color: var(--text-secondary); flex-shrink: 0; }
+        .guide-pdf-icon {
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
 
-        .guide-pdf-content { flex: 1; display: flex; flex-direction: column; gap: 0.15rem; }
-        .guide-pdf-title { color: var(--text-primary); font-size: 0.85rem; font-weight: 600; }
-        .guide-pdf-subtitle { color: var(--text-secondary); font-size: 0.8rem; }
+        .guide-pdf-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .guide-pdf-title {
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .guide-pdf-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
 
         .guide-pdf-btn {
             display: inline-block;
@@ -830,10 +1120,22 @@
             transition: all 0.3s ease;
         }
 
-        .guide-pdf-btn:hover { background-color: var(--accent-hover); transform: translateY(-2px); }
+        .guide-pdf-btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
 
-        .modal-video { border-radius: 10px; overflow: hidden; aspect-ratio: 16/9; }
-        .modal-video iframe { width: 100%; height: 100%; border: none; }
+        .modal-video {
+            border-radius: 10px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+
+        .modal-video iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
 
         .modal-actions {
             display: flex;
@@ -843,8 +1145,18 @@
             padding-top: 1rem;
         }
 
-        .modal-size-selector { flex: 1; }
-        .modal-size-selector label { display: block; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .modal-size-selector {
+            flex: 1;
+        }
+
+        .modal-size-selector label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
         .modal-size-selector select {
             width: 100%;
@@ -858,7 +1170,10 @@
             font-family: inherit;
         }
 
-        .modal-size-selector select:focus { outline: none; border-color: var(--accent); }
+        .modal-size-selector select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
 
         .modal-add-to-cart {
             flex: 1;
@@ -876,7 +1191,10 @@
             font-family: inherit;
         }
 
-        .modal-add-to-cart:hover { background-color: var(--accent-hover); transform: translateY(-2px); }
+        .modal-add-to-cart:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
 
         /* ========== Footer ========== */
         footer {
@@ -902,9 +1220,18 @@
             letter-spacing: 1px;
         }
 
-        .footer-section p { color: var(--text-secondary); line-height: 1.7; margin-bottom: 1rem; font-size: 0.9rem; }
+        .footer-section p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
 
-        .newsletter-form { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
 
         .newsletter-input {
             flex: 1;
@@ -918,7 +1245,10 @@
             font-family: inherit;
         }
 
-        .newsletter-input:focus { outline: none; border-color: var(--accent); }
+        .newsletter-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
 
         .newsletter-btn {
             padding: 0.75rem 1.25rem;
@@ -934,7 +1264,9 @@
             font-family: inherit;
         }
 
-        .newsletter-btn:hover { background-color: var(--accent-hover); }
+        .newsletter-btn:hover {
+            background-color: var(--accent-hover);
+        }
 
         .newsletter-message {
             margin-top: 0.75rem;
@@ -944,8 +1276,17 @@
             display: none;
         }
 
-        .newsletter-message.success { background-color: rgba(52, 168, 83, 0.15); color: #4ade80; border: 1px solid rgba(52, 168, 83, 0.3); }
-        .newsletter-message.error { background-color: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .newsletter-message.success {
+            background-color: rgba(52, 168, 83, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(52, 168, 83, 0.3);
+        }
+
+        .newsletter-message.error {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
 
         .footer-bottom {
             border-top: 1px solid var(--border-color);
@@ -953,37 +1294,104 @@
             text-align: center;
         }
 
-        .footer-bottom p { color: var(--text-secondary); font-size: 0.85rem; }
+        .footer-bottom p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
 
         /* ========== Responsive ========== */
         @media (max-width: 768px) {
-            header { top: 1rem; width: calc(100% - 2rem); max-width: none; }
-            nav { padding: 0.6rem 1rem; }
-            .logo { font-size: 1.25rem; }
+            header {
+                top: 1rem;
+                width: calc(100% - 2rem);
+                max-width: none;
+            }
 
-            .products-hero { min-height: 50vh; padding: 7rem 1.5rem 3rem; }
-            .products-hero-title { font-size: clamp(2.5rem, 10vw, 4rem); }
+            nav {
+                padding: 0.6rem 1rem;
+            }
 
-            .products-grid { grid-template-columns: 1fr; }
+            .logo {
+                font-size: 1.25rem;
+            }
 
-            .cart-sidebar { width: calc(100% - 1rem); max-height: 85vh; margin-top: 0.5rem; }
+            .products-hero {
+                min-height: 50vh;
+                padding: 7rem 1.5rem 3rem;
+            }
 
-            .menu-overlay-links a { font-size: 1.75rem; }
+            .products-hero-title {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+            }
 
-            .profile-dropdown { position: fixed; top: 80px; right: 1rem; left: 1rem; min-width: auto; }
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
 
-            .product-modal-overlay { padding: 1rem; }
-            .modal-content { flex-direction: column; padding: 1.5rem; }
-            .modal-gallery { flex: none; }
-            .modal-title { font-size: 1.5rem; }
-            .modal-price { font-size: 1.5rem; }
-            .specs-grid { grid-template-columns: 1fr; }
-            .modal-actions { flex-direction: column; }
-            .modal-close-btn { top: 0.5rem; right: 0.5rem; }
-            .thumbnails { justify-content: center; }
+            .cart-sidebar {
+                width: calc(100% - 1rem);
+                max-height: 85vh;
+                margin-top: 0.5rem;
+            }
 
-            .footer-content { grid-template-columns: 1fr; gap: 2rem; }
-            .newsletter-form { flex-direction: column; }
+            .menu-overlay-links a {
+                font-size: 1.75rem;
+            }
+
+            .profile-dropdown {
+                position: fixed;
+                top: 80px;
+                right: 1rem;
+                left: 1rem;
+                min-width: auto;
+            }
+
+            .product-modal-overlay {
+                padding: 1rem;
+            }
+
+            .modal-content {
+                flex-direction: column;
+                padding: 1.5rem;
+            }
+
+            .modal-gallery {
+                flex: none;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .modal-price {
+                font-size: 1.5rem;
+            }
+
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .modal-close-btn {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+
+            .thumbnails {
+                justify-content: center;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
         }
     </style>
     <script type="importmap">
@@ -995,6 +1403,7 @@
     }
     </script>
 </head>
+
 <body>
     <!-- Scroll Progress Bar -->
     <div class="scroll-progress" id="scrollProgress"></div>
@@ -1013,17 +1422,18 @@
             <div class="nav-right">
                 <div class="cart-icon" id="cartIcon">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 6h15l-1.5 9h-12z" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="9" cy="19" r="2"/>
-                        <circle cx="18" cy="19" r="2"/>
-                        <path d="M6 6L5 3H2"/>
+                        <path d="M6 6h15l-1.5 9h-12z" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="9" cy="19" r="2" />
+                        <circle cx="18" cy="19" r="2" />
+                        <path d="M6 6L5 3H2" />
                     </svg>
                     <span class="cart-badge" id="cartBadge">0</span>
                 </div>
                 <div id="user-section">
                     <div class="profile-icon" id="profileIcon">
                         <svg id="profileIconDefault" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
                         </svg>
                         <img id="profileIconAvatar" style="display:none;" alt="Avatar" />
                     </div>
@@ -1074,18 +1484,26 @@
                     <div class="modal-guide-pdf" id="modalGuidePdf" style="display: none;">
                         <div class="guide-pdf-box">
                             <div class="guide-pdf-icon">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M14 2V8H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M9 13H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                    <path d="M9 17H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"
+                                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                    <path d="M14 2V8H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                    <path d="M9 13H15" stroke="currentColor" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                    <path d="M9 17H15" stroke="currentColor" stroke-width="1.5"
+                                        stroke-linecap="round" />
                                 </svg>
                             </div>
                             <div class="guide-pdf-content">
                                 <span class="guide-pdf-title">Guide d'utilisation disponible</span>
                                 <span class="guide-pdf-subtitle">Consultez le manuel d'utilisation de ce produit</span>
                             </div>
-                            <a href="about:blank" id="modalGuidePdfLink" target="_blank" class="guide-pdf-btn">Ouvrir le PDF</a>
+                            <a href="about:blank" id="modalGuidePdfLink" target="_blank" class="guide-pdf-btn">Ouvrir le
+                                PDF</a>
                         </div>
                     </div>
                 </div>
@@ -1096,8 +1514,10 @@
                     <div class="modal-specs" id="modalSpecs" style="display: none;">
                         <h4>Specifications</h4>
                         <div class="specs-grid">
-                            <div class="spec-item"><span class="spec-label">Dimensions</span><span class="spec-value" id="modalDimensions">-</span></div>
-                            <div class="spec-item"><span class="spec-label">Poids</span><span class="spec-value" id="modalPoids">-</span></div>
+                            <div class="spec-item"><span class="spec-label">Dimensions</span><span class="spec-value"
+                                    id="modalDimensions">-</span></div>
+                            <div class="spec-item"><span class="spec-label">Poids</span><span class="spec-value"
+                                    id="modalPoids">-</span></div>
                         </div>
                     </div>
                     <div class="modal-materials" id="modalMaterials" style="display: none;">
@@ -1143,13 +1563,15 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>A propos</h3>
-                    <p>CRIMP. propose des equipements d'escalade de qualite pour tous les niveaux. Notre mission est de rendre l'entrainement accessible a tous les grimpeurs.</p>
+                    <p>CRIMP. propose des equipements d'escalade de qualite pour tous les niveaux. Notre mission est de
+                        rendre l'entrainement accessible a tous les grimpeurs.</p>
                 </div>
                 <div class="footer-section">
                     <h3>Newsletter</h3>
                     <p>Restez informe des nouveaux produits et promotions</p>
                     <form class="newsletter-form" id="newsletterForm">
-                        <input type="email" class="newsletter-input" placeholder="Votre email" required id="newsletterEmail">
+                        <input type="email" class="newsletter-input" placeholder="Votre email" required
+                            id="newsletterEmail">
                         <button type="submit" class="newsletter-btn">S'abonner</button>
                     </form>
                     <div class="newsletter-message" id="newsletterMessage"></div>
@@ -1169,7 +1591,7 @@
         window.cart = JSON.parse(localStorage.getItem('projetcrimp_cart') || '[]');
         window.currentUser = null;
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             setupEventListeners();
             updateCart();
             animateHero();
@@ -1196,13 +1618,13 @@
             title.innerHTML = html;
 
             // Trigger cascade
-            requestAnimationFrame(function() {
-                requestAnimationFrame(function() {
-                    title.querySelectorAll('.letter').forEach(function(l) {
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    title.querySelectorAll('.letter').forEach(function (l) {
                         l.classList.add('visible');
                     });
                     // Underline after letters
-                    setTimeout(function() {
+                    setTimeout(function () {
                         document.getElementById('heroUnderline').classList.add('visible');
                     }, letterIndex * 60 + 300);
                 });
@@ -1212,7 +1634,7 @@
         // ========== Scroll Progress Bar ==========
         function setupScrollProgress() {
             var bar = document.getElementById('scrollProgress');
-            window.addEventListener('scroll', function() {
+            window.addEventListener('scroll', function () {
                 var scrollTop = window.scrollY;
                 var docHeight = document.documentElement.scrollHeight - window.innerHeight;
                 var progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
@@ -1226,8 +1648,8 @@
             var grid = document.getElementById('productsGrid');
             if (!grid) return;
 
-            var observer = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('revealed');
                         observer.unobserve(entry.target);
@@ -1237,7 +1659,7 @@
 
             // Observe existing cards
             function observeExisting() {
-                grid.querySelectorAll('.product-card:not(.revealed)').forEach(function(card) {
+                grid.querySelectorAll('.product-card:not(.revealed)').forEach(function (card) {
                     observer.observe(card);
                 });
             }
@@ -1245,17 +1667,17 @@
             observeExisting();
 
             // Also observe new cards added later
-            var mutationObs = new MutationObserver(function() { observeExisting(); });
+            var mutationObs = new MutationObserver(function () { observeExisting(); });
             mutationObs.observe(grid, { childList: true });
         }
 
         // ========== Add to cart (from card - not used in minimalist design but kept for compatibility) ==========
         function addToCart(productId) {
-            var product = window.products.find(function(p) { return p.id === productId; });
+            var product = window.products.find(function (p) { return p.id === productId; });
             if (!product) return;
             var selectedSize = (product.sizes && product.sizes.length > 0) ? product.sizes[0] : 'Unique';
 
-            var existingItem = window.cart.find(function(item) {
+            var existingItem = window.cart.find(function (item) {
                 return item.id === productId && item.size === selectedSize;
             });
 
@@ -1283,47 +1705,47 @@
 
             localStorage.setItem('projetcrimp_cart', JSON.stringify(window.cart));
 
-            var itemCount = window.cart.reduce(function(sum, item) { return sum + item.quantity; }, 0);
+            var itemCount = window.cart.reduce(function (sum, item) { return sum + item.quantity; }, 0);
             badge.textContent = itemCount;
 
             if (window.cart.length === 0) {
                 itemsContainer.innerHTML = '<div class="cart-empty">Votre panier est vide</div>';
                 checkoutBtn.disabled = true;
             } else {
-                itemsContainer.innerHTML = window.cart.map(function(item) {
+                itemsContainer.innerHTML = window.cart.map(function (item) {
                     return '<div class="cart-item">' +
                         '<div class="cart-item-header">' +
-                            '<span class="cart-item-name">' + item.name + '</span>' +
-                            '<span class="cart-item-price">' + item.price + ' \u20ac</span>' +
+                        '<span class="cart-item-name">' + item.name + '</span>' +
+                        '<span class="cart-item-price">' + item.price + ' \u20ac</span>' +
                         '</div>' +
                         '<div class="cart-item-size">' + item.size + '</div>' +
                         '<div class="cart-item-details">' +
-                            '<div class="quantity-controls">' +
-                                '<button class="qty-btn" onclick="updateQuantity(' + item.id + ', \'' + item.size + '\', -1)">\u2212</button>' +
-                                '<span class="quantity-display">' + item.quantity + '</span>' +
-                                '<button class="qty-btn" onclick="updateQuantity(' + item.id + ', \'' + item.size + '\', 1)">+</button>' +
-                            '</div>' +
-                            '<span class="item-total">Tot ' + (item.price * item.quantity) + ' \u20ac</span>' +
+                        '<div class="quantity-controls">' +
+                        '<button class="qty-btn" onclick="updateQuantity(' + item.id + ', \'' + item.size + '\', -1)">\u2212</button>' +
+                        '<span class="quantity-display">' + item.quantity + '</span>' +
+                        '<button class="qty-btn" onclick="updateQuantity(' + item.id + ', \'' + item.size + '\', 1)">+</button>' +
                         '</div>' +
-                    '</div>';
+                        '<span class="item-total">Tot ' + (item.price * item.quantity) + ' \u20ac</span>' +
+                        '</div>' +
+                        '</div>';
                 }).join('');
                 checkoutBtn.disabled = false;
             }
 
-            var total = window.cart.reduce(function(sum, item) { return sum + (item.price * item.quantity); }, 0);
+            var total = window.cart.reduce(function (sum, item) { return sum + (item.price * item.quantity); }, 0);
             totalElement.textContent = total + ' \u20ac';
         }
 
         // ========== Update quantity ==========
         function updateQuantity(productId, size, change) {
-            var item = window.cart.find(function(i) { return i.id === productId && i.size === size; });
+            var item = window.cart.find(function (i) { return i.id === productId && i.size === size; });
             if (item) {
                 if (item.quantity === 1 && change === -1) {
                     if (!confirm('Supprimer cet article du panier ?')) return;
                 }
                 item.quantity += change;
                 if (item.quantity <= 0) {
-                    window.cart = window.cart.filter(function(i) { return !(i.id === productId && i.size === size); });
+                    window.cart = window.cart.filter(function (i) { return !(i.id === productId && i.size === size); });
                 }
                 updateCart();
             }
@@ -1341,15 +1763,15 @@
             var menuLinks = document.querySelectorAll('.menu-link');
 
             // Menu toggle
-            menuToggle.addEventListener('click', function() {
+            menuToggle.addEventListener('click', function () {
                 menuToggle.classList.toggle('active');
                 menuOverlay.classList.toggle('active');
                 document.body.style.overflow = menuOverlay.classList.contains('active') ? 'hidden' : '';
             });
 
             // Close menu on link click
-            menuLinks.forEach(function(link) {
-                link.addEventListener('click', function() {
+            menuLinks.forEach(function (link) {
+                link.addEventListener('click', function () {
                     menuToggle.classList.remove('active');
                     menuOverlay.classList.remove('active');
                     document.body.style.overflow = '';
@@ -1357,7 +1779,7 @@
             });
 
             // Escape key
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
                     if (menuOverlay.classList.contains('active')) {
                         menuToggle.classList.remove('active');
@@ -1393,7 +1815,7 @@
                 ticking = false;
             }
 
-            window.addEventListener('scroll', function() {
+            window.addEventListener('scroll', function () {
                 if (!ticking) {
                     requestAnimationFrame(updateHeader);
                     ticking = true;
@@ -1401,12 +1823,12 @@
             }, { passive: true });
 
             // Cart open/close
-            cartIcon.addEventListener('click', function() {
+            cartIcon.addEventListener('click', function () {
                 cartOverlay.classList.add('active');
                 cartSidebar.classList.add('active');
             });
 
-            var closeCartFunc = function() {
+            var closeCartFunc = function () {
                 cartOverlay.classList.remove('active');
                 cartSidebar.classList.remove('active');
             };
@@ -1415,7 +1837,7 @@
             cartOverlay.addEventListener('click', closeCartFunc);
 
             // Checkout
-            checkoutBtn.addEventListener('click', function() {
+            checkoutBtn.addEventListener('click', function () {
                 if (window.cart.length === 0) return;
                 window.location.href = 'checkout.html';
             });
@@ -1423,7 +1845,7 @@
             // Newsletter form
             var newsletterForm = document.getElementById('newsletterForm');
             if (newsletterForm) {
-                newsletterForm.addEventListener('submit', async function(e) {
+                newsletterForm.addEventListener('submit', async function (e) {
                     e.preventDefault();
 
                     var emailInput = document.getElementById('newsletterEmail');
@@ -1467,12 +1889,23 @@
                     } finally {
                         submitBtn.disabled = false;
                         submitBtn.textContent = 'S\'abonner';
-                        setTimeout(function() { messageDiv.style.display = 'none'; }, 5000);
+                        setTimeout(function () { messageDiv.style.display = 'none'; }, 5000);
                     }
                 });
             }
         }
     </script>
     <script src="js/main.js"></script>
+    <!-- Analytics Tracking -->
+    <script>
+        (function () {
+            fetch('api/track.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ page: window.location.pathname })
+            }).catch(function () { });
+        })();
+    </script>
 </body>
+
 </html>

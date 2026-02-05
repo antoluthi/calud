@@ -58,6 +58,7 @@ unset($produit); // Casser la référence
             <nav>
                 <ul class="sidebar-nav">
                     <li><a href="index.php"><span class="icon">📊</span> Dashboard</a></li>
+                    <li><a href="statistiques.php"><span class="icon">📈</span> Statistiques</a></li>
                     <li><a href="produits.php" class="active"><span class="icon">📦</span> Produits</a></li>
                     <li><a href="commandes.php"><span class="icon">🛒</span> Commandes</a></li>
                     <li><a href="messages.php"><span class="icon">✉️</span> Messages</a></li>
