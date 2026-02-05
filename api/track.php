@@ -1,16 +1,13 @@
 <?php
 /**
  * API de Tracking - Enregistre les visites de manière anonyme
- * Endpoint léger appelé à chaque chargement de page
+ * Endpoint appelé à chaque chargement de page
  */
 
-// Pas de config complète pour performance - connexion directe
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+// Inclure la configuration pour la connexion DB et les headers CORS
+require_once 'config.php';
 
-// Handle preflight
+// Handle preflight (déjà géré partiellement par config.php mais au cas où)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
@@ -22,19 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Connexion DB minimale
-try {
-    $db = new PDO(
-        'mysql:host=localhost;dbname=site_escalade;charset=utf8mb4',
-        'root',
-        '',
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Database connection failed']);
-    exit;
-}
+// Connexion DB via la fonction centrale (utilise les bonnes credentials du .env)
+$db = getDB();
 
 // Récupérer les données
 $input = json_decode(file_get_contents('php://input'), true);
@@ -42,13 +28,14 @@ $page = $input['page'] ?? $_SERVER['HTTP_REFERER'] ?? '/';
 
 // Anonymiser l'IP avec hash
 $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-$ipHash = hash('sha256', $ip . date('Y-m-d')); // Hash quotidien
+// Ajouter un "salt" quotidien pour rendre impossible le traçage sur longue période
+$ipHash = hash('sha256', $ip . date('Y-m-d') . 'SALT_SECRET'); 
 
 // Détecter le device et navigateur
 $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $referer = $_SERVER['HTTP_REFERER'] ?? '';
 
-// Détection device type
+// Détection device type simplifié
 function detectDeviceType($ua) {
     $ua = strtolower($ua);
     if (preg_match('/(tablet|ipad|playbook|silk)|(android(?!.*mobile))/i', $ua)) {
@@ -60,7 +47,7 @@ function detectDeviceType($ua) {
     return 'desktop';
 }
 
-// Détection navigateur
+// Détection navigateur simplifiée
 function detectBrowser($ua) {
     if (preg_match('/Edge|Edg/i', $ua)) return 'Edge';
     if (preg_match('/Chrome/i', $ua)) return 'Chrome';
@@ -71,7 +58,7 @@ function detectBrowser($ua) {
     return 'Autre';
 }
 
-// Détection OS
+// Détection OS simplifiée
 function detectOS($ua) {
     if (preg_match('/Windows/i', $ua)) return 'Windows';
     if (preg_match('/Macintosh|Mac OS/i', $ua)) return 'macOS';
@@ -85,8 +72,8 @@ $deviceType = detectDeviceType($userAgent);
 $browser = detectBrowser($userAgent);
 $os = detectOS($userAgent);
 
-// Session ID basé sur IP + User-Agent + Date
-$sessionId = hash('sha256', $ip . $userAgent . date('Y-m-d'));
+// Session ID basé sur IP hash + UA (empreinte journalière)
+$sessionId = hash('sha256', $ipHash . $userAgent);
 
 // Insérer la visite
 try {
@@ -108,6 +95,8 @@ try {
     
     echo json_encode(['success' => true]);
 } catch (PDOException $e) {
+    // Log silencieux pour ne pas exposer l'erreur
+    error_log('Erreur tracking: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode(['error' => 'Failed to record visit']);
 }
