@@ -383,6 +383,30 @@
             fill: var(--text-secondary);
         }
 
+        /* ========== Auth Forms (dropdown login/register) ========== */
+        .profile-dropdown { min-width: 280px; }
+        .auth-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 0.75rem; }
+        .auth-tab { flex: 1; padding: 0.75rem; background: none; border: none; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s ease; border-bottom: 2px solid transparent; }
+        .auth-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+        .auth-tab:hover { color: var(--text-primary); }
+        .auth-panel { display: none; padding: 0.5rem; }
+        .auth-panel.active { display: block; }
+        .auth-form-group { margin-bottom: 0.75rem; }
+        .auth-form-group input { width: 100%; padding: 0.75rem 1rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); font-size: 0.85rem; font-family: inherit; transition: border-color 0.3s ease; }
+        .auth-form-group input:focus { outline: none; border-color: var(--accent); }
+        .auth-form-group input::placeholder { color: var(--text-secondary); }
+        .auth-error { color: #f87171; font-size: 0.8rem; margin-bottom: 0.5rem; display: none; padding: 0.5rem 0.75rem; background: rgba(248, 113, 113, 0.1); border-radius: 8px; }
+        .auth-error.visible { display: block; }
+        .auth-submit-btn { width: 100%; padding: 0.75rem; background-color: var(--accent); border: none; border-radius: 100px; color: var(--bg-primary); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-family: inherit; }
+        .auth-submit-btn:hover { background-color: var(--accent-hover); }
+        .auth-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .auth-divider { display: flex; align-items: center; gap: 1rem; margin: 1rem 0; color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+        .auth-google-btn { width: 100%; padding: 0.65rem; background: none; border: 1px solid var(--border-color); border-radius: 100px; color: var(--text-primary); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .auth-google-btn:hover { background-color: var(--accent); border-color: var(--accent); color: var(--bg-primary); }
+        .auth-google-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .profile-dropdown-avatar-initial { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; color: var(--accent); }
+
         /* ========== Cart Sidebar ========== */
         .cart-overlay {
             position: fixed;

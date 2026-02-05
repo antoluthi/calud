@@ -483,12 +483,23 @@ async function checkAuthStatus() {
         const profileDropdown = document.getElementById('profileDropdown');
 
         if (data.authenticated && data.user) {
-            // Utilisateur connecté - afficher l'avatar
-            profileIconDefault.style.display = 'none';
-            profileIconAvatar.style.display = 'block';
-            profileIconAvatar.src = data.user.picture;
+            // Utilisateur connecte - afficher l'avatar ou l'icone par defaut
+            if (data.user.picture) {
+                profileIconDefault.style.display = 'none';
+                profileIconAvatar.style.display = 'block';
+                profileIconAvatar.src = data.user.picture;
+            } else {
+                // Pas de photo (compte email) - garder l'icone SVG par defaut
+                profileIconDefault.style.display = 'block';
+                profileIconAvatar.style.display = 'none';
+            }
 
-            // Contenu du dropdown pour utilisateur connecté
+            // Avatar ou initiale dans le dropdown header
+            const avatarHTML = data.user.picture
+                ? '<img src="' + data.user.picture + '" alt="Avatar" class="profile-dropdown-avatar">'
+                : '<div class="profile-dropdown-avatar-initial">' + (data.user.name ? data.user.name.charAt(0).toUpperCase() : '?') + '</div>';
+
+            // Contenu du dropdown pour utilisateur connecte
             const adminButton = data.user.is_admin ? `
                 <a href="admin/" class="profile-dropdown-item">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -500,7 +511,7 @@ async function checkAuthStatus() {
 
             profileDropdown.innerHTML = `
                 <div class="profile-dropdown-header">
-                    <img src="${data.user.picture}" alt="Avatar" class="profile-dropdown-avatar">
+                    ${avatarHTML}
                     <div class="profile-dropdown-info">
                         <div class="profile-dropdown-name">${data.user.name}</div>
                         <div class="profile-dropdown-email">${data.user.email}</div>
@@ -517,11 +528,11 @@ async function checkAuthStatus() {
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
                     </svg>
-                    Déconnexion
+                    Deconnexion
                 </button>
             `;
 
-            // Mettre à jour currentUser pour le reste de l'app (panier, contact)
+            // Mettre a jour currentUser pour le reste de l'app (panier, contact)
             if (typeof window.currentUser !== 'undefined') {
                 window.currentUser = {
                     name: data.user.name,
@@ -530,27 +541,81 @@ async function checkAuthStatus() {
                 };
             }
 
-            // Mettre à jour le formulaire de contact
+            // Mettre a jour le formulaire de contact
             if (typeof window.updateContactForm === 'function') {
                 window.updateContactForm();
             }
         } else {
-            // Utilisateur non connecté - afficher l'icône par défaut
+            // Utilisateur non connecte - afficher l'icone par defaut
             profileIconDefault.style.display = 'block';
             profileIconAvatar.style.display = 'none';
 
-            // Contenu du dropdown pour utilisateur non connecté
+            // Contenu du dropdown avec tabs Connexion / Inscription
             profileDropdown.innerHTML = `
-                <button class="profile-dropdown-item" onclick="handleLogin()">
-                    <svg width="20" height="20" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
-                        <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.18L12.05 13.56c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.438 15.983 5.482 18 9.003 18z" fill="#34A853"/>
-                        <path d="M3.964 10.712c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.96H.957C.347 6.175 0 7.55 0 9.002c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-                        <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.428 0 9.002 0 5.48 0 2.438 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
-                    </svg>
-                    Se connecter avec Google
-                </button>
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchAuthTab('login', this)">Connexion</button>
+                    <button class="auth-tab" onclick="switchAuthTab('register', this)">Inscription</button>
+                </div>
+                <div class="auth-panel active" id="authPanelLogin">
+                    <div class="auth-error" id="authLoginError"></div>
+                    <div class="auth-form-group">
+                        <input type="email" id="authLoginEmail" placeholder="Email" autocomplete="email">
+                    </div>
+                    <div class="auth-form-group">
+                        <input type="password" id="authLoginPassword" placeholder="Mot de passe" autocomplete="current-password">
+                    </div>
+                    <button class="auth-submit-btn" onclick="handleEmailLogin()">Se connecter</button>
+                    <div class="auth-divider">ou</div>
+                    <button class="auth-google-btn" onclick="handleLogin()">
+                        <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                            <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.18L12.05 13.56c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.438 15.983 5.482 18 9.003 18z" fill="#34A853"/>
+                            <path d="M3.964 10.712c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.96H.957C.347 6.175 0 7.55 0 9.002c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                            <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.428 0 9.002 0 5.48 0 2.438 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
+                        </svg>
+                        Google
+                    </button>
+                </div>
+                <div class="auth-panel" id="authPanelRegister">
+                    <div class="auth-error" id="authRegisterError"></div>
+                    <div class="auth-form-group">
+                        <input type="text" id="authRegisterName" placeholder="Nom" autocomplete="name">
+                    </div>
+                    <div class="auth-form-group">
+                        <input type="email" id="authRegisterEmail" placeholder="Email" autocomplete="email">
+                    </div>
+                    <div class="auth-form-group">
+                        <input type="password" id="authRegisterPassword" placeholder="Mot de passe (min. 8 car.)" autocomplete="new-password">
+                    </div>
+                    <button class="auth-submit-btn" onclick="handleEmailRegister()">Creer un compte</button>
+                    <div class="auth-divider">ou</div>
+                    <button class="auth-google-btn" onclick="handleLogin()">
+                        <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                            <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.18L12.05 13.56c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.438 15.983 5.482 18 9.003 18z" fill="#34A853"/>
+                            <path d="M3.964 10.712c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.96H.957C.347 6.175 0 7.55 0 9.002c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                            <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.428 0 9.002 0 5.48 0 2.438 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
+                        </svg>
+                        Google
+                    </button>
+                </div>
             `;
+
+            // Enter key support pour les champs login/register
+            setTimeout(function() {
+                var loginPassword = document.getElementById('authLoginPassword');
+                if (loginPassword) {
+                    loginPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleEmailLogin(); });
+                }
+                var loginEmail = document.getElementById('authLoginEmail');
+                if (loginEmail) {
+                    loginEmail.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleEmailLogin(); });
+                }
+                var registerPassword = document.getElementById('authRegisterPassword');
+                if (registerPassword) {
+                    registerPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleEmailRegister(); });
+                }
+            }, 0);
 
             if (typeof window.currentUser !== 'undefined') {
                 window.currentUser = null;
@@ -568,7 +633,94 @@ async function checkAuthStatus() {
     }
 }
 
-// Gérer la connexion
+// Switcher entre les onglets Connexion / Inscription
+function switchAuthTab(tab, btnElement) {
+    document.querySelectorAll('.auth-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.auth-panel').forEach(function(p) { p.classList.remove('active'); });
+    btnElement.classList.add('active');
+    if (tab === 'login') {
+        document.getElementById('authPanelLogin').classList.add('active');
+    } else {
+        document.getElementById('authPanelRegister').classList.add('active');
+    }
+}
+
+// Connexion par email
+async function handleEmailLogin() {
+    var email = document.getElementById('authLoginEmail').value.trim();
+    var password = document.getElementById('authLoginPassword').value;
+    var errorEl = document.getElementById('authLoginError');
+
+    errorEl.classList.remove('visible');
+
+    if (!email || !password) {
+        errorEl.textContent = 'Veuillez remplir tous les champs';
+        errorEl.classList.add('visible');
+        return;
+    }
+
+    try {
+        var response = await fetch('api/auth/login-email.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: password })
+        });
+        var data = await response.json();
+
+        if (data.success) {
+            window.location.reload();
+        } else {
+            errorEl.textContent = data.error || 'Erreur de connexion';
+            errorEl.classList.add('visible');
+        }
+    } catch (e) {
+        errorEl.textContent = 'Erreur de connexion au serveur';
+        errorEl.classList.add('visible');
+    }
+}
+
+// Inscription par email
+async function handleEmailRegister() {
+    var name = document.getElementById('authRegisterName').value.trim();
+    var email = document.getElementById('authRegisterEmail').value.trim();
+    var password = document.getElementById('authRegisterPassword').value;
+    var errorEl = document.getElementById('authRegisterError');
+
+    errorEl.classList.remove('visible');
+
+    if (!name || !email || !password) {
+        errorEl.textContent = 'Veuillez remplir tous les champs';
+        errorEl.classList.add('visible');
+        return;
+    }
+
+    if (password.length < 8) {
+        errorEl.textContent = 'Le mot de passe doit contenir au moins 8 caracteres';
+        errorEl.classList.add('visible');
+        return;
+    }
+
+    try {
+        var response = await fetch('api/auth/register.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: password, name: name })
+        });
+        var data = await response.json();
+
+        if (data.success) {
+            window.location.reload();
+        } else {
+            errorEl.textContent = data.error || 'Erreur lors de l\'inscription';
+            errorEl.classList.add('visible');
+        }
+    } catch (e) {
+        errorEl.textContent = 'Erreur de connexion au serveur';
+        errorEl.classList.add('visible');
+    }
+}
+
+// Gerer la connexion Google
 function handleLogin() {
     window.location.href = 'api/auth/login.php';
 }

@@ -69,13 +69,13 @@ $picture = $userInfo['picture'] ?? '';
 // Connexion à la base de données
 $db = getDB();
 
-// Vérifier si l'utilisateur existe déjà
+// 1. Chercher par google_id (cas normal Google)
 $stmt = $db->prepare("SELECT id FROM users WHERE google_id = ?");
 $stmt->execute([$googleId]);
 $existingUser = $stmt->fetch();
 
 if ($existingUser) {
-    // Mettre à jour les informations de l'utilisateur existant
+    // Utilisateur Google existant - mettre a jour ses infos
     $stmt = $db->prepare("
         UPDATE users
         SET email = ?, name = ?, picture = ?, last_login = CURRENT_TIMESTAMP
@@ -84,13 +84,29 @@ if ($existingUser) {
     $stmt->execute([$email, $name, $picture, $googleId]);
     $userId = $existingUser['id'];
 } else {
-    // Créer un nouvel utilisateur
-    $stmt = $db->prepare("
-        INSERT INTO users (google_id, email, name, picture)
-        VALUES (?, ?, ?, ?)
-    ");
-    $stmt->execute([$googleId, $email, $name, $picture]);
-    $userId = $db->lastInsertId();
+    // 2. Chercher par email (fusion avec un compte email existant)
+    $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    $emailUser = $stmt->fetch();
+
+    if ($emailUser) {
+        // Fusionner : ajouter google_id au compte email existant, garder son password_hash
+        $stmt = $db->prepare("
+            UPDATE users
+            SET google_id = ?, name = ?, picture = ?, last_login = CURRENT_TIMESTAMP
+            WHERE id = ?
+        ");
+        $stmt->execute([$googleId, $name, $picture, $emailUser['id']]);
+        $userId = $emailUser['id'];
+    } else {
+        // 3. Nouveau utilisateur Google
+        $stmt = $db->prepare("
+            INSERT INTO users (google_id, email, name, picture, auth_method)
+            VALUES (?, ?, ?, ?, 'google')
+        ");
+        $stmt->execute([$googleId, $email, $name, $picture]);
+        $userId = $db->lastInsertId();
+    }
 }
 
 // Enregistrer l'utilisateur dans la session
