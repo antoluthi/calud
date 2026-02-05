@@ -197,54 +197,32 @@ function displayProducts(productsData) {
     });
 }
 
-// Création d'une carte produit
+// Création d'une carte produit (design minimaliste)
 function createProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card';
 
-    // Image (ou placeholder si pas d'image)
-    const imageHTML = product.image
-        ? `<img src="${product.image}" alt="${product.name}">`
-        : `<div class="product-image">🧗</div>`;
-
-    // Features list
-    const featuresHTML = product.features && product.features.length > 0
-        ? `<ul class="product-features">
-            ${product.features.map(feature => `<li>${feature}</li>`).join('')}
-           </ul>`
-        : '';
-
-    // Size selector
-    const sizesHTML = product.sizes && product.sizes.length > 0
-        ? `<div class="size-selector">
-            <label>Taille</label>
-            <select id="size-${product.id}">
-                ${product.sizes.map(size => `<option value="${size}">${size}</option>`).join('')}
-            </select>
-           </div>`
-        : '';
+    // Badge: first feature or category
+    const badgeText = (product.features && product.features.length > 0) ? product.features[0] : '';
 
     card.innerHTML = `
-        ${product.image
-            ? `<div class="product-image"><img src="${product.image}" alt="${product.name}"></div>`
-            : `<div class="product-image"></div>`
-        }
-        <div class="product-info">
-            <h3>${product.name}</h3>
-            <div class="price">${product.price.toFixed(2)} €</div>
-            <p>${product.description}</p>
-            ${featuresHTML}
-            ${sizesHTML}
-            <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart(${product.id})">Ajouter au panier</button>
+        <div class="card-image">
+            ${product.image
+                ? `<img src="${product.image}" alt="${product.name}">`
+                : `<div class="card-image-placeholder"></div>`
+            }
+            ${badgeText ? `<span class="card-badge">${badgeText}</span>` : ''}
+        </div>
+        <div class="card-body">
+            <span class="card-name">${product.name}</span>
+            <span class="card-price">${product.price.toFixed(2)} €</span>
+            <button class="card-cta" onclick="event.stopPropagation(); openProductModal(${product.id})">Voir</button>
         </div>
     `;
 
-    // Ajouter le click pour ouvrir la modal
+    // Click on card opens modal
     card.addEventListener('click', (e) => {
-        // Ne pas ouvrir si on clique sur le select ou le bouton
-        if (e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION' || e.target.tagName === 'BUTTON') {
-            return;
-        }
+        if (e.target.tagName === 'BUTTON') return;
         openProductModal(product.id);
     });
 
