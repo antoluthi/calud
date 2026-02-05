@@ -509,6 +509,15 @@ async function checkAuthStatus() {
                 </a>
             ` : '';
 
+            const deleteAccountButton = !data.user.is_admin ? `
+                <button class="profile-dropdown-item" onclick="handleDeleteAccount()" style="color: #f87171;">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill: #f87171;">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                    Supprimer mon compte
+                </button>
+            ` : '';
+
             profileDropdown.innerHTML = `
                 <div class="profile-dropdown-header">
                     ${avatarHTML}
@@ -530,6 +539,7 @@ async function checkAuthStatus() {
                     </svg>
                     Deconnexion
                 </button>
+                ${deleteAccountButton}
             `;
 
             // Mettre a jour currentUser pour le reste de l'app (panier, contact)
@@ -737,6 +747,32 @@ async function handleLogout() {
         }
     } catch (error) {
         console.error('Erreur lors de la déconnexion:', error);
+    }
+}
+
+// Supprimer son propre compte
+async function handleDeleteAccount() {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ?\n\nCette action est irréversible.')) {
+        return;
+    }
+    if (!confirm('Dernière confirmation : votre compte sera définitivement supprimé et vous serez déconnecté.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch('api/users/me.php', {
+            method: 'DELETE'
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            window.location.href = 'index.html';
+        } else {
+            alert(data.error || 'Erreur lors de la suppression du compte');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur de connexion au serveur');
     }
 }
 

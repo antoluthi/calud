@@ -176,6 +176,7 @@ $clients = $clientsQuery->fetchAll();
                                                     title="<?= $client['is_admin'] ? 'Retirer droits admin' : 'Donner droits admin' ?>">
                                                 <?= $client['is_admin'] ? '👤' : '👑' ?>
                                             </button>
+                                            <button class="btn-icon" onclick="deleteClient(<?= $client['id'] ?>, '<?= htmlspecialchars($client['name'], ENT_QUOTES) ?>')" title="Supprimer ce client" style="color: #f87171;">🗑️</button>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -198,6 +199,7 @@ $clients = $clientsQuery->fetchAll();
         </div>
     </div>
 
+    <script>const CURRENT_ADMIN_ID = <?= $user['id'] ?>;</script>
     <script src="js/clients.js"></script>
 </body>
 </html>

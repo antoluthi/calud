@@ -42,6 +42,21 @@ async function viewClient(client) {
 function displayClientDetails(data) {
     const client = data.client;
     const commandes = data.commandes;
+    client.is_self = (typeof CURRENT_ADMIN_ID !== 'undefined' && client.id == CURRENT_ADMIN_ID);
+
+    // Déterminer la méthode d'authentification
+    const hasGoogle = !!client.google_id;
+    const hasPassword = !!client.password_hash;
+    let authBadges = '';
+    if (hasGoogle && hasPassword) {
+        authBadges = '<span class="badge badge-success">Google + Email</span>';
+    } else if (hasGoogle) {
+        authBadges = '<span class="badge badge-info">Google</span>';
+    } else if (hasPassword) {
+        authBadges = '<span class="badge" style="background-color: rgba(231,84,128,0.2); color: #e75480;">Email</span>';
+    } else {
+        authBadges = '<span class="badge" style="background-color: rgba(255,255,255,0.1); color: var(--text-secondary);">Inconnu</span>';
+    }
 
     let html = `
         <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; padding: 1.5rem; background-color: var(--bg-secondary); border-radius: 12px;">
@@ -49,8 +64,12 @@ function displayClientDetails(data) {
             <div style="flex: 1;">
                 <h3 style="margin-bottom: 0.5rem;">${client.name}</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">${client.email}</p>
-                <div style="display: flex; gap: 0.5rem;">
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                     ${client.is_admin ? '<span class="badge badge-warning">👑 Administrateur</span>' : '<span class="badge badge-info">Client</span>'}
+                </div>
+                <div style="margin-top: 0.75rem;">
+                    <span style="color: var(--text-secondary); font-size: 0.85rem; margin-right: 0.5rem;">Authentification :</span>
+                    ${authBadges}
                 </div>
             </div>
         </div>
@@ -135,12 +154,51 @@ function displayClientDetails(data) {
         `;
     }
 
+    // Bouton supprimer en bas de la modal (pas pour soi-même)
+    if (!client.is_self) {
+        html += `
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                <button onclick="deleteClient(${client.id}, '${client.name.replace(/'/g, "\\'")}')"
+                        style="width: 100%; padding: 0.75rem; background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.2s;"
+                        onmouseover="this.style.background='rgba(248,113,113,0.25)'"
+                        onmouseout="this.style.background='rgba(248,113,113,0.15)'">
+                    🗑️ Supprimer ce client
+                </button>
+            </div>
+        `;
+    }
+
     document.getElementById('clientDetails').innerHTML = html;
 }
 
 // Fermer la modal
 function closeClientModal() {
     document.getElementById('clientModal').classList.remove('active');
+}
+
+// Supprimer un client
+async function deleteClient(id, name) {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer le compte de ${name} ?\n\nSes commandes seront conservées comme commandes guest.`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`../api/admin/clients.php?id=${id}`, {
+            method: 'DELETE'
+        });
+        const result = await response.json();
+
+        if (response.ok) {
+            closeClientModal();
+            showAlert('Client supprimé avec succès', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showAlert(result.error || 'Erreur lors de la suppression', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showAlert('Erreur de connexion au serveur', 'error');
+    }
 }
 
 // Fermer en cliquant en dehors

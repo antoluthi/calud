@@ -126,14 +126,9 @@ if ($method === 'DELETE') {
     }
 
     try {
-        // Vérifier s'il y a des commandes
-        $stmt = $db->prepare("SELECT COUNT(*) as nb FROM commandes WHERE user_id = ?");
+        // Dissocier les commandes (elles restent comme commandes guest)
+        $stmt = $db->prepare("UPDATE commandes SET user_id = NULL WHERE user_id = ?");
         $stmt->execute([$id]);
-        $count = $stmt->fetch();
-
-        if ($count['nb'] > 0) {
-            sendJSON(['error' => 'Impossible de supprimer un client avec des commandes'], 400);
-        }
 
         // Supprimer le client
         $stmt = $db->prepare("DELETE FROM users WHERE id = ?");
