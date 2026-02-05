@@ -2,6 +2,8 @@
 let viewer3DState = null;
 let threeJSLoaded = false;
 let THREE_MODULE = null;
+let GLTFLoaderClass = null;
+let OrbitControlsClass = null;
 let threeJSLoadingPromise = null;
 
 // Charger Three.js dynamiquement (resolu via l'importmap dans index.html)
@@ -17,9 +19,9 @@ async function loadThreeJS() {
         try {
             THREE_MODULE = await import('three');
             const gltfMod = await import('three/addons/loaders/GLTFLoader.js');
-            THREE_MODULE.GLTFLoader = gltfMod.GLTFLoader;
+            GLTFLoaderClass = gltfMod.GLTFLoader;
             const orbitMod = await import('three/addons/controls/OrbitControls.js');
-            THREE_MODULE.OrbitControls = orbitMod.OrbitControls;
+            OrbitControlsClass = orbitMod.OrbitControls;
             threeJSLoaded = true;
         } catch (e) {
             console.error('Erreur chargement Three.js:', e);
@@ -61,7 +63,7 @@ function init3DViewer(modelUrl) {
     container.appendChild(renderer.domElement);
 
     // Controls
-    const controls = new T.OrbitControls(camera, renderer.domElement);
+    const controls = new OrbitControlsClass(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.enableZoom = true;
@@ -80,7 +82,7 @@ function init3DViewer(modelUrl) {
     scene.add(dirLight2);
 
     // Load model
-    const loader = new T.GLTFLoader();
+    const loader = new GLTFLoaderClass();
     loader.load(modelUrl, (gltf) => {
         const model = gltf.scene;
 
