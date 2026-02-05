@@ -76,13 +76,6 @@ function closeProductModal() {
     document.getElementById('productModal').classList.remove('active');
 }
 
-// Fermer la modal en cliquant en dehors
-document.getElementById('productModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeProductModal();
-    }
-});
-
 // Soumettre le formulaire
 let isSubmitting = false; // Flag pour éviter les double-soumissions
 
