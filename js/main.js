@@ -2,20 +2,33 @@
 let viewer3DState = null;
 let threeJSLoaded = false;
 let THREE_MODULE = null;
+let threeJSLoadingPromise = null;
 
 // Charger Three.js dynamiquement (resolu via l'importmap dans index.html)
 async function loadThreeJS() {
-    if (threeJSLoaded) return;
-    try {
-        THREE_MODULE = await import('three');
-        const gltfMod = await import('three/addons/loaders/GLTFLoader.js');
-        THREE_MODULE.GLTFLoader = gltfMod.GLTFLoader;
-        const orbitMod = await import('three/addons/controls/OrbitControls.js');
-        THREE_MODULE.OrbitControls = orbitMod.OrbitControls;
-        threeJSLoaded = true;
-    } catch (e) {
-        console.error('Erreur chargement Three.js:', e);
-    }
+    // Si déjà chargé, retourner immédiatement
+    if (threeJSLoaded) return Promise.resolve();
+
+    // Si un chargement est en cours, attendre sa fin (évite les race conditions)
+    if (threeJSLoadingPromise) return threeJSLoadingPromise;
+
+    // Créer une Promise singleton pour le chargement
+    threeJSLoadingPromise = (async () => {
+        try {
+            THREE_MODULE = await import('three');
+            const gltfMod = await import('three/addons/loaders/GLTFLoader.js');
+            THREE_MODULE.GLTFLoader = gltfMod.GLTFLoader;
+            const orbitMod = await import('three/addons/controls/OrbitControls.js');
+            THREE_MODULE.OrbitControls = orbitMod.OrbitControls;
+            threeJSLoaded = true;
+        } catch (e) {
+            console.error('Erreur chargement Three.js:', e);
+            threeJSLoadingPromise = null; // Reset pour permettre une nouvelle tentative
+            throw e; // Propager l'erreur
+        }
+    })();
+
+    return threeJSLoadingPromise;
 }
 
 // Initialiser le viewer 3D dans le conteneur d'image principale
@@ -85,6 +98,11 @@ function init3DViewer(modelUrl) {
     }, undefined, (error) => {
         console.error('Erreur chargement modele 3D:', error);
         spinner.remove();
+        // Afficher un message d'erreur à l'utilisateur
+        const errorMsg = document.createElement('div');
+        errorMsg.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#888;text-align:center;padding:20px;';
+        errorMsg.innerHTML = '<div style="font-size:2rem;margin-bottom:10px;">⚠️</div><div>Impossible de charger le modèle 3D</div><div style="font-size:0.8rem;margin-top:5px;opacity:0.7;">Vérifiez votre connexion ou le chemin du fichier</div>';
+        container.appendChild(errorMsg);
     });
 
     // Animation loop
@@ -208,9 +226,9 @@ function createProductCard(product) {
     card.innerHTML = `
         <div class="card-image">
             ${product.image
-                ? `<img src="${product.image}" alt="${product.name}">`
-                : `<div class="card-image-placeholder"></div>`
-            }
+            ? `<img src="${product.image}" alt="${product.name}">`
+            : `<div class="card-image-placeholder"></div>`
+        }
             ${badgeText ? `<span class="card-badge">${badgeText}</span>` : ''}
         </div>
         <div class="card-body">
@@ -283,7 +301,7 @@ function openProductModal(productId) {
 
         if (has3D) {
             thumbsHTML += `
-                <div class="thumbnail thumbnail-3d" onclick="(async()=>{await loadThreeJS();setMain3DViewer('${product.model_3d}',this)})()">
+                <div class="thumbnail thumbnail-3d" onclick="(async()=>{try{await loadThreeJS();setMain3DViewer('${product.model_3d}',this)}catch(e){console.error('Erreur viewer 3D:',e);alert('Erreur lors du chargement du viewer 3D')}})()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28">
                         <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                         <path d="M2 17l10 5 10-5"/>
