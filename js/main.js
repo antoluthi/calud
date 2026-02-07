@@ -719,16 +719,8 @@ async function handleEmailRegister() {
         var data = await response.json();
 
         if (data.success && data.needs_verification) {
-            // Remplacer le formulaire par un message de confirmation
-            var panel = document.getElementById('authPanelRegister');
-            if (panel) {
-                panel.innerHTML = '<div style="text-align: center; padding: 1rem 0.5rem;">' +
-                    '<div style="width: 48px; height: 48px; background: rgba(74, 222, 128, 0.15); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 24px;">&#9993;</div>' +
-                    '<p style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem;">Verifiez votre email</p>' +
-                    '<p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5;">Un lien d\'activation a ete envoye a <strong style="color: var(--text-primary);">' + escapeHtml(email) + '</strong>. Cliquez dessus pour activer votre compte.</p>' +
-                    '<p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 1rem;">Le lien expire dans 24 heures.</p>' +
-                    '</div>';
-            }
+            window.location.href = 'verify-pending.html?email=' + encodeURIComponent(email);
+            return;
         } else if (data.success) {
             window.location.reload();
         } else {
