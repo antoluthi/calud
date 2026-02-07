@@ -211,16 +211,55 @@ try {
     // Generate order ID
     $orderId = 'PC-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
 
+    // Valider et appliquer le code promo cote serveur
+    $promoCode = $data['promoCode'] ?? null;
+    $discount = 0;
+
+    if ($promoCode) {
+        $stmtPromo = $pdo->prepare("SELECT * FROM promo_codes WHERE code = ? AND active = 1");
+        $stmtPromo->execute([strtoupper($promoCode)]);
+        $promo = $stmtPromo->fetch();
+
+        if ($promo) {
+            $valid = true;
+            if ($promo['starts_at'] && strtotime($promo['starts_at']) > time()) $valid = false;
+            if ($promo['expires_at'] && strtotime($promo['expires_at']) < time()) $valid = false;
+            if ($promo['max_uses'] !== null && $promo['used_count'] >= $promo['max_uses']) $valid = false;
+            if ($data['subtotal'] < $promo['min_order_amount']) $valid = false;
+
+            if ($valid) {
+                if ($promo['discount_type'] === 'percent') {
+                    $discount = round($data['subtotal'] * ($promo['discount_value'] / 100), 2);
+                } else {
+                    $discount = min($promo['discount_value'], $data['subtotal']);
+                }
+                // Incrementer le compteur d'utilisation
+                $pdo->prepare("UPDATE promo_codes SET used_count = used_count + 1 WHERE id = ?")->execute([$promo['id']]);
+                $promoCode = $promo['code'];
+            } else {
+                $promoCode = null;
+            }
+        } else {
+            $promoCode = null;
+        }
+    }
+
+    // Recalculer le total cote serveur
+    $subtotal = $data['subtotal'];
+    $afterDiscount = $subtotal - $discount;
+    $shipping = $afterDiscount >= 100 ? 0 : 5.90;
+    $total = $afterDiscount + $shipping;
+
     // Insert order
     $stmt = $pdo->prepare("
         INSERT INTO commandes (
             order_id, user_id, email, phone, first_name, last_name,
             address, address2, postal_code, city, country,
-            payment_method, subtotal, shipping, total, status, created_at
+            payment_method, promo_code, discount, subtotal, shipping, total, status, created_at
         ) VALUES (
             ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, 'pending', NOW()
+            ?, ?, ?, ?, ?, ?, 'pending', NOW()
         )
     ");
 
@@ -237,10 +276,18 @@ try {
         $data['city'],
         $data['country'],
         $data['paymentMethod'],
-        $data['subtotal'],
-        $data['shipping'],
-        $data['total']
+        $promoCode,
+        $discount,
+        $subtotal,
+        $shipping,
+        $total
     ]);
+
+    // Stocker le total recalcule pour l'email
+    $data['discount'] = $discount;
+    $data['promoCode'] = $promoCode;
+    $data['shipping'] = $shipping;
+    $data['total'] = $total;
 
     $commandeId = $pdo->lastInsertId();
 

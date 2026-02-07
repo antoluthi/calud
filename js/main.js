@@ -461,15 +461,40 @@ function addToCartFromModal() {
 
     updateCart();
 
-    // Visual feedback
-    const btn = document.getElementById('modalAddToCart');
-    const originalText = btn.textContent;
-    btn.textContent = '✓ Ajouté !';
-    btn.style.backgroundColor = '#34a853';
-    setTimeout(() => {
-        btn.textContent = originalText;
-        btn.style.backgroundColor = '';
-    }, 1000);
+    // Sauvegarder le nom avant de fermer (closeProductModal reset currentModalProduct)
+    var addedName = currentModalProduct ? currentModalProduct.name : 'Article';
+
+    // Fermer la modal
+    closeProductModal();
+
+    // Notification toast
+    showCartToast(addedName);
+}
+
+// Afficher une notification toast d'ajout au panier
+function showCartToast(productName) {
+    // Supprimer un toast existant
+    var existing = document.getElementById('cartToast');
+    if (existing) existing.remove();
+
+    var toast = document.createElement('div');
+    toast.id = 'cartToast';
+    toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(20,20,20,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid #2a2a2a;border-radius:100px;padding:0.75rem 1.5rem;display:flex;align-items:center;gap:0.75rem;z-index:9999;opacity:0;transition:opacity 0.3s ease,transform 0.3s ease;box-shadow:0 10px 30px rgba(0,0,0,0.4);font-family:inherit;';
+    toast.innerHTML = '<span style="width:28px;height:28px;background:rgba(74,222,128,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span style="color:#fff;font-size:0.9rem;font-weight:500;white-space:nowrap;">Ajoute au panier</span>';
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+        });
+    });
+
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(20px)';
+        setTimeout(function() { toast.remove(); }, 300);
+    }, 2500);
 }
 
 // Vérifier l'état d'authentification

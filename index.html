@@ -1868,7 +1868,7 @@
                 <span class="cart-total-label">Total</span>
                 <span class="cart-total-amount" id="cartTotal">0 &euro;</span>
             </div>
-            <button class="checkout-btn" id="checkoutBtn" disabled>Check out</button>
+            <button class="checkout-btn" id="checkoutBtn" disabled>Commander</button>
         </div>
     </div>
 
@@ -1913,7 +1913,7 @@
                     <div class="modal-price" id="modalProductPrice">0.00 &euro;</div>
                     <p class="modal-description" id="modalProductDescription">Description du produit</p>
                     <div class="modal-specs" id="modalSpecs" style="display: none;">
-                        <h4>Specifications</h4>
+                        <h4>Caracteristiques</h4>
                         <div class="specs-grid">
                             <div class="spec-item"><span class="spec-label">Dimensions</span><span class="spec-value"
                                     id="modalDimensions">-</span></div>
@@ -2240,7 +2240,7 @@
                         '<span class="quantity-display">' + item.quantity + '</span>' +
                         '<button class="qty-btn" onclick="updateQuantity(' + item.id + ', \'' + item.size + '\', 1)">+</button>' +
                         '</div>' +
-                        '<span class="item-total">Tot ' + (item.price * item.quantity) + ' \u20ac</span>' +
+                        '<span class="item-total">Total ' + (item.price * item.quantity) + ' \u20ac</span>' +
                         '</div></div>';
                 }).join('');
                 checkoutBtn.disabled = false;

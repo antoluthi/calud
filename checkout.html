@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - CRIMP.</title>
+    <title>Commander - CRIMP.</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -246,6 +246,107 @@
             font-weight: 600;
         }
 
+        .promo-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .promo-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .promo-row input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 100px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .promo-row input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .promo-row input::placeholder {
+            color: var(--text-secondary);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .promo-apply-btn {
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 100px;
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .promo-apply-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        .promo-apply-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .promo-message {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .promo-message.success { color: var(--success); }
+        .promo-message.error { color: var(--error); }
+
+        .promo-applied {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(74, 222, 128, 0.08);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            border-radius: 100px;
+            padding: 0.6rem 0.75rem 0.6rem 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .promo-applied-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .promo-remove-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .promo-remove-btn:hover { color: var(--error); }
+
         .secure-badge {
             display: flex;
             align-items: center;
@@ -269,7 +370,7 @@
 <body>
     <div class="checkout-container">
         <header class="checkout-header">
-            <h1>Checkout</h1>
+            <h1>Commander</h1>
             <a href="index.html">&larr; Retour a la boutique</a>
         </header>
 
@@ -278,6 +379,7 @@
 
     <script>
         let cart = JSON.parse(localStorage.getItem('projetcrimp_cart') || '[]');
+        let appliedPromo = null; // { code, discount_type, discount_value, discount, label }
 
         function renderCheckout() {
             const container = document.getElementById('checkoutContent');
@@ -294,8 +396,6 @@
             }
 
             const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const shipping = subtotal >= 100 ? 0 : 5.90;
-            const total = subtotal + shipping;
 
             container.innerHTML = `
                 <div class="checkout-content">
@@ -381,20 +481,15 @@
                                 `).join('')}
                             </div>
 
-                            <div class="order-totals">
-                                <div class="order-row">
-                                    <span>Sous-total</span>
-                                    <span>${subtotal.toFixed(2)} €</span>
+                            <div class="order-totals" id="orderTotals">
+                            </div>
+
+                            <div class="promo-section" id="promoSection">
+                                <div class="promo-row">
+                                    <input type="text" id="promoInput" placeholder="Code promo" autocomplete="off">
+                                    <button class="promo-apply-btn" onclick="applyPromoCode()" id="promoApplyBtn">Appliquer</button>
                                 </div>
-                                <div class="order-row">
-                                    <span>Livraison</span>
-                                    <span>${shipping === 0 ? 'Gratuite' : shipping.toFixed(2) + ' €'}</span>
-                                </div>
-                                ${shipping > 0 ? '<div class="order-row" style="font-size:0.75rem;color:var(--text-secondary);">Gratuite des 100€</div>' : ''}
-                                <div class="order-row total">
-                                    <span>Total</span>
-                                    <span>${total.toFixed(2)} €</span>
-                                </div>
+                                <div class="promo-message" id="promoMessage"></div>
                             </div>
 
                             <button class="checkout-submit" onclick="submitOrder()" id="submitBtn">
@@ -411,11 +506,114 @@
                     </div>
                 </div>
             `;
+
+            renderTotals();
+
+            // Enter pour appliquer le code promo
+            var promoInput = document.getElementById('promoInput');
+            if (promoInput) {
+                promoInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { e.preventDefault(); applyPromoCode(); }
+                });
+            }
+        }
+
+        function renderTotals() {
+            var totalsEl = document.getElementById('orderTotals');
+            if (!totalsEl) return;
+
+            var subtotal = cart.reduce(function(sum, item) { return sum + (item.price * item.quantity); }, 0);
+            var discount = appliedPromo ? appliedPromo.discount : 0;
+            var afterDiscount = subtotal - discount;
+            var shipping = afterDiscount >= 100 ? 0 : 5.90;
+            var total = afterDiscount + shipping;
+
+            var html = '<div class="order-row"><span>Sous-total</span><span>' + subtotal.toFixed(2) + ' \u20ac</span></div>';
+
+            if (appliedPromo) {
+                html += '<div class="order-row" style="color:var(--success);"><span>Reduction (' + appliedPromo.label + ')</span><span>-' + discount.toFixed(2) + ' \u20ac</span></div>';
+                html += '<div class="promo-applied"><span class="promo-applied-info">\ud83c\udff7\ufe0f ' + appliedPromo.code + '</span><button class="promo-remove-btn" onclick="removePromoCode()" title="Retirer">&times;</button></div>';
+            }
+
+            html += '<div class="order-row"><span>Livraison</span><span>' + (shipping === 0 ? 'Gratuite' : shipping.toFixed(2) + ' \u20ac') + '</span></div>';
+            if (shipping > 0) {
+                html += '<div class="order-row" style="font-size:0.75rem;color:var(--text-secondary);">Gratuite d\u00e8s 100\u20ac</div>';
+            }
+            html += '<div class="order-row total"><span>Total</span><span>' + total.toFixed(2) + ' \u20ac</span></div>';
+
+            totalsEl.innerHTML = html;
+
+            // Masquer le formulaire promo si un code est applique
+            var promoSection = document.getElementById('promoSection');
+            if (promoSection) {
+                promoSection.style.display = appliedPromo ? 'none' : 'block';
+            }
+        }
+
+        async function applyPromoCode() {
+            var input = document.getElementById('promoInput');
+            var msgEl = document.getElementById('promoMessage');
+            var btn = document.getElementById('promoApplyBtn');
+            var code = input.value.trim();
+
+            if (!code) {
+                msgEl.className = 'promo-message error';
+                msgEl.textContent = 'Entrez un code promo';
+                return;
+            }
+
+            var subtotal = cart.reduce(function(sum, item) { return sum + (item.price * item.quantity); }, 0);
+
+            btn.disabled = true;
+            btn.textContent = '...';
+            msgEl.textContent = '';
+
+            try {
+                var response = await fetch('api/promo-validate.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code, subtotal: subtotal })
+                });
+                var data = await response.json();
+
+                if (data.valid) {
+                    appliedPromo = {
+                        code: data.code,
+                        discount_type: data.discount_type,
+                        discount_value: data.discount_value,
+                        discount: data.discount,
+                        label: data.label
+                    };
+                    input.value = '';
+                    msgEl.textContent = '';
+                    renderTotals();
+                } else {
+                    msgEl.className = 'promo-message error';
+                    msgEl.textContent = data.error || 'Code invalide';
+                }
+            } catch (e) {
+                msgEl.className = 'promo-message error';
+                msgEl.textContent = 'Erreur de connexion';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Appliquer';
+            }
+        }
+
+        function removePromoCode() {
+            appliedPromo = null;
+            renderTotals();
         }
 
         async function submitOrder() {
             const btn = document.getElementById('submitBtn');
             const messageDiv = document.getElementById('checkoutMessage');
+
+            var subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            var discount = appliedPromo ? appliedPromo.discount : 0;
+            var afterDiscount = subtotal - discount;
+            var shipping = afterDiscount >= 100 ? 0 : 5.90;
+            var total = afterDiscount + shipping;
 
             const formData = {
                 email: document.getElementById('email').value,
@@ -429,11 +627,12 @@
                 country: document.getElementById('country').value,
                 paymentMethod: 'transfer',
                 items: cart,
-                subtotal: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                subtotal: subtotal,
+                discount: discount,
+                promoCode: appliedPromo ? appliedPromo.code : null,
+                shipping: shipping,
+                total: total,
             };
-
-            formData.shipping = formData.subtotal >= 100 ? 0 : 5.90;
-            formData.total = formData.subtotal + formData.shipping;
 
             const required = ['email', 'firstName', 'lastName', 'address', 'postalCode', 'city'];
             for (const field of required) {
