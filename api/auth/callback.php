@@ -91,25 +91,28 @@ if ($existingUser) {
 
     if ($emailUser) {
         // Fusionner : ajouter google_id au compte email existant, garder son password_hash
+        // Marquer email_verified = 1 (Google a verifie l'email)
         $stmt = $db->prepare("
             UPDATE users
-            SET google_id = ?, name = ?, picture = ?, last_login = CURRENT_TIMESTAMP
+            SET google_id = ?, name = ?, picture = ?, email_verified = 1, verification_token = NULL, verification_token_expires = NULL, last_login = CURRENT_TIMESTAMP
             WHERE id = ?
         ");
         $stmt->execute([$googleId, $name, $picture, $emailUser['id']]);
         $userId = $emailUser['id'];
     } else {
-        // 3. Nouveau utilisateur Google
+        // 3. Nouveau utilisateur Google (email auto-verifie par Google)
         $stmt = $db->prepare("
-            INSERT INTO users (google_id, email, name, picture, auth_method)
-            VALUES (?, ?, ?, ?, 'google')
+            INSERT INTO users (google_id, email, name, picture, auth_method, email_verified)
+            VALUES (?, ?, ?, ?, 'google', 1)
         ");
         $stmt->execute([$googleId, $email, $name, $picture]);
         $userId = $db->lastInsertId();
     }
 }
 
-// Enregistrer l'utilisateur dans la session
+// Regenerer l'ID de session (anti session fixation)
+session_regenerate_id(true);
+
 $_SESSION['user_id'] = $userId;
 $_SESSION['user_email'] = $email;
 $_SESSION['user_name'] = $name;

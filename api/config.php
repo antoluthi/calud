@@ -7,6 +7,14 @@
 
 // Démarrer la session si pas déjà démarrée
 if (session_status() === PHP_SESSION_NONE) {
+    $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'secure' => $isSecure,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
     session_start();
 }
 
@@ -39,10 +47,12 @@ define('REDIRECT_URI', BASE_URL . '/api/auth/callback.php');
 
 // Configuration des erreurs
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
 // Headers CORS pour permettre les requêtes depuis le frontend
-header('Access-Control-Allow-Origin: *');
+$allowedOrigin = $_ENV['BASE_URL'] ?? 'http://localhost:8000';
+header('Access-Control-Allow-Origin: ' . $allowedOrigin);
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Content-Type: application/json; charset=utf-8');
